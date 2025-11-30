@@ -231,9 +231,9 @@ const TRANSLATIONS = {
         // Progress Bar
         pbWhy: "क्यों",
         pbYou: "आप",
-        pbExecutor: "Executor (निष्पादक)",
-        pbHeirs: "Beneficiaries (वारिस)",
-        pbAssets: "Assets (संपत्ति)",
+        pbExecutor: "निष्पादक",
+        pbHeirs: "वारिस",
+        pbAssets: "संपत्ति",
         pbGenerate: "बनाएं",
 
         // Step 0: Education
