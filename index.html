@@ -1,0 +1,2261 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Sahay V30 - Final & Detailed</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
+    <style>
+        .step-section {
+            display: none;
+        }
+
+        .step-section.active {
+            display: block;
+            animation: fadeIn 0.4s ease-out;
+        }
+
+        .fade-in {
+            animation: fadeIn 0.3s;
+        }
+
+        @keyframes fadeIn {
+            from {
+                opacity: 0;
+                transform: translateY(10px);
+            }
+
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        #save-toast {
+            transition: opacity 0.5s;
+            opacity: 0;
+        }
+
+        #save-toast.show {
+            opacity: 1;
+        }
+
+        .error-border {
+            border-color: #ef4444 !important;
+            box-shadow: 0 0 0 1px #ef4444 !important;
+        }
+
+        /* Custom Scrollbar for modal content if needed */
+        .modal-content {
+            max-height: 80vh;
+            overflow-y: auto;
+        }
+
+        /* Asset Card Transitions */
+        .asset-body-transition {
+            transition: max-height 0.3s ease-in-out, opacity 0.3s ease-in-out;
+            overflow: hidden;
+        }
+
+        .rotate-180 {
+            transform: rotate(180deg);
+        }
+
+        /* Preview Paper Style */
+        .preview-paper {
+            background: white;
+            box-shadow: 0 0 15px rgba(0, 0, 0, 0.1);
+            min-height: 297mm;
+            padding: 25mm;
+            font-family: 'Times New Roman', Times, serif;
+            color: #000;
+            line-height: 1.6;
+            font-size: 12pt;
+        }
+
+        .preview-placeholder {
+            color: #9ca3af;
+            background-color: #f3f4f6;
+            padding: 0 4px;
+            border-radius: 2px;
+            font-style: italic;
+        }
+    </style>
+    <link rel="stylesheet" href="/index.css">
+    <script type="importmap">
+{
+  "imports": {
+    "react": "https://aistudiocdn.com/react@^19.2.0"
+  }
+}
+</script>
+</head>
+
+<body class="bg-slate-100 text-slate-800 font-sans pb-20" onload="initApp()">
+
+    <!-- Header -->
+    <header class="bg-indigo-900 text-white shadow-md sticky top-0 z-50">
+        <div class="max-w-5xl mx-auto flex justify-between items-center px-4 pt-3 pb-1">
+            <div class="cursor-pointer" onclick="goToStep(0)">
+                <h1 class="text-xl font-bold">Sahay <span class="text-indigo-300 font-normal">| Will Creator</span></h1>
+                <span id="save-status"
+                    class="text-[10px] bg-green-600 px-1 rounded text-white tracking-widest transition-colors">READY</span>
+            </div>
+            <div class="flex gap-2">
+                <button onclick="toggleLanguage()"
+                    class="flex items-center gap-2 bg-white text-indigo-700 hover:bg-indigo-50 px-3 py-1 rounded text-sm font-bold transition border border-indigo-200">
+                    <span class="text-lg">🌐</span> <span id="lang-toggle-text">हिंदी</span>
+                </button>
+                <button onclick="openPreview()"
+                    class="flex items-center gap-2 bg-indigo-50 text-indigo-700 hover:bg-indigo-100 px-3 py-1 rounded text-sm font-bold transition border border-indigo-200">
+                    <span class="text-lg">👁️</span> <span data-i18n="btnPreview">Preview Will</span>
+                </button>
+            </div>
+        </div>
+
+        <!-- Milestone Stepper -->
+        <div class="w-full bg-indigo-900 pb-8 pt-2 px-4">
+            <div class="max-w-3xl mx-auto relative flex items-center justify-between">
+                <!-- Background Line -->
+                <div class="absolute left-0 top-[15px] w-full h-0.5 bg-indigo-950 rounded z-0"></div>
+                <!-- Active Line -->
+                <div id="stepper-line"
+                    class="absolute left-0 top-[15px] h-0.5 bg-green-500 rounded transition-all duration-500 z-0"
+                    style="width: 0%"></div>
+
+                <!-- Steps -->
+                <div id="step-node-0" onclick="navigateToStep(0)"
+                    class="relative z-10 flex flex-col items-center w-8 cursor-pointer">
+                    <div
+                        class="step-circle w-8 h-8 rounded-full border-2 flex items-center justify-center text-xs font-bold bg-indigo-900 border-indigo-500 text-indigo-400 transition-all duration-300">
+                        1</div>
+                    <span
+                        class="absolute top-full left-1/2 -translate-x-1/2 w-max text-[10px] mt-1 font-medium text-indigo-400 transition-colors duration-300"
+                        data-i18n="pbWhy">Why</span>
+                </div>
+                <div id="step-node-1" onclick="navigateToStep(1)"
+                    class="relative z-10 flex flex-col items-center w-8 cursor-pointer">
+                    <div
+                        class="step-circle w-8 h-8 rounded-full border-2 flex items-center justify-center text-xs font-bold bg-indigo-900 border-indigo-500 text-indigo-400 transition-all duration-300">
+                        2</div>
+                    <span
+                        class="absolute top-full left-1/2 -translate-x-1/2 w-max text-[10px] mt-1 font-medium text-indigo-400 transition-colors duration-300"
+                        data-i18n="pbYou">You</span>
+                </div>
+                <div id="step-node-2" onclick="navigateToStep(2)"
+                    class="relative z-10 flex flex-col items-center w-8 cursor-pointer">
+                    <div
+                        class="step-circle w-8 h-8 rounded-full border-2 flex items-center justify-center text-xs font-bold bg-indigo-900 border-indigo-500 text-indigo-400 transition-all duration-300">
+                        3</div>
+                    <span
+                        class="absolute top-full left-1/2 -translate-x-1/2 w-max text-[10px] mt-1 font-medium text-indigo-400 transition-colors duration-300"
+                        data-i18n="pbExecutor">Executor</span>
+                </div>
+                <div id="step-node-3" onclick="navigateToStep(3)"
+                    class="relative z-10 flex flex-col items-center w-8 cursor-pointer">
+                    <div
+                        class="step-circle w-8 h-8 rounded-full border-2 flex items-center justify-center text-xs font-bold bg-indigo-900 border-indigo-500 text-indigo-400 transition-all duration-300">
+                        4</div>
+                    <span
+                        class="absolute top-full left-1/2 -translate-x-1/2 w-max text-[10px] mt-1 font-medium text-indigo-400 transition-colors duration-300"
+                        data-i18n="pbHeirs">Heirs</span>
+                </div>
+                <div id="step-node-4" onclick="navigateToStep(4)"
+                    class="relative z-10 flex flex-col items-center w-8 cursor-pointer">
+                    <div
+                        class="step-circle w-8 h-8 rounded-full border-2 flex items-center justify-center text-xs font-bold bg-indigo-900 border-indigo-500 text-indigo-400 transition-all duration-300">
+                        5</div>
+                    <span
+                        class="absolute top-full left-1/2 -translate-x-1/2 w-max text-[10px] mt-1 font-medium text-indigo-400 transition-colors duration-300"
+                        data-i18n="pbAssets">Assets</span>
+                </div>
+                <div id="step-node-5" onclick="navigateToStep(5)"
+                    class="relative z-10 flex flex-col items-center w-8 cursor-pointer">
+                    <div
+                        class="step-circle w-8 h-8 rounded-full border-2 flex items-center justify-center text-xs font-bold bg-indigo-900 border-indigo-500 text-indigo-400 transition-all duration-300">
+                        6</div>
+                    <span
+                        class="absolute top-full left-1/2 -translate-x-1/2 w-max text-[10px] mt-1 font-medium text-indigo-400 transition-colors duration-300"
+                        data-i18n="pbGenerate">Generate</span>
+                </div>
+            </div>
+        </div>
+    </header>
+
+    <div id="save-toast" class="fixed bottom-4 right-4 bg-gray-800 text-white px-4 py-2 rounded text-xs z-50">Draft
+        Saved...</div>
+
+    <main class="max-w-5xl mx-auto p-6 mt-6 bg-white shadow-xl rounded-lg min-h-[600px] relative">
+
+        <!-- STEP 0: EDUCATION -->
+        <div id="step-0" class="step-section active space-y-6 fade-in">
+            <h2 class="text-3xl font-bold text-slate-800" data-i18n="s0Title">1. Why Create a Will?</h2>
+
+            <!-- DISCLAIMER -->
+            <div class="bg-gray-100 border-l-4 border-gray-500 p-4 rounded shadow-sm">
+                <p class="text-xs text-gray-600 italic leading-relaxed">
+                    <strong data-i18n="disclaimerTitle">Disclaimer:</strong> <span data-i18n="disclaimerText">This
+                        website is a self-help educational tool and does not provide legal advice. The generated
+                        document is a draft based on standard Indian legal templates. For complex estates, disputes, or
+                        tax planning, please consult a qualified lawyer. This tool has no official legal
+                        standing.</span>
+                </p>
+            </div>
+
+            <div class="grid grid-cols-1 gap-6">
+                <div class="bg-orange-50 border-l-4 border-orange-500 p-6 rounded shadow-sm">
+                    <h3 class="font-bold text-orange-900 text-xl mb-2" data-i18n="nomineeTitle">⚠️ The Truth About
+                        "Nominees"</h3>
+                    <div class="text-sm text-slate-700 space-y-2">
+                        <p data-i18n="nomineeText">There is a dangerous misconception in India that a Nominee becomes
+                            the owner
+                            of the asset upon death. <strong>This is false.</strong></p>
+                        <p><strong data-i18n="legalRealityTitle">The Legal Reality:</strong> <span
+                                data-i18n="legalRealityText">A Nominee is merely a "Trustee" or "Custodian." Their
+                                only job is to hold the money/asset until it can be distributed to the <strong>Legal
+                                    Heirs</strong>.</span></p>
+                        <p><strong data-i18n="consequenceTitle">The Consequence:</strong> <span
+                                data-i18n="consequenceText">If you don't write a Will, your Nominee might have to fight
+                                legal battles with other relatives who claim a share of your wealth under religious
+                                succession laws. A Will overrides this and makes your wish the final law.</span></p>
+                    </div>
+                </div>
+                <div class="bg-blue-50 border-l-4 border-blue-500 p-6 rounded shadow-sm">
+                    <h3 class="font-bold text-blue-900 text-xl mb-2" data-i18n="offlineTitle">📝 You Can Do This Offline
+                        (No App Needed)</h3>
+                    <div class="text-sm text-slate-700 space-y-2">
+                        <p data-i18n="offlineText">We built this app to help you, but you should know your rights. You
+                            can create a perfectly
+                            valid Will on a plain piece of A4 paper.</p>
+                        <ul class="list-disc pl-5 space-y-1">
+                            <li><strong data-i18n="noStampTitle">No Stamp Paper:</strong> <span
+                                    data-i18n="noStampText">A Will does NOT need to be written on stamp paper.</span>
+                            </li>
+                            <li><strong data-i18n="handwrittenTitle">Handwritten is Best:</strong> <span
+                                    data-i18n="handwrittenText">Courts often trust handwritten wills more than
+                                    typed ones as they are harder to forge.</span></li>
+                            <li><strong data-i18n="goldenRuleTitle">The Golden Rule:</strong> <span
+                                    data-i18n="goldenRuleText">You must sign it in the presence of <strong>Two
+                                        Witnesses</strong>, and they must sign it immediately after you.</span></li>
+                            <li><strong data-i18n="registrationTitle">Registration:</strong> <span
+                                    data-i18n="registrationText">While optional, registering your Will at the
+                                    Sub-Registrar's office is highly recommended.</span></li>
+                        </ul>
+                    </div>
+                </div>
+            </div>
+
+            <!-- RESUME BANNER -->
+            <div id="resume-banner" class="hidden bg-green-50 border border-green-200 p-4 rounded text-center mt-4">
+                <p class="font-bold text-green-800 mb-3" data-i18n="resumeDraftTitle">We found a saved draft!</p>
+                <div class="flex flex-col md:flex-row justify-center items-center gap-3">
+                    <button onclick="resumeJourney()"
+                        class="bg-green-600 text-white font-bold py-2 px-6 rounded shadow hover:bg-green-700 text-sm"
+                        data-i18n="btnResume">Resume
+                        Draft</button>
+                    <button onclick="startFresh()"
+                        class="bg-white border border-red-300 text-red-500 font-bold py-2 px-4 rounded hover:bg-red-50 text-sm"
+                        data-i18n="btnStartFresh">Start
+                        Fresh (Delete Data)</button>
+                </div>
+            </div>
+
+            <div id="start-btn-container" class="text-center mt-6">
+                <button onclick="navigateToStep(1)"
+                    class="bg-indigo-600 text-white text-lg font-bold py-4 px-10 rounded-full shadow-lg hover:bg-indigo-700 transition transform hover:-translate-y-1"
+                    data-i18n="btnStart">Start
+                    Creating My Will</button>
+            </div>
+        </div>
+
+        <!-- STEP 1: YOUR DETAILS & RELIGION (Merged) -->
+        <div id="step-1" class="step-section space-y-5 fade-in">
+            <h2 class="text-2xl font-bold text-gray-700 border-b pb-2" data-i18n="s1Title">2. Your Details & Religion
+            </h2>
+
+            <!-- RELIGION SECTION (Merged) -->
+            <div class="bg-indigo-50 border border-indigo-200 p-4 rounded text-sm text-indigo-900 mb-4">
+                <strong data-i18n="legalContextTitle">Legal Context:</strong> <span
+                    data-i18n="legalContextText">Succession laws in India differ based on religion.</span>
+            </div>
+            <div class="space-y-2 mb-6 border-b pb-6">
+                <label class="block font-medium"><span data-i18n="lblReligion">Select your Religion:</span> <span
+                        class="text-red-500">*</span></label>
+                <select id="religionSelector" onchange="removeError(this); checkReligion(); saveData()"
+                    class="w-full border p-3 rounded bg-white required-field">
+                    <option value="" data-i18n="optSelect">-- Select --</option>
+                    <option value="Hindu" data-i18n="optHindu">Hindu (incl. Sikh, Jain, Buddhist)</option>
+                    <option value="Christian" data-i18n="optChristian">Christian / Parsi</option>
+                    <option value="Muslim" data-i18n="optMuslim">Muslim</option>
+                    <option value="Other" data-i18n="optOther">Other</option>
+                </select>
+
+                <div id="other-religion-wrapper" class="hidden mt-3">
+                    <label class="block text-xs font-bold text-gray-500 mb-1" data-i18n="lblCustomReligion">Please
+                        specify your religion:</label>
+                    <input type="text" id="customReligion" oninput="saveData()" class="w-full border p-3 rounded"
+                        placeholder="e.g. Jewish, Baháʼí" data-i18n-placeholder="phCustomReligion">
+                </div>
+
+                <div id="muslim-warning"
+                    class="hidden bg-blue-50 border-l-4 border-blue-500 p-4 rounded mt-2 shadow-sm">
+                    <h4 class="font-bold text-blue-900 text-sm mb-2 flex items-center gap-2">
+                        <span class="text-xl">ℹ️</span> <span data-i18n="muslimWarningTitle">Important for Muslims
+                            (Sharia Law)</span>
+                    </h4>
+                    <div class="text-xs text-blue-800 space-y-2 leading-relaxed">
+                        <p data-i18n="muslimWarningText1">Under Islamic Succession Laws, the testamentary freedom is
+                            limited:</p>
+                        <ul class="list-disc pl-4 space-y-1">
+                            <li><strong data-i18n="mwRuleTitle">The 1/3rd Rule:</strong> <span
+                                    data-i18n="mwRuleText">You can generally only bequeath up to 1/3rd of your total
+                                    estate through a Will. The remaining 2/3rds must be distributed to your legal heirs
+                                    according to fixed shares in the Quran.</span>
+                            </li>
+                            <li><strong data-i18n="mwConsentTitle">Consent Required:</strong> <span
+                                    data-i18n="mwConsentText">If you wish to give more than 1/3rd, or if you wish to
+                                    give any amount to a legal heir who is already receiving a fixed share, you
+                                    typically need the consent of all other heirs after your death. Without this
+                                    consent, that part of the Will may be invalid.</span></li>
+                        </ul>
+                    </div>
+                </div>
+
+                <div id="hindu-warning"
+                    class="hidden bg-orange-50 border-l-4 border-orange-500 p-4 rounded mt-2 shadow-sm">
+                    <h4 class="font-bold text-orange-900 text-sm mb-2 flex items-center gap-2">
+                        <span class="text-xl">ℹ️</span> <span data-i18n="hinduWarningTitle">Hindu Succession Act</span>
+                    </h4>
+                    <div class="text-xs text-orange-800 space-y-2 leading-relaxed">
+                        <p class="mb-2"><strong data-i18n="hwNoteTitle">Note:</strong> <span data-i18n="hwNoteText">For
+                                the purpose of succession laws in India, Sikhs, Jains, and Buddhists are governed by the
+                                Hindu Succession Act.</span>
+                        </p>
+                        <h5 class="font-bold" data-i18n="hwPropTitle">Ancestral vs. Self-Acquired Property:</h5>
+                        <ul class="list-disc pl-4 space-y-1">
+                            <li><strong data-i18n="hwSelfTitle">Self-Acquired Property:</strong> <span
+                                    data-i18n="hwSelfText">Assets you earned or bought yourself. You have 100% freedom
+                                    to give these to anyone you like.</span></li>
+                            <li><strong data-i18n="hwAncestralTitle">Ancestral Property:</strong> <span
+                                    data-i18n="hwAncestralText">Property inherited from up to 4 generations back. You
+                                    cannot Will away the entire property, only your share of it. Other family members
+                                    (coparceners) have a birthright in this property.</span></li>
+                        </ul>
+                    </div>
+                </div>
+            </div>
+
+            <!-- PERSONAL DETAILS -->
+            <div class="grid gap-4">
+                <div><label class="text-xs font-bold text-gray-500"><span data-i18n="lblFullName">Full Legal Name</span>
+                        <span class="text-red-500">*</span></label><input type="text" id="myName"
+                        oninput="removeError(this); saveData()" class="w-full border p-3 rounded required-field"
+                        placeholder="e.g. Rahul Sharma" data-i18n-placeholder="phFullName"></div>
+                <div class="grid grid-cols-2 gap-4">
+                    <div>
+                        <label class="text-xs font-bold text-gray-500"><span data-i18n="lblFatherName">Parent / Spouse
+                                Name</span> <span class="text-red-500">*</span></label>
+                        <div class="flex gap-2">
+                            <select id="myRelPrefix" onchange="saveData()"
+                                class="w-28 border p-3 rounded bg-white text-sm">
+                                <option value="S/o" data-i18n="optSonOf">Son of</option>
+                                <option value="D/o" data-i18n="optDaughterOf">Daughter of</option>
+                                <option value="W/o" data-i18n="optWifeOf">Wife of</option>
+                            </select>
+                            <input type="text" id="fatherName" oninput="removeError(this); saveData()"
+                                class="w-full border p-3 rounded required-field" placeholder="Name"
+                                data-i18n-placeholder="phFatherName">
+                        </div>
+                    </div>
+                    <div><label class="text-xs font-bold text-gray-500" data-i18n="lblDob">Date of Birth</label><input
+                            type="date" id="myDob" onchange="saveData()" class="w-full border p-3 rounded"></div>
+                </div>
+
+                <div><label class="text-xs font-bold text-gray-500"><span data-i18n="lblAddress">Permanent
+                            Address</span> <span class="text-red-500">*</span></label><textarea id="myAddress"
+                        oninput="removeError(this); saveData()" class="w-full border p-3 rounded h-20 required-field"
+                        placeholder="Full Address" data-i18n-placeholder="phAddress"></textarea></div>
+
+                <div>
+                    <label class="text-xs font-bold text-gray-500"><span data-i18n="lblPlace">City/Place of Signing
+                            Will</span> <span class="text-red-500">*</span></label>
+                    <input type="text" id="myPlace" oninput="removeError(this); saveData()"
+                        class="w-full border p-3 rounded required-field" placeholder="e.g. Mumbai, Maharashtra"
+                        data-i18n-placeholder="phPlace">
+                    <p class="text-[10px] text-gray-400 mt-1" data-i18n="placeHelper">This establishes the legal
+                        jurisdiction.</p>
+                </div>
+            </div>
+            <div class="flex justify-between pt-4">
+                <button onclick="goToStep(0)" class="text-gray-500" data-i18n="btnBack">← Back</button>
+                <button onclick="validateAndNext(1, 2)" class="bg-indigo-600 text-white px-6 py-2 rounded"
+                    data-i18n="btnNextExecutor">Next: Executor</button>
+            </div>
+        </div>
+
+        <!-- STEP 2: EXECUTOR (Renumbered) -->
+        <div id="step-2" class="step-section space-y-5 fade-in">
+            <h2 class="text-2xl font-bold text-gray-700 border-b pb-2" data-i18n="s2Title">3. The Executor</h2>
+            <!-- Clean UI, No Box, No ID -->
+            <div class="grid gap-4">
+
+                <div class="bg-indigo-50 border-l-4 border-indigo-400 p-2 text-[11px] text-indigo-900 leading-tight">
+                    <strong data-i18n="s2NoteTitle">Note:</strong> <span data-i18n="s2NoteText">The Executor must be a
+                        Major (18+ years) and of Sound Mind. They will legally represent you after death.</span>
+                </div>
+
+                <div><label class="text-xs font-bold text-gray-500"><span data-i18n="lblExName">Executor Name</span>
+                        <span class="text-red-500">*</span></label><input type="text" id="exName"
+                        oninput="removeError(this); saveData()" class="w-full border p-3 rounded required-field"
+                        placeholder="Full Name" data-i18n-placeholder="phExName"></div>
+                <div class="grid grid-cols-1 gap-4">
+                    <div>
+                        <label class="text-xs font-bold text-gray-500"><span data-i18n="lblExRel">Relationship</span>
+                            <span class="text-red-500">*</span></label>
+                        <input type="text" id="exRel" oninput="removeError(this); saveData()"
+                            class="w-full border p-3 rounded required-field" placeholder="e.g. Brother"
+                            data-i18n-placeholder="phExRel">
+                        <p class="text-[10px] text-gray-400 mt-1" data-i18n="exRelHelper">Helps distinguish them from
+                            others with similar names.</p>
+                    </div>
+                </div>
+
+                <div><label class="text-xs font-bold text-gray-500"><span data-i18n="lblExAddress">Executor
+                            Address</span> <span class="text-red-500">*</span></label><input type="text" id="exAddress"
+                        oninput="removeError(this); saveData()" class="w-full border p-3 rounded required-field"
+                        placeholder="Current Address" data-i18n-placeholder="phExAddress"></div>
+
+                <div>
+                    <label class="text-xs font-bold text-gray-500"><span data-i18n="lblExParentName">Executor's Parent /
+                            Spouse Name</span> <span class="text-red-500">*</span></label>
+                    <div class="flex gap-2">
+                        <select id="exRelPrefix" onchange="saveData()" class="w-28 border p-3 rounded bg-white text-sm">
+                            <option value="S/o" data-i18n="optSonOf">Son of</option>
+                            <option value="D/o" data-i18n="optDaughterOf">Daughter of</option>
+                            <option value="W/o" data-i18n="optWifeOf">Wife of</option>
+                        </select>
+                        <input type="text" id="exParentName" oninput="removeError(this); saveData()"
+                            class="w-full border p-3 rounded required-field" placeholder="Name"
+                            data-i18n-placeholder="phFatherName">
+                    </div>
+                </div>
+            </div>
+            <div class="flex justify-between pt-4">
+                <button onclick="goToStep(1)" class="text-gray-500" data-i18n="btnBack">← Back</button>
+                <button onclick="validateAndNext(2, 3)" class="bg-indigo-600 text-white px-6 py-2 rounded"
+                    data-i18n="btnNextBeneficiaries">Next: Beneficiaries</button>
+            </div>
+        </div>
+
+        <!-- STEP 3: BENEFICIARIES (Renumbered) -->
+        <div id="step-3" class="step-section space-y-6 fade-in">
+            <h2 class="text-2xl font-bold text-gray-700 border-b pb-2" data-i18n="s3Title">4. Your Beneficiaries</h2>
+
+            <div class="bg-blue-50 border border-blue-200 text-blue-800 text-sm p-3 rounded flex gap-3 items-start">
+                <span class="text-xl">💡</span>
+                <div><strong data-i18n="s3TipTitle">Flexible Management:</strong> <span data-i18n="s3TipText">Add your
+                        heirs below. You can assign assets to them in the next step.</span></div>
+            </div>
+
+            <!-- Beneficiary List Container -->
+            <div id="beneficiary-container" class="space-y-4"></div>
+
+            <button onclick="addBeneficiaryRow()"
+                class="w-full py-3 border-2 border-dashed border-blue-300 text-blue-600 font-semibold rounded hover:bg-blue-50 hover:shadow-md transition"
+                data-i18n="btnAddBeneficiary">+
+                Add New Beneficiary</button>
+
+            <div class="flex justify-between pt-4">
+                <button onclick="goToStep(2)" class="text-gray-500" data-i18n="btnBack">← Back</button>
+                <button onclick="validateAndMoveToAssets()" class="bg-indigo-600 text-white px-6 py-2 rounded"
+                    data-i18n="btnNextAssets">Next: Distribute Assets</button>
+            </div>
+        </div>
+
+        <!-- STEP 4: ASSETS (Renumbered) -->
+        <div id="step-4" class="step-section space-y-6 fade-in">
+            <h2 class="text-2xl font-bold text-gray-700 border-b pb-2" data-i18n="s4Title">5. Distribute Assets</h2>
+
+
+            <!-- Privacy Warning Info Box -->
+            <div class="bg-blue-50 border-l-4 border-blue-500 p-4 rounded text-sm shadow-sm mb-4">
+                <h3 class="font-bold text-blue-900 mb-2" data-i18n="s4TipsTitle">💡 Asset Identification Tips</h3>
+                <p class="text-blue-800 mb-2" data-i18n="s4TipsText">You can describe assets in general terms or include
+                    specific details to help your executor locate them.</p>
+                <div class="bg-yellow-50 border border-yellow-200 rounded p-3 mt-2">
+                    <p class="text-yellow-900 text-xs"><strong data-i18n="s4PrivacyTitle">⚠️ Privacy Note:</strong>
+                        <span data-i18n="s4PrivacyText">Wills may become public records during probate. Consider:</span>
+                    </p>
+                    <ul class="text-yellow-900 text-xs ml-4 mt-1 list-disc">
+                        <li data-i18n="s4PrivacyPt1">Using partial identifiers (e.g. "Account ending in 1234")</li>
+                        <li data-i18n="s4PrivacyPt2">Keeping full details in a separate private Asset Inventory document
+                            that you give directly to your executor (not filed with the Will)</li>
+                    </ul>
+                </div>
+            </div>
+
+            <!-- PRIMARY ASSETS CARD -->
+            <div
+                class="bg-white rounded-lg shadow-sm border border-gray-200 overflow-hidden ring-2 ring-transparent hover:ring-indigo-50 transition-all mb-6">
+                <!-- Header -->
+                <div class="bg-white p-4 border-b border-gray-100 flex items-center gap-3 select-none">
+                    <div
+                        class="w-10 h-10 rounded-full bg-blue-50 flex items-center justify-center text-blue-600 font-bold text-xl">
+                        A</div>
+                    <div>
+                        <h3 class="font-bold text-gray-800 text-sm" data-i18n="s4SpecificTitle">Specific Assets</h3>
+                        <p class="text-xs text-gray-500" data-i18n="s4SpecificDesc">Add detailed assets (Flat, Bank A/C,
+                            Insurance, etc.) here.</p>
+                    </div>
+                </div>
+
+                <!-- Body -->
+                <div class="p-4 md:p-6 bg-slate-50">
+                    <div id="asset-container" class="space-y-4 mb-4"></div>
+
+                    <button onclick="addAssetRow()"
+                        class="w-full py-3 border-2 border-dashed border-indigo-300 text-indigo-600 font-semibold rounded hover:bg-indigo-50 hover:shadow-md transition flex items-center justify-center gap-2"
+                        data-i18n="btnAddAsset">
+                        <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4">
+                            </path>
+                        </svg>
+                        Add Another Asset
+                    </button>
+                </div>
+            </div>
+
+            <!-- RESIDUAL CLAUSE CARD (UNIFIED UI) -->
+            <div
+                class="bg-white rounded-lg shadow-sm border border-gray-200 overflow-hidden ring-2 ring-transparent hover:ring-indigo-50 transition-all">
+                <!-- Header -->
+                <div class="bg-white p-4 border-b border-gray-100 flex justify-between items-center select-none">
+                    <div class="flex items-center gap-3">
+                        <div
+                            class="w-10 h-10 rounded-full bg-orange-50 flex items-center justify-center text-orange-500 font-bold text-xl">
+                            R</div>
+                        <div>
+                            <h3 class="font-bold text-gray-800 text-sm" data-i18n="s4ResidualTitle">Residual Assets
+                                (Everything Else)</h3>
+                            <p class="text-xs text-gray-500" data-i18n="s4ResidualDesc">Covers assets not listed above
+                                or future acquisitions.</p>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Body -->
+                <div class="p-4 md:p-6 bg-slate-50">
+                    <div id="residual-shares-list" class="space-y-2"></div>
+
+                    <button onclick="addResidualShare()"
+                        class="w-full py-3 border-2 border-dashed border-indigo-300 text-indigo-600 font-semibold rounded hover:bg-indigo-50 hover:shadow-md transition flex items-center justify-center gap-2 mt-4"
+                        data-i18n="btnAddResidual">
+                        <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4">
+                            </path>
+                        </svg>
+                        Add Residual Beneficiary
+                    </button>
+                </div>
+            </div>
+
+            <div class="flex justify-between pt-8">
+                <button onclick="goToStep(3)" class="text-gray-500" data-i18n="btnBack">← Back</button>
+                <button onclick="finishJourney()"
+                    class="bg-green-600 text-white px-6 py-2 rounded font-bold shadow hover:bg-green-700"
+                    data-i18n="btnFinish">Finish &
+                    Review</button>
+            </div>
+        </div>
+
+        <!-- PREVIEW OVERLAY -->
+        <div id="preview-overlay"
+            class="hidden fixed inset-0 bg-gray-900 bg-opacity-75 z-50 flex justify-center overflow-y-auto py-10 backdrop-blur-sm fade-in"
+            onclick="if(event.target === this) closePreview()">
+            <div class="relative w-full max-w-[210mm] mx-auto">
+                <button onclick="closePreview()"
+                    class="fixed top-4 right-4 bg-white text-gray-800 px-4 py-2 rounded-full font-bold shadow-lg hover:bg-gray-100 z-50 flex items-center gap-2"
+                    data-i18n="btnClosePreview">
+                    <span>✕</span> Close Preview
+                </button>
+
+                <div class="preview-paper" id="preview-content">
+                    <!-- Content injected via JS -->
+                </div>
+
+                <div class="text-center mt-8 mb-10 text-white text-sm opacity-75" data-i18n="previewDisclaimer">
+                    This is a preview. Final formatting may vary slightly in the PDF.
+                </div>
+            </div>
+        </div>
+
+        <!-- SUCCESS OVERLAY (UPDATED FOR DOWNLOAD OPTIONS) -->
+        <div id="success-overlay" class="hidden bg-white z-50 p-6 rounded-lg text-center">
+            <div class="max-w-2xl mx-auto pt-10">
+                <div class="bg-green-100 p-4 rounded-full inline-block mb-4"><svg class="w-16 h-16 text-green-600"
+                        fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                            d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"></path>
+                    </svg></div>
+                <h2 class="text-3xl font-bold text-gray-900 mb-2" data-i18n="successTitle">Will Draft Ready!</h2>
+                <p class="text-gray-600 mb-6" data-i18n="successSubtitle">Choose a format to download your Will.</p>
+
+                <div class="flex flex-col sm:flex-row gap-4 justify-center mb-8">
+                    <button onclick="generatePDF()" id="btn-download-pdf"
+                        class="flex items-center justify-center gap-2 bg-red-600 text-white px-6 py-3 rounded-lg font-bold shadow hover:bg-red-700 transition transform hover:-translate-y-1"
+                        data-i18n="btnDownloadPDF">
+                        <span class="text-xl">📄</span> Download PDF
+                    </button>
+                    <button onclick="generateRTF()"
+                        class="flex items-center justify-center gap-2 bg-blue-600 text-white px-6 py-3 rounded-lg font-bold shadow hover:bg-blue-700 transition transform hover:-translate-y-1"
+                        data-i18n="btnDownloadRTF">
+                        <span class="text-xl">📝</span> Download Editable (.rtf)
+                    </button>
+                </div>
+
+                <div class="bg-blue-50 border border-blue-200 rounded-lg p-6 text-left space-y-4 shadow-sm">
+                    <h3 class="text-xl font-bold text-blue-900 border-b border-blue-200 pb-2"
+                        data-i18n="nextStepsTitle">📋 Critical Next Steps
+                    </h3>
+                    <div class="flex gap-4">
+                        <div class="bg-white p-2 rounded text-2xl">🖨️</div>
+                        <div>
+                            <h4 class="font-bold text-gray-800" data-i18n="nsPrintTitle">Print</h4>
+                            <p class="text-sm text-gray-600" data-i18n="nsPrintText">Print on high-quality A4 paper.
+                                Digital signatures are NOT valid for Wills in India.</p>
+                        </div>
+                    </div>
+                    <div class="flex gap-4">
+                        <div class="bg-white p-2 rounded text-2xl">✍️</div>
+                        <div>
+                            <h4 class="font-bold text-gray-800" data-i18n="nsSignTitle">Sign Every Page</h4>
+                            <p class="text-sm text-gray-600" data-i18n="nsSignText">To prevent tampering or page
+                                swapping, You and your two witnesses must sign the bottom of every single page. A Will
+                                without signatures on all pages can be challenged in court.</p>
+                            <p class="text-xs text-red-600 mt-1 font-bold" data-i18n="nsSignReminder">REMINDER:
+                                Beneficiaries must NOT sign the Will.</p>
+                        </div>
+                    </div>
+                    <div class="flex gap-4">
+                        <div class="bg-white p-2 rounded text-2xl">🔐</div>
+                        <div>
+                            <h4 class="font-bold text-gray-800" data-i18n="nsSafeTitle">Safe Storage</h4>
+                            <p class="text-sm text-gray-600" data-i18n="nsSafeText">Store safely and tell your Executor
+                                where it is.</p>
+                        </div>
+                    </div>
+                    <div class="flex gap-4">
+                        <div class="bg-white p-2 rounded text-2xl">📹</div>
+                        <div>
+                            <h4 class="font-bold text-gray-800" data-i18n="nsVideoTitle">Record a Video Will (Pro Tip)
+                            </h4>
+                            <p class="text-sm text-gray-600" data-i18n="nsVideoText">Record a video on your phone while
+                                signing. Read the Will aloud to prove sound mind.</p>
+                        </div>
+                    </div>
+                    <div class="flex gap-4">
+                        <div class="bg-white p-2 rounded text-2xl">🏛️</div>
+                        <div>
+                            <h4 class="font-bold text-gray-800">Register (Optional)</h4>
+                            <p class="text-sm text-gray-600">Register at Sub-Registrar office to prevent disputes.</p>
+                        </div>
+                    </div>
+                </div>
+                <button onclick="goHome()"
+                    class="mt-10 text-indigo-600 font-semibold underline hover:text-indigo-800">Back to Home</button>
+            </div>
+        </div>
+
+    </main>
+
+    <!-- CUSTOM WARNING MODAL -->
+    <div id="custom-warning-modal"
+        class="hidden fixed inset-0 bg-black bg-opacity-50 z-[60] flex items-center justify-center p-4 fade-in">
+        <div class="bg-white rounded-lg shadow-2xl max-w-md w-full p-6 transform transition-all">
+            <div class="flex items-start gap-4">
+                <div class="bg-yellow-100 p-2 rounded-full flex-shrink-0">
+                    <span class="text-2xl">⚠️</span>
+                </div>
+                <div>
+                    <h3 id="modal-title" class="text-lg font-bold text-gray-900 mb-2">Warning Title</h3>
+                    <p id="modal-message" class="text-sm text-gray-600 mb-4 leading-relaxed">Warning Message goes
+                        here...</p>
+
+                    <div id="modal-checkbox-container"
+                        class="hidden flex items-center gap-2 mb-4 bg-gray-50 p-2 rounded border border-gray-100">
+                        <input type="checkbox" id="modal-dont-show"
+                            class="rounded text-indigo-600 focus:ring-indigo-500 h-4 w-4">
+                        <label for="modal-dont-show"
+                            class="text-xs font-medium text-gray-500 select-none cursor-pointer">Don't show this warning
+                            again for beneficiaries</label>
+                    </div>
+
+                    <div class="flex gap-3 justify-end mt-2">
+                        <button onclick="closeWarningModal()"
+                            class="px-4 py-2 bg-white border border-gray-300 rounded-md text-gray-700 text-sm font-bold hover:bg-gray-50 transition">Go
+                            Back</button>
+                        <button onclick="confirmWarningModal()"
+                            class="px-4 py-2 bg-indigo-600 text-white rounded-md text-sm font-bold hover:bg-indigo-700 shadow transition">Proceed
+                            Anyway</button>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script src="translations.js"></script>
+    <script>
+        let beneficiaries = [];
+        let assetCount = 0;
+        let beneficiaryCount = 0;
+        let lastActiveStep = 0;
+        let savedStepIndex = 1;
+        let maxReachedStep = 0;
+        let suppressBenWarning = false;
+        let currentModalCallback = null;
+        let saveTimeout = null;
+        const STORAGE_KEY = 'sahayWillDataV30';
+
+        const ASSET_ICONS = {
+            'flat': '🏠', 'land': '🌳', 'shop': '🏢',
+            'savings': '🏦', 'fd': '📜', 'locker': '🔐', 'loan': '🤝',
+            'nps': '👴', 'mf': '📈', 'demat': '📊', 'crypto': '₿', 'insurance': '🛡️',
+            'esop': '💼', 'business': '🏭',
+            'vehicle': '🚗', 'jewelry': '💍'
+        };
+
+        const ASSET_SCHEMAS = {
+            'flat': [
+                { key: 'addr', label: 'Complete Property Address (incl. Pin Code)', type: 'textarea' },
+                { key: 'survey', label: 'Survey/Khata/Deed No. (optional)', type: 'text' }
+            ],
+            'land': [
+                { key: 'addr', label: 'Location / Village / Taluk', type: 'text' },
+                { key: 'survey', label: 'Survey Number (optional)', type: 'text' }
+            ],
+            'shop': [
+                { key: 'addr', label: 'Shop/Office Address', type: 'textarea' },
+                { key: 'reg', label: 'Registration details (optional)', type: 'text' }
+            ],
+            'savings': [
+                { key: 'bank', label: 'Bank Name & Branch', type: 'text' },
+                { key: 'acc_no', label: 'Account ending in (last 4 digits)', type: 'text' },
+                { key: 'ifsc', label: 'Branch Name / IFSC (Optional)', type: 'text' }
+            ],
+            'fd': [
+                { key: 'bank', label: 'Bank / Post Office Name', type: 'text' },
+                { key: 'fd_no', label: 'Last 4 digits of FD number', type: 'text' }
+            ],
+            'locker': [
+                { key: 'bank', label: 'Bank Name & Branch', type: 'text' },
+                { key: 'locker_no', label: 'Locker number (optional)', type: 'text' }
+            ],
+            'nps': [
+                { key: 'pran', label: 'Last 4 digits of PRAN/UAN/PPO', type: 'text' }
+            ],
+            'esop': [
+                { key: 'company', label: 'Company Name', type: 'text' },
+                { key: 'units', label: 'Grant year or last 4 digits', type: 'textarea' }
+            ],
+            'business': [
+                { key: 'name', label: 'Business Name', type: 'text' },
+                { key: 'structure', label: 'Structure (Proprietorship / Partnership / Pvt Ltd)', type: 'text' },
+                { key: 'share', label: 'Registration details (optional)', type: 'text' }
+            ],
+            'mf': [
+                { key: 'fund', label: 'AMC Name (e.g. SBI Mutual Fund)', type: 'text' },
+                { key: 'folio', label: 'Last 4 digits of folio number', type: 'text' },
+                { key: 'specific_holding', label: 'Specific Scheme (Optional - Leave blank for all schemes in folio)', type: 'text' }
+            ],
+            'demat': [
+                { key: 'broker', label: 'Broker Name (e.g. Zerodha, Groww)', type: 'text' },
+                { key: 'dpid', label: 'Last 4 digits of Client ID', type: 'text' },
+                { key: 'specific_holding', label: 'Specific Stock/ISIN (Optional - Leave blank for entire account)', type: 'text' }
+            ],
+            'crypto': [
+                { key: 'exchange', label: 'Exchange/Wallet Name', type: 'text' },
+                { key: 'identifier', label: 'Last 4 characters of wallet ID', type: 'text' },
+                { key: 'specific_holding', label: 'Specific Coin/Token (Optional - Leave blank for whole wallet)', type: 'text' }
+            ],
+            'insurance': [
+                { key: 'insurer', label: 'Insurance Company', type: 'text' },
+                { key: 'policy', label: 'Last 4 digits of policy number', type: 'text' }
+            ],
+            'loan': [
+                { key: 'borrower', label: 'Borrower Name (Who owes you money?)', type: 'text' },
+                { key: 'amount', label: 'Amount Owed (Approx)', type: 'text' },
+                { key: 'date', label: 'Loan date or last 4 digits', type: 'text' }
+            ],
+            'vehicle': [
+                { key: 'model', label: 'Vehicle Make & Model (e.g. Honda City)', type: 'text' },
+                { key: 'reg', label: 'Last 4 digits of registration', type: 'text' }
+            ],
+            'jewelry': [
+                { key: 'desc', label: 'Description (Weight, Metal, Distinctive marks)', type: 'textarea' },
+                { key: 'loc', label: 'Location (Where is it kept?)', type: 'text' }
+            ]
+        };
+
+        // --- UTILITIES ---
+
+        function escapeHtml(text) {
+            if (!text) return "";
+            return String(text)
+                .replace(/&/g, "&amp;")
+                .replace(/</g, "&lt;")
+                .replace(/>/g, "&gt;")
+                .replace(/"/g, "&quot;")
+                .replace(/'/g, "&#039;");
+        }
+
+        window.removeSpecificRow = function (uniqueId) {
+            if (confirm("Are you sure you want to remove this asset?")) {
+                const el = document.getElementById('asset-row-' + uniqueId);
+                if (el) { el.remove(); saveData(); }
+            }
+        };
+
+        window.removeBeneficiaryRow = function (uniqueId) {
+            if (confirm("Remove this beneficiary? This will remove them from any assigned assets.")) {
+                const el = document.getElementById('ben-row-' + uniqueId);
+                if (el) { el.remove(); saveData(); }
+            }
+        };
+
+        function initApp() {
+            loadData();
+            // Restore language preference if saved
+            updateLanguage();
+            // Check for auto-start flag set by startFresh()
+            if (sessionStorage.getItem('SAHAY_AUTO_START') === 'true') {
+                sessionStorage.removeItem('SAHAY_AUTO_START');
+                updateMaxReached(1);
+                goToStep(1); // Go directly to Step 2 (Index 1)
+            } else {
+                updateProgressBar(lastActiveStep);
+            }
+        }
+
+        function startFresh() {
+            showCustomWarning(
+                "⚠️ Delete Draft & Start Over?",
+                "You are about to delete your saved draft. All previous progress will be permanently lost.\n\nAre you sure?",
+                false,
+                () => {
+                    localStorage.removeItem(STORAGE_KEY);
+                    // Set flag so initApp knows to jump to Step 1 after reload
+                    sessionStorage.setItem('SAHAY_AUTO_START', 'true');
+                    location.reload();
+                }
+            );
+        }
+
+        function updateProgressBar(step) {
+            const totalNodes = 6;
+            const progressPercent = (step / (totalNodes - 1)) * 100;
+            document.getElementById('stepper-line').style.width = progressPercent + '%';
+
+            for (let i = 0; i < totalNodes; i++) {
+                const node = document.getElementById(`step-node-${i}`);
+                if (!node) continue;
+                const circle = node.querySelector('.step-circle');
+                const label = node.querySelector('span');
+
+                circle.className = 'step-circle w-8 h-8 rounded-full border-2 flex items-center justify-center text-xs font-bold transition-all duration-300';
+                label.className = 'absolute top-full left-1/2 -translate-x-1/2 w-max text-[10px] mt-1 font-medium transition-colors duration-300';
+
+                if (i < step) {
+                    circle.classList.add('bg-green-600', 'border-green-600', 'text-white');
+                    circle.innerHTML = '✓';
+                    label.classList.add('text-green-500');
+                } else if (i === step) {
+                    circle.classList.add('bg-white', 'border-white', 'text-indigo-900', 'scale-110', 'shadow-lg');
+                    circle.innerHTML = i + 1;
+                    label.classList.add('text-white', 'font-bold');
+                } else {
+                    circle.classList.add('bg-indigo-900', 'border-indigo-500', 'text-indigo-400');
+                    circle.innerHTML = i + 1;
+                    label.classList.add('text-indigo-400');
+                }
+            }
+        }
+
+        function goToStep(step) {
+            lastActiveStep = step;
+            document.querySelectorAll('.step-section').forEach(el => el.classList.remove('active'));
+
+            if (step === 5) {
+                document.getElementById('success-overlay').classList.remove('hidden');
+                document.getElementById('preview-overlay').classList.add('hidden');
+            } else {
+                document.getElementById(`step-${step}`).classList.add('active');
+                document.getElementById('preview-overlay').classList.add('hidden');
+                document.getElementById('success-overlay').classList.add('hidden');
+            }
+
+            updateProgressBar(step);
+            window.scrollTo(0, 0);
+        }
+
+        function navigateToStep(step) {
+            if (step <= maxReachedStep) {
+                goToStep(step);
+            }
+        }
+
+        function updateMaxReached(step) {
+            if (step > maxReachedStep) maxReachedStep = step;
+        }
+
+        function resumeJourney() { goToStep(savedStepIndex); }
+        function goHome() { document.getElementById('success-overlay').classList.add('hidden'); document.getElementById('preview-overlay').classList.add('hidden'); goToStep(0); }
+        function removeError(input) { input.classList.remove('error-border'); }
+
+        function checkReligion() {
+            const rel = document.getElementById('religionSelector').value;
+            document.getElementById('muslim-warning').classList.toggle('hidden', rel !== 'Muslim');
+            document.getElementById('hindu-warning').classList.toggle('hidden', rel !== 'Hindu');
+            document.getElementById('other-religion-wrapper').classList.toggle('hidden', rel !== 'Other');
+        }
+
+        // --- CUSTOM MODAL LOGIC ---
+        function showCustomWarning(title, message, isBeneficiaryStep, callback) {
+            document.getElementById('modal-title').innerText = title;
+            document.getElementById('modal-message').innerText = message;
+
+            const checkboxContainer = document.getElementById('modal-checkbox-container');
+            if (isBeneficiaryStep) {
+                checkboxContainer.classList.remove('hidden');
+                document.getElementById('modal-dont-show').checked = false;
+            } else {
+                checkboxContainer.classList.add('hidden');
+            }
+            currentModalCallback = callback;
+            document.getElementById('custom-warning-modal').classList.remove('hidden');
+        }
+        function closeWarningModal() { document.getElementById('custom-warning-modal').classList.add('hidden'); currentModalCallback = null; }
+        function confirmWarningModal() {
+            const checkbox = document.getElementById('modal-dont-show');
+            if (!document.getElementById('modal-checkbox-container').classList.contains('hidden') && checkbox.checked) suppressBenWarning = true;
+            if (currentModalCallback) currentModalCallback();
+            closeWarningModal();
+        }
+
+        function validateAndNext(currentStep, nextStep) {
+            const stepDiv = document.getElementById(`step-${currentStep}`);
+            const requiredInputs = stepDiv.querySelectorAll('.required-field');
+            let isValid = true;
+            requiredInputs.forEach(input => {
+                if (!input.value.trim()) { input.classList.add('error-border'); isValid = false; }
+                else { input.classList.remove('error-border'); }
+            });
+
+            if (currentStep === 1 && document.getElementById('religionSelector').value === 'Other') {
+                const otherInput = document.getElementById('customReligion');
+                if (!otherInput.value.trim()) { otherInput.classList.add('error-border'); isValid = false; }
+                else { otherInput.classList.remove('error-border'); }
+            }
+
+            if (!isValid) {
+                alert("Please fill in all mandatory fields highlighted in red.");
+                return;
+            }
+            updateMaxReached(nextStep);
+            goToStep(nextStep);
+        }
+
+        // --- PREVIEW LOGIC ---
+        function openPreview() {
+            performSave(); // Force save to update beneficiaries array
+            renderPreview();
+            document.getElementById('preview-overlay').classList.remove('hidden');
+            document.body.style.overflow = 'hidden'; // Prevent background scrolling
+        }
+
+        function closePreview() {
+            document.getElementById('preview-overlay').classList.add('hidden');
+            document.body.style.overflow = 'auto';
+        }
+
+        function getValOrPlace(id, placeholder) {
+            const val = document.getElementById(id) ? document.getElementById(id).value : '';
+            return val.trim() ? val : `<span class="preview-placeholder">[${placeholder}]</span>`;
+        }
+
+        function renderPreview() {
+            const container = document.getElementById('preview-content');
+            const t = TRANSLATIONS[currentLang];
+            const today = new Date().toLocaleDateString(currentLang === 'hi' ? 'hi-IN' : 'en-IN', { year: 'numeric', month: 'long', day: 'numeric' });
+
+            // Helper for beneficiaries
+            const getBenString = (bId) => {
+                const b = beneficiaries.find(x => x.id == bId);
+                if (!b) return `<span class="preview-placeholder">[Beneficiary]</span>`;
+                let s = `<b>${b.name}</b> (${b.rel})`;
+                if (b.addr) s += `, R/o ${b.addr}`;
+                if (b.father && b.father.trim()) s += `, ${b.relPrefix || 'S/o'} ${b.father}`;
+                if (b.isMinor && b.gName) {
+                    s += ` [Minor. Guardian: ${b.gName}`;
+                    if (b.gRel) s += ` (${b.gRel})`;
+                    if (b.gFather && b.gFather.trim()) s += `, ${b.gRelPrefix || 'S/o'} ${b.gFather}`;
+                    if (b.gAddr) s += `, R/o ${b.gAddr}`;
+                    s += `]`;
+                }
+                return s;
+            };
+
+            // 1. Title
+            let html = `<h1 style="text-align: center; font-size: 22pt; font-weight: bold; margin-bottom: 10px;">${t.pdfTitle}</h1>`;
+            html += `<hr style="border: 0; border-top: 1px solid #000; margin-bottom: 30px;">`;
+
+            // 2. Preamble
+            let religionTxt = getValOrPlace('religionSelector', t.pdfReligionLabel);
+            if (document.getElementById('religionSelector').value === 'Other') religionTxt = getValOrPlace('customReligion', t.pdfReligionLabel);
+
+            // Translate religion if possible
+            if (currentLang === 'hi') {
+                if (religionTxt === 'Hindu') religionTxt = 'हिंदू';
+                else if (religionTxt === 'Muslim') religionTxt = 'मुस्लिम';
+                else if (religionTxt === 'Christian') religionTxt = 'ईसाई';
+                else if (religionTxt === 'Sikh') religionTxt = 'सिख';
+                else if (religionTxt === 'Jain') religionTxt = 'जैन';
+                else if (religionTxt === 'Buddhist') religionTxt = 'बौद्ध';
+            }
+
+            const myName = getValOrPlace('myName', t.dynFullName).toUpperCase();
+            const fatherName = document.getElementById('fatherName') ? document.getElementById('fatherName').value.trim() : '';
+            const myRelPrefix = document.getElementById('myRelPrefix') ? document.getElementById('myRelPrefix').value : 'S/o';
+            // Translate relationship prefix
+            let myRelPrefixTrans = myRelPrefix;
+            if (currentLang === 'hi') {
+                if (myRelPrefix === 'S/o') myRelPrefixTrans = 'पुत्र';
+                else if (myRelPrefix === 'D/o') myRelPrefixTrans = 'पुत्री';
+                else if (myRelPrefix === 'W/o') myRelPrefixTrans = 'पत्नी';
+            }
+
+            let preamble = "";
+            if (currentLang === 'en') {
+                preamble = `I, <b>${myName}</b>`;
+                if (fatherName) preamble += `, ${myRelPrefix} ${fatherName}`;
+                preamble += `, residing at ${getValOrPlace('myAddress', 'Permanent Address')} (Religion: ${religionTxt}), being of sound mind and memory, do hereby make, publish and declare this to be my Last Will and Testament.`;
+            } else {
+                preamble = `मैं, <b>${myName}</b>`;
+                if (fatherName) preamble += `, ${myRelPrefixTrans} ${fatherName}`;
+                preamble += `, निवासी ${getValOrPlace('myAddress', t.dynPermAddress)} (धर्म: ${religionTxt}), स्वस्थ मन और स्मृति का होने के नाते, एतद्द्वारा अपनी यह अंतिम वसीयत और वसीयतनामा बनाता हूँ, प्रकाशित करता हूँ और घोषित करता हूँ।`;
+            }
+            html += `<p style="margin-bottom: 15px;">${preamble}</p>`;
+
+            // 3. Revocation
+            html += `<h3 style="font-size: 14pt; font-weight: bold; margin-top: 20px; margin-bottom: 10px;">${t.pdfRevocationTitle}</h3>`;
+            html += `<p style="margin-bottom: 15px;">${t.pdfRevocationText}</p>`;
+
+            // 4. Executor
+            html += `<h3 style="font-size: 14pt; font-weight: bold; margin-top: 20px; margin-bottom: 10px;">${t.pdfExecutorTitle}</h3>`;
+
+            const exName = getValOrPlace('exName', t.lblExName).toUpperCase();
+            const exRel = getValOrPlace('exRel', t.lblExRel);
+            const exParentName = document.getElementById('exParentName') ? document.getElementById('exParentName').value.trim() : '';
+            const exRelPrefix = document.getElementById('exRelPrefix') ? document.getElementById('exRelPrefix').value : 'S/o';
+            let exRelPrefixTrans = exRelPrefix;
+            if (currentLang === 'hi') {
+                if (exRelPrefix === 'S/o') exRelPrefixTrans = 'पुत्र';
+                else if (exRelPrefix === 'D/o') exRelPrefixTrans = 'पुत्री';
+                else if (exRelPrefix === 'W/o') exRelPrefixTrans = 'पत्नी';
+            }
+            const exAddress = getValOrPlace('exAddress', t.lblExAddress);
+
+            let execText = "";
+            if (currentLang === 'en') {
+                execText = `I appoint <b>${exName}</b> (Rel: ${exRel})`;
+                if (exParentName) execText += `, ${exRelPrefix} ${exParentName}`;
+                execText += `, residing at ${exAddress}, to be the sole Executor of this Will.`;
+            } else {
+                execText = `मैं <b>${exName}</b> (संबंध: ${exRel})`;
+                if (exParentName) execText += `, ${exRelPrefixTrans} ${exParentName}`;
+                execText += `, निवासी ${exAddress}, को इस वसीयत का एकमात्र निष्पादक नियुक्त करता हूँ।`;
+            }
+            html += `<p style="margin-bottom: 15px;">${execText}</p>`;
+
+            // 5. Assets
+            html += `<h3 style="font-size: 14pt; font-weight: bold; margin-top: 20px; margin-bottom: 10px;">${t.pdfDistributionTitle}</h3>`;
+            html += `<p style="margin-bottom: 15px;">${t.pdfDistributionIntro}</p>`;
+
+            const assetRows = document.querySelectorAll('.asset-item');
+            if (assetRows.length === 0) {
+                html += `<p class="preview-placeholder" style="margin-left: 20px;">[No assets added yet...]</p>`;
+            } else {
+                assetRows.forEach((row, idx) => {
+                    const typeSelect = row.querySelector('.asset-type-select');
+                    const typeLabel = typeSelect.options[typeSelect.selectedIndex].text;
+
+                    // Description
+                    let desc = "";
+                    row.querySelectorAll('.dynamic-field-input').forEach(inp => {
+                        if (inp.value) desc += `${inp.placeholder}: ${inp.value}, `;
+                    });
+                    if (desc.length > 2) desc = desc.substring(0, desc.length - 2);
+                    if (!desc) desc = `<span class="preview-placeholder">[Asset Description]</span>`;
+
+                    html += `<div style="margin-bottom: 20px; margin-left: 10px;">`;
+                    html += `<div style="font-weight: bold; font-size: 13pt; margin-bottom: 5px;">${idx + 1}. ${typeLabel.toUpperCase()}</div>`;
+                    html += `<div style="font-weight: bold; margin-bottom: 5px;">${t.pdfDescriptionLabel}: <span style="font-weight: normal;">${desc}</span></div>`;
+                    html += `<div style="font-style: italic; margin-bottom: 5px;">${t.pdfBeneficiariesLabel}:</div>`;
+
+                    // Shares
+                    const shares = row.querySelectorAll('.share-row');
+                    if (shares.length === 0) {
+                        html += `<div style="margin-left: 20px;" class="preview-placeholder">[No beneficiaries assigned]</div>`;
+                    } else {
+                        html += `<ul style="list-style-type: none; padding-left: 20px; margin: 0;">`;
+                        shares.forEach((sr, sIdx) => {
+                            const bId = sr.querySelector('.ben-select-share').value;
+                            const shareVal = sr.querySelector('.share-input').value;
+                            const altId = sr.querySelector('.ben-select-alt-share').value;
+                            const bullet = String.fromCharCode(97 + sIdx);
+                            const toStr = currentLang === 'hi' ? 'को' : 'to';
+
+                            html += `<li style="margin-bottom: 5px;">(${bullet}) ${shareVal}% ${toStr} ${getBenString(bId)}`;
+                            if (altId) {
+                                html += `<div style="font-size: 10pt; color: #555; margin-left: 20px;">${t.pdfAlternateLabel}: ${getBenString(altId)}</div>`;
+                            }
+                            html += `</li>`;
+                        });
+                        html += `</ul>`;
+                    }
+                    html += `</div>`;
+                });
+            }
+
+            // 6. Residual
+            html += `<h3 style="font-size: 14pt; font-weight: bold; margin-top: 20px; margin-bottom: 10px;">${t.pdfResidualTitle}</h3>`;
+            html += `<p style="margin-bottom: 10px;">${t.pdfResidualIntro}</p>`;
+
+            const resRows = document.querySelectorAll('.residual-row');
+            if (resRows.length === 0) {
+                html += `<p class="preview-placeholder" style="margin-left: 20px;">[No residual beneficiaries selected...]</p>`;
+            } else {
+                html += `<ul style="list-style-type: none; padding-left: 20px; margin: 0;">`;
+                resRows.forEach((row, idx) => {
+                    const bId = row.querySelector('.residual-ben-select').value;
+                    const shareVal = row.querySelector('.residual-share-input').value;
+                    const altId = row.querySelector('.residual-ben-alt-select').value;
+                    const bullet = String.fromCharCode(97 + idx);
+                    const toStr = currentLang === 'hi' ? 'को' : 'to';
+
+                    html += `<li style="margin-bottom: 5px;">(${bullet}) ${shareVal}% ${toStr} ${getBenString(bId)}`;
+                    if (altId) {
+                        html += `<div style="font-size: 10pt; color: #555; margin-left: 20px;">${t.pdfAlternateLabel}: ${getBenString(altId)}</div>`;
+                    }
+                    html += `</li>`;
+                });
+                html += `</ul>`;
+            }
+
+            // 7. Signatures
+            html += `<div style="margin-top: 50px;">`;
+            html += `<h3 style="font-size: 12pt; font-weight: bold; margin-bottom: 10px;">${currentLang === 'hi' ? 'इसके साक्ष्य में' : 'IN WITNESS WHEREOF'}</h3>`;
+            const witnessText = currentLang === 'hi'
+                ? `मैंने ${getValOrPlace('myPlace', 'स्थान')} में ${today} को इस वसीयत पर अपने हस्ताक्षर किए हैं।`
+                : `I have set my hand to this Will at ${getValOrPlace('myPlace', 'Place')} on ${today}.`;
+            html += `<p style="margin-bottom: 30px;">${witnessText}</p>`;
+
+            // Testator Sign
+            html += `<div style="margin-bottom: 40px;">`;
+            html += `<div style="border-top: 1px solid #000; width: 200px; margin-bottom: 5px;"></div>`;
+            html += `<div style="font-weight: bold;">${currentLang === 'hi' ? 'वसीयतकर्ता हस्ताक्षर' : 'TESTATOR SIGNATURE'}</div>`;
+            html += `<div>(${getValOrPlace('myName', t.dynFullName)})</div>`;
+            html += `</div>`;
+
+            // Witnesses
+            html += `<h3 style="font-size: 12pt; font-weight: bold; margin-bottom: 10px;">${currentLang === 'hi' ? 'गवाहों द्वारा हस्ताक्षरित' : 'SIGNED BY THE WITNESSES'}</h3>`;
+            const witnessCert = currentLang === 'hi'
+                ? 'हम प्रमाणित करते हैं कि वसीयतकर्ता ने हमारी उपस्थिति में इस वसीयत पर हस्ताक्षर किए, और हमने उनकी उपस्थिति में गवाहों के रूप में हस्ताक्षर किए।'
+                : 'We certify that the Testator signed this Will in our presence, and we have signed as witnesses in their presence.';
+            html += `<p style="margin-bottom: 30px;">${witnessCert}</p>`;
+
+            html += `<div style="display: flex; justify-content: space-between;">`;
+            // Witness 1
+            html += `<div style="width: 45%;">`;
+            html += `<div style="font-weight: bold; margin-bottom: 20px;">${t.pdfWitness1Label}:</div>`;
+            html += `<div style="border-top: 1px solid #000; width: 100%; margin-bottom: 5px;"></div>`;
+            html += `<div style="margin-bottom: 10px;">${currentLang === 'hi' ? 'हस्ताक्षर' : 'Signature'}</div>`;
+            html += `<div style="margin-bottom: 10px;">${currentLang === 'hi' ? 'नाम' : 'Name'}: ___________________</div>`;
+            html += `<div>${currentLang === 'hi' ? 'पता' : 'Address'}: _________________</div>`;
+            html += `</div>`;
+
+            // Witness 2
+            html += `<div style="width: 45%;">`;
+            html += `<div style="font-weight: bold; margin-bottom: 20px;">${t.pdfWitness2Label}:</div>`;
+            html += `<div style="border-top: 1px solid #000; width: 100%; margin-bottom: 5px;"></div>`;
+            html += `<div style="margin-bottom: 10px;">${currentLang === 'hi' ? 'हस्ताक्षर' : 'Signature'}</div>`;
+            html += `<div style="margin-bottom: 10px;">${currentLang === 'hi' ? 'नाम' : 'Name'}: ___________________</div>`;
+            html += `<div>${currentLang === 'hi' ? 'पता' : 'Address'}: _________________</div>`;
+            html += `</div>`;
+
+            html += `</div>`; // End flex
+            html += `</div>`; // End signatures
+
+            container.innerHTML = html;
+        }
+
+        // Beneficiaries
+        function toggleBeneficiary(uniqueId) {
+            const body = document.getElementById(`ben-body-${uniqueId}`);
+            const row = document.getElementById(`ben-row-${uniqueId}`);
+
+            if (body.classList.contains('hidden')) {
+                document.querySelectorAll('[id^="ben-body-"]').forEach(el => el.classList.add('hidden'));
+                document.querySelectorAll('.beneficiary-item').forEach(el => el.classList.remove('ring-2', 'ring-blue-100'));
+                body.classList.remove('hidden');
+                row.classList.add('ring-2', 'ring-blue-100');
+            } else {
+                body.classList.add('hidden');
+                row.classList.remove('ring-2', 'ring-blue-100');
+                saveData();
+            }
+        }
+
+        function updateBeneficiaryHeader(uniqueId) {
+            const t = TRANSLATIONS[currentLang];
+            const row = document.getElementById(`ben-row-${uniqueId}`);
+            const nameVal = document.getElementById(`ben-name-${uniqueId}`).value.trim();
+            let relVal = document.getElementById(`ben-rel-${uniqueId}`).value.trim();
+
+            // Translate common relationship terms
+            if (currentLang === 'hi' && relVal) {
+                const relMap = {
+                    'son': 'बेटा', 'daughter': 'बेटी', 'wife': 'पत्नी', 'husband': 'पति',
+                    'brother': 'भाई', 'sister': 'बहन', 'mother': 'माँ', 'father': 'पिता',
+                    'friend': 'मित्र', 'nephew': 'भतीजा', 'niece': 'भतीजी'
+                };
+                const lowerRel = relVal.toLowerCase();
+                if (relMap[lowerRel]) relVal = relMap[lowerRel];
+            }
+
+            row.querySelector('.ben-title-display').innerText = nameVal || t.dynNewBeneficiary;
+            row.querySelector('.ben-desc-display').innerText = nameVal ? (relVal ? `${t.dynRelation}: ${relVal}` : t.dynRelation + ' not specified') : t.dynExpandDetails;
+            row.querySelector('.ben-icon-display').innerText = nameVal ? nameVal.charAt(0).toUpperCase() : '+';
+            saveData();
+        }
+
+        function updateAllHeaders() {
+            // Update all beneficiary headers
+            document.querySelectorAll('[id^="ben-row-"]').forEach(row => {
+                const id = row.id.replace('ben-row-', '');
+                updateBeneficiaryHeader(id);
+            });
+
+            // Update all asset headers
+            document.querySelectorAll('[id^="asset-row-"]').forEach(row => {
+                const id = row.id.replace('asset-row-', '');
+                updateAssetHeader(id);
+            });
+        }
+
+        function toggleGuardianSection(uniqueId) {
+            const chk = document.getElementById(`ben-minor-${uniqueId}`);
+            const div = document.getElementById(`guardian-div-${uniqueId}`);
+            if (chk.checked) div.classList.remove('hidden'); else div.classList.add('hidden');
+            saveData();
+        }
+
+        function addBeneficiaryRow(data = null) {
+            const t = TRANSLATIONS[currentLang]; // Get translations
+
+            document.querySelectorAll('[id^="ben-body-"]').forEach(el => el.classList.add('hidden'));
+            document.querySelectorAll('.beneficiary-item').forEach(el => el.classList.remove('ring-2', 'ring-blue-100'));
+            beneficiaryCount++;
+            const uniqueId = data ? data.id : Date.now();
+            const container = document.getElementById('beneficiary-container');
+
+            const html = `
+                <div id="ben-row-${uniqueId}" class="beneficiary-item bg-white rounded-lg shadow-sm border border-gray-200 overflow-hidden transition-all duration-300 ring-2 ring-blue-100" data-id="${uniqueId}">
+                    <div class="bg-white p-4 cursor-pointer hover:bg-gray-50 flex justify-between items-center select-none" onclick="toggleBeneficiary('${uniqueId}')">
+                        <div class="flex items-center gap-3">
+                             <div class="w-10 h-10 rounded-full bg-blue-50 flex items-center justify-center text-blue-600 font-bold text-xl ben-icon-display">${data ? data.name.charAt(0).toUpperCase() : '+'}</div>
+                             <div>
+                                 <h3 class="font-bold text-gray-800 text-sm ben-title-display">${data ? data.name : t.dynNewBeneficiary}</h3>
+                                 <p class="text-xs text-gray-500 ben-desc-display truncate">${data && data.rel ? t.dynRelation + ': ' + data.rel : t.dynExpandDetails}</p>
+                             </div>
+                        </div>
+                        <div class="flex items-center gap-3">
+                             <span class="text-xs font-bold text-blue-600 bg-blue-50 px-2 py-1 rounded">${t.dynEdit}</span>
+                             <button type="button" onclick="event.stopPropagation(); window.removeBeneficiaryRow('${uniqueId}')" class="text-gray-400 hover:text-red-500 p-1 hover:bg-red-50 rounded transition">
+                                <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16" /></svg>
+                             </button>
+                        </div>
+                    </div>
+
+                    <!-- Flat Body, No Nested Boxes -->
+                    <div id="ben-body-${uniqueId}" class="border-t border-gray-100 p-4 md:p-6 bg-slate-50 ${data ? 'hidden' : ''}">
+                        <div class="grid grid-cols-1 md:grid-cols-2 gap-4 mb-4">
+                            <div>
+                                <label class="text-[10px] font-bold uppercase text-gray-500 block mb-1">${t.dynFullName}</label>
+                                <input type="text" id="ben-name-${uniqueId}" class="w-full border p-2 rounded text-sm outline-none" placeholder="${t.dynFullName}" oninput="updateBeneficiaryHeader('${uniqueId}')" value="${data ? data.name : ''}">
+                            </div>
+                            <div>
+                                <label class="text-[10px] font-bold uppercase text-gray-500 block mb-1">${t.dynRelationship}</label>
+                                <input type="text" id="ben-rel-${uniqueId}" class="w-full border p-2 rounded text-sm outline-none" placeholder="${t.dynPhRelationship}" oninput="updateBeneficiaryHeader('${uniqueId}')" value="${data ? data.rel : ''}">
+                            </div>
+                        </div>
+                        
+                        <!-- Added Address -->
+                        <div class="mb-4">
+                            <label class="text-[10px] font-bold uppercase text-gray-500 block mb-1">${t.dynPermAddress}</label>
+                            <textarea id="ben-addr-${uniqueId}" class="w-full border p-2 rounded text-sm outline-none" rows="2" placeholder="${t.dynPhAddress}" oninput="saveData()">${data ? data.addr : ''}</textarea>
+                        </div>
+
+                        <!-- ID Info (Flat) -->
+                        <div class="mb-6">
+                            <label class="text-[10px] font-bold uppercase text-gray-500 block mb-1">${t.dynParentSpouse}</label>
+                             <div class="flex gap-2">
+                                 <select id="ben-relPrefix-${uniqueId}" onchange="saveData()" class="w-28 border p-2 rounded text-sm bg-white text-gray-600 outline-none">
+                                     <option value="S/o" ${data && data.relPrefix === 'S/o' ? 'selected' : ''}>${t.optSonOf}</option>
+                                     <option value="D/o" ${data && data.relPrefix === 'D/o' ? 'selected' : ''}>${t.optDaughterOf}</option>
+                                     <option value="W/o" ${data && data.relPrefix === 'W/o' ? 'selected' : ''}>${t.optWifeOf}</option>
+                                 </select>
+                                 <input type="text" id="ben-father-${uniqueId}" value="${data ? escapeHtml(data.father) : ''}" class="w-full border p-2 rounded text-sm focus:ring-1 focus:ring-blue-500 outline-none" placeholder="${t.dynPhName}" oninput="saveData()">
+                             </div>
+                        </div>
+
+                        <!-- Options -->
+                         <div class="grid grid-cols-1 md:grid-cols-2 gap-4 mb-4">
+                            <div>
+                                <label class="text-[10px] font-bold text-gray-400 uppercase tracking-wide block mb-1">${t.dynDefaultAlternate}</label>
+                                <select id="ben-defaultAlt-${uniqueId}" class="w-full border p-2 rounded text-sm bg-white text-gray-600 outline-none" onchange="saveData()">
+                                    <option value="">-- ${t.dynDefaultAlternate} --</option>
+                                </select>
+                            </div>
+                            <div class="flex items-center mt-6">
+                                <input type="checkbox" id="ben-minor-${uniqueId}" class="w-4 h-4 text-blue-600 rounded" onchange="toggleGuardianSection('${uniqueId}')" ${data && data.isMinor ? 'checked' : ''}>
+                                <label for="ben-minor-${uniqueId}" class="ml-2 text-sm text-gray-700 font-bold select-none cursor-pointer">${t.dynIsMinor}</label>
+                            </div>
+                         </div>
+
+                         <!-- Guardian Section (Clean) -->
+                         <div id="guardian-div-${uniqueId}" class="mt-3 pt-3 border-t border-gray-200 ${data && data.isMinor ? '' : 'hidden'}">
+                             <div class="grid grid-cols-1 md:grid-cols-2 gap-3 mb-2">
+                                <div>
+                                    <label class="text-[10px] font-bold uppercase text-gray-500 block mb-1">${t.dynGuardianName}</label>
+                                    <input type="text" id="guardian-name-${uniqueId}" class="w-full border p-2 rounded text-sm outline-none" placeholder="${t.dynPhGuardianName}" value="${data ? data.gName : ''}" oninput="saveData()">
+                                </div>
+                                <div>
+                                    <label class="text-[10px] font-bold uppercase text-gray-500 block mb-1">${t.dynGuardianRel}</label>
+                                    <input type="text" id="guardian-rel-${uniqueId}" class="w-full border p-2 rounded text-sm outline-none" placeholder="${t.dynPhGuardianRel}" value="${data ? data.gRel : ''}" oninput="saveData()">
+                                </div>
+                             </div>
+                             <div class="grid grid-cols-1 md:grid-cols-2 gap-3">
+                                <div>
+                                    <label class="text-[10px] font-bold uppercase text-gray-500 block mb-1">${t.dynGuardianParent}</label>
+                                     <div class="flex gap-2">
+                                         <select id="ben-gRelPrefix-${uniqueId}" onchange="saveData()" class="w-28 border p-2 rounded text-sm bg-white text-gray-600 outline-none">
+                                             <option value="S/o" ${data && data.gRelPrefix === 'S/o' ? 'selected' : ''}>${t.optSonOf}</option>
+                                             <option value="D/o" ${data && data.gRelPrefix === 'D/o' ? 'selected' : ''}>${t.optDaughterOf}</option>
+                                             <option value="W/o" ${data && data.gRelPrefix === 'W/o' ? 'selected' : ''}>${t.optWifeOf}</option>
+                                         </select>
+                                         <input type="text" id="guardian-father-${uniqueId}" class="w-full border p-2 rounded text-sm outline-none" placeholder="${t.dynPhName}" value="${data ? data.gFather : ''}" oninput="saveData()">
+                                     </div>
+                                </div>
+                                <div>
+                                    <label class="text-[10px] font-bold uppercase text-gray-500 block mb-1">${t.dynGuardianAddress}</label>
+                                    <input type="text" id="guardian-addr-${uniqueId}" class="w-full border p-2 rounded text-sm outline-none" placeholder="${t.dynPhGuardianAddress}" value="${data ? data.gAddr : ''}" oninput="saveData()">
+                                </div>
+                             </div>
+                         </div>
+
+                        <div class="text-center mt-6">
+                            <button onclick="toggleBeneficiary('${uniqueId}')" class="text-sm font-bold text-white bg-blue-600 hover:bg-blue-700 px-8 py-2 rounded shadow transition">Done & Collapse</button>
+                        </div>
+                    </div>
+                </div>
+            `;
+            container.insertAdjacentHTML('beforeend', html);
+            if (data) {
+                document.getElementById(`ben-defaultAlt-${uniqueId}`).setAttribute('data-selected', data.defaultAltId || '');
+                if (data.relPrefix) document.getElementById(`ben-relPrefix-${uniqueId}`).value = data.relPrefix;
+                if (data.gRelPrefix) document.getElementById(`ben-gRelPrefix-${uniqueId}`).value = data.gRelPrefix;
+            }
+            if (!data) saveData();
+        }
+
+        function validateAndMoveToAssets() {
+            const bens = document.querySelectorAll('.beneficiary-item');
+            if (bens.length === 0) { alert("Please add at least one beneficiary."); return; }
+            let isValid = true;
+            bens.forEach(row => {
+                const uid = row.getAttribute('data-id');
+                const name = document.getElementById(`ben-name-${uid}`).value.trim();
+                const rel = document.getElementById(`ben-rel-${uid}`).value.trim();
+                if (!name || !rel) {
+                    document.getElementById(`ben-body-${uid}`).classList.remove('hidden');
+                    if (!name) document.getElementById(`ben-name-${uid}`).classList.add('error-border');
+                    if (!rel) document.getElementById(`ben-rel-${uid}`).classList.add('error-border');
+                    isValid = false;
+                } else {
+                    document.getElementById(`ben-name-${uid}`).classList.remove('error-border');
+                    document.getElementById(`ben-rel-${uid}`).classList.remove('error-border');
+                }
+            });
+            if (isValid) {
+                updateMaxReached(4);
+                goToStep(4);
+            }
+            if (document.getElementById('asset-container').children.length === 0) addAssetRow();
+            if (document.getElementById('residual-shares-list').children.length === 0) addResidualShare();
+        }
+
+        // ASSETS
+        function toggleAsset(uniqueId) {
+            const body = document.getElementById(`asset-body-${uniqueId}`);
+            const row = document.getElementById(`asset-row-${uniqueId}`);
+            if (body.classList.contains('hidden')) {
+                document.querySelectorAll('[id^="asset-body-"]').forEach(el => el.classList.add('hidden'));
+                document.querySelectorAll('.asset-item').forEach(el => el.classList.remove('ring-2', 'ring-indigo-100'));
+                body.classList.remove('hidden');
+                row.classList.add('ring-2', 'ring-indigo-100');
+            } else {
+                body.classList.add('hidden');
+                row.classList.remove('ring-2', 'ring-indigo-100');
+            }
+        }
+
+        function updateAssetHeader(uniqueId) {
+            const t = TRANSLATIONS[currentLang];
+            const row = document.getElementById(`asset-row-${uniqueId}`);
+            const typeSelect = row.querySelector('.asset-type-select');
+            const inputs = row.querySelectorAll('.dynamic-field-input');
+            let desc = "";
+            inputs.forEach(inp => { if (inp.value) desc += inp.value + " "; });
+
+            const typeVal = typeSelect.value;
+            row.querySelector('.asset-icon-display').innerText = ASSET_ICONS[typeVal] || '📄';
+            row.querySelector('.asset-title-display').innerText = typeVal ? typeSelect.options[typeSelect.selectedIndex].text : t.dynNewAsset;
+
+            // Better UX: if type is selected but no description, show "Expand to add details"
+            if (typeVal && !desc.trim()) {
+                row.querySelector('.asset-desc-display').innerText = t.dynExpandDetails;
+            } else {
+                row.querySelector('.asset-desc-display').innerText = desc.trim() || t.dynSelectType;
+            }
+        }
+
+        function addAssetRow() {
+            const t = TRANSLATIONS[currentLang]; // Get translations
+
+            document.querySelectorAll('[id^="asset-body-"]').forEach(el => el.classList.add('hidden'));
+            document.querySelectorAll('.asset-item').forEach(el => el.classList.remove('ring-2', 'ring-indigo-100'));
+
+            assetCount++;
+            const container = document.getElementById('asset-container');
+            const uniqueId = assetCount;
+
+            const html = `
+                <div id="asset-row-${uniqueId}" class="asset-item bg-white rounded-lg shadow-sm border border-gray-200 overflow-hidden transition-all duration-300 ring-2 ring-indigo-100">
+                    <div class="bg-white p-4 cursor-pointer hover:bg-gray-50 flex justify-between items-center select-none" onclick="toggleAsset(${uniqueId})">
+                        <div class="flex items-center gap-3">
+                             <div class="w-10 h-10 rounded-full bg-indigo-50 flex items-center justify-center text-indigo-600 font-bold text-xl asset-icon-display">?</div>
+                             <div>
+                                 <h3 class="font-bold text-gray-800 text-sm asset-title-display">${t.dynNewAsset}</h3>
+                                 <p class="text-xs text-gray-500 asset-desc-display truncate max-w-xs md:max-w-md">${t.dynSelectType}</p>
+                             </div>
+                        </div>
+                        <div class="flex items-center gap-3">
+                             <span class="text-xs font-bold text-indigo-600 bg-indigo-50 px-2 py-1 rounded">${t.dynEdit}</span>
+                             <button type="button" onclick="event.stopPropagation(); window.removeSpecificRow(${uniqueId})" class="text-gray-400 hover:text-red-500 p-1 hover:bg-red-50 rounded transition">
+                                <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16" /></svg>
+                             </button>
+                        </div>
+                    </div>
+                    <div id="asset-body-${uniqueId}" class="border-t border-gray-100 p-4 md:p-6 bg-slate-50">
+                        <div class="bg-white p-4 rounded-lg border border-gray-200 mb-4 shadow-sm">
+                             <div class="mb-3">
+                                <label class="text-xs font-bold text-gray-500 uppercase mb-1 block">${t.dynAssetType}</label>
+                                <select class="asset-type-select w-full border p-2 rounded text-sm bg-gray-50 outline-none transition" onchange="renderAssetFields(${uniqueId}, this.value); checkSplitWarning(${uniqueId}); updateAssetHeader(${uniqueId}); saveData()">
+                                    <option value="">${t.dynSelectAssetType}</option>
+                                    <optgroup label="${t.assetOptRealEstate}"><option value="flat">${t.assetOptFlat}</option><option value="land">${t.assetOptLand}</option><option value="shop">${t.assetOptShop}</option></optgroup>
+                                    <optgroup label="${t.assetOptBankCash}"><option value="savings">${t.assetOptSavings}</option><option value="fd">${t.assetOptFD}</option><option value="locker">${t.assetOptLocker}</option><option value="loan">${t.assetOptLoan}</option></optgroup>
+                                    <optgroup label="${t.assetOptInvestments}"><option value="nps">${t.assetOptNPS}</option><option value="mf">${t.assetOptMF}</option><option value="demat">${t.assetOptDemat}</option><option value="crypto">${t.assetOptCrypto}</option><option value="insurance">${t.assetOptInsurance}</option></optgroup>
+                                    <optgroup label="${t.assetOptBusiness}"><option value="esop">${t.assetOptESOP}</option><option value="business">${t.assetOptBusinessInt}</option></optgroup>
+                                    <optgroup label="${t.assetOptValuables}"><option value="jewelry">${t.assetOptJewelry}</option><option value="vehicle">${t.assetOptVehicle}</option></optgroup>
+                                </select>
+                             </div>
+                             <div id="dynamic-fields-${uniqueId}"></div>
+                        </div>
+                        <div class="bg-white p-4 rounded-lg border border-gray-200 shadow-sm">
+                             <div id="split-warning-${uniqueId}" class="hidden mb-3 bg-amber-50 border-l-4 border-amber-400 p-3 rounded-r">
+                                <div class="flex gap-2">
+                                    <span class="text-xl">⚠️</span>
+                                    <p class="text-xs text-amber-900 leading-snug"><strong>${t.dynIndivisibleWarning.split(':')[0]}:</strong> ${t.dynIndivisibleWarning.split(':')[1]}</p>
+                                </div>
+                             </div>
+                             <div id="shares-container-${uniqueId}" class="space-y-2"></div>
+                             <button onclick="addShareRow(${uniqueId})" class="mt-3 text-xs flex items-center gap-1 bg-white border border-indigo-200 text-indigo-600 font-bold px-3 py-2 rounded hover:bg-indigo-50 transition">
+                                <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4"></path></svg>
+                                ${t.dynAddShare}
+                             </button>
+                        </div>
+                        <div class="text-center mt-6">
+                            <button onclick="toggleAsset(${uniqueId})" class="text-sm font-bold text-white bg-indigo-600 hover:bg-indigo-700 px-8 py-2 rounded shadow transition">${t.dynEdit === 'Edit' ? 'Done & Collapse' : 'पूर्ण और संक्षिप्त करें'}</button>
+                        </div>
+                    </div>
+                </div>
+            `;
+            container.insertAdjacentHTML('beforeend', html);
+            addShareRow(uniqueId);
+            saveData();
+        }
+
+        function renderAssetFields(uniqueId, type) {
+            const container = document.getElementById(`dynamic-fields-${uniqueId}`);
+            container.innerHTML = '';
+            const schema = ASSET_SCHEMAS[type] || ASSET_SCHEMAS['jewelry'];
+            schema.forEach(field => {
+                const wrapper = document.createElement('div');
+                wrapper.className = "mb-3";
+                const label = document.createElement('label');
+                label.className = "text-[10px] font-bold uppercase text-gray-500 block mb-1";
+                label.innerText = field.label;
+                let input;
+                if (field.type === 'textarea') { input = document.createElement('textarea'); input.rows = 2; }
+                else { input = document.createElement('input'); input.type = 'text'; }
+                input.className = `dynamic-field-input w-full border p-2 rounded text-sm focus:ring-1 focus:ring-indigo-500 outline-none`;
+                input.setAttribute('data-key', field.key);
+                input.placeholder = field.label;
+                input.oninput = function () { removeError(this); updateAssetHeader(uniqueId); saveData(); };
+                wrapper.appendChild(label); wrapper.appendChild(input); container.appendChild(wrapper);
+            });
+        }
+
+        function onPrimaryBenChange(selectEl) {
+            const benId = selectEl.value; if (!benId) return;
+            const ben = beneficiaries.find(b => b.id == benId);
+            const altSelect = selectEl.closest('.share-row').querySelector('.ben-select-alt-share');
+            if (ben && ben.defaultAltId) altSelect.value = ben.defaultAltId;
+        }
+
+        function onResidualPrimaryBenChange(selectEl) {
+            const benId = selectEl.value; if (!benId) return;
+            const ben = beneficiaries.find(b => b.id == benId);
+            const altSelect = selectEl.closest('.residual-row').querySelector('.residual-ben-alt-select');
+            if (ben && ben.defaultAltId) altSelect.value = ben.defaultAltId;
+        }
+
+        function addShareRow(assetId, benId = '', shareVal = '100', altId = '') {
+            const t = TRANSLATIONS[currentLang]; // Get translations
+
+            const container = document.getElementById(`shares-container-${assetId}`);
+            const div = document.createElement('div');
+            div.className = "share-row bg-gray-50 p-3 rounded border border-gray-200 mb-2 relative group hover:bg-white hover:shadow-sm transition-all";
+            div.innerHTML = `
+                <div class="grid grid-cols-1 md:grid-cols-12 gap-3 items-start">
+                    <div class="md:col-span-4">
+                         <label class="text-[10px] font-bold uppercase text-gray-500 block mb-1">${t.dynBeneficiaries}</label>
+                         <select class="ben-select-share w-full border p-2 rounded text-sm bg-white focus:border-indigo-500 outline-none" onchange="onPrimaryBenChange(this); saveData()"></select>
+                    </div>
+                    <div class="md:col-span-2">
+                         <label class="text-[10px] font-bold uppercase text-gray-500 block mb-1">${t.dynPercentShare}</label>
+                         <div class="relative">
+                            <input type="number" class="share-input w-full border p-2 rounded text-sm font-bold text-center bg-white outline-none" value="${shareVal}" min="1" max="100" oninput="saveData()">
+                            <span class="absolute right-2 top-2 text-xs text-gray-400 font-bold">%</span>
+                         </div>
+                    </div>
+                    <div class="md:col-span-5">
+                         <label class="text-[10px] font-bold uppercase text-gray-400 block mb-1">${t.dynAlternate}</label>
+                         <select class="ben-select-alt-share w-full border p-2 rounded text-sm bg-white text-gray-600 outline-none" onchange="saveData()"></select>
+                    </div>
+                    <div class="md:col-span-1 flex items-end justify-center h-full pb-1">
+                         <button onclick="removeShareRow(this)" class="text-gray-300 hover:text-red-500 transition" title="Remove Share">
+                             <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16"></path></svg>
+                         </button>
+                    </div>
+                </div>
+            `;
+            container.appendChild(div);
+            populateDropdown(div.querySelector('.ben-select-share'));
+            populateDropdown(div.querySelector('.ben-select-alt-share'));
+            div.querySelector('.ben-select-share').value = benId;
+            div.querySelector('.ben-select-alt-share').value = altId;
+            checkSplitWarning(assetId); saveData();
+        }
+
+        function removeShareRow(btn) {
+            const row = btn.closest('.share-row');
+            const assetId = row.parentElement.id.split('-')[2];
+            if (row.parentElement.children.length > 1) { row.remove(); checkSplitWarning(assetId); saveData(); }
+            else alert("Asset must have at least one beneficiary.");
+        }
+
+        // Updated for Consistency
+
+        // Function to reload all dynamic rows when language changes
+        function reloadDynamicRows() {
+            // Save current data
+            const currentData = {
+                beneficiaries: [],
+                assets: []
+            };
+
+            // Collect beneficiary data
+            document.querySelectorAll('.beneficiary-item').forEach(benRow => {
+                const id = benRow.getAttribute('data-id');
+                const ben = {
+                    id: id,
+                    name: document.getElementById(`ben-name-${id}`)?.value || '',
+                    rel: document.getElementById(`ben-rel-${id}`)?.value || '',
+                    addr: document.getElementById(`ben-addr-${id}`)?.value || '',
+                    father: document.getElementById(`ben-father-${id}`)?.value || '',
+                    relPrefix: document.getElementById(`ben-relPrefix-${id}`)?.value || 'S/o',
+                    isMinor: document.getElementById(`ben-minor-${id}`)?.checked || false,
+                    gName: document.getElementById(`guardian-name-${id}`)?.value || '',
+                    gRel: document.getElementById(`guardian-rel-${id}`)?.value || '',
+                    gFather: document.getElementById(`guardian-father-${id}`)?.value || '',
+                    gRelPrefix: document.getElementById(`ben-gRelPrefix-${id}`)?.value || 'S/o',
+                    gAddr: document.getElementById(`guardian-addr-${id}`)?.value || '',
+                    defaultAltId: document.getElementById(`ben-defaultAlt-${id}`)?.getAttribute('data-selected') || ''
+                };
+                currentData.beneficiaries.push(ben);
+            });
+
+            // Collect asset data
+            document.querySelectorAll('.asset-item').forEach(assetRow => {
+                const assetBody = assetRow.querySelector('[id^="asset-body-"]');
+                if (!assetBody) return;
+
+                const assetId = assetBody.id.replace('asset-body-', '');
+                const typeSelect = assetRow.querySelector('.asset-type-select');
+                const type = typeSelect?.value || '';
+
+                if (!type) return;
+
+                const asset = {
+                    id: assetId,
+                    type: type,
+                    shares: []
+                };
+
+                // Collect share data
+                const sharesContainer = document.getElementById(`shares-container-${assetId}`);
+                if (sharesContainer) {
+                    sharesContainer.querySelectorAll('.share-row').forEach(shareRow => {
+                        const benSelect = shareRow.querySelector('.ben-select-share');
+                        const shareInput = shareRow.querySelector('.share-input');
+                        const altSelect = shareRow.querySelector('.ben-select-alt-share');
+
+                        asset.shares.push({
+                            benId: benSelect?.value || '',
+                            share: shareInput?.value || '100',
+                            altId: altSelect?.value || ''
+                        });
+                    });
+                }
+
+                currentData.assets.push(asset);
+            });
+
+            // Clear existing rows
+            document.getElementById('beneficiary-container').innerHTML = '';
+            document.getElementById('asset-container').innerHTML = '';
+
+            // Reset counters
+            beneficiaryCount = 0;
+            assetCount = 0;
+
+            // Re-render beneficiaries
+            currentData.beneficiaries.forEach(ben => {
+                addBeneficiaryRow(ben);
+            });
+
+            // Re-render assets
+            currentData.assets.forEach(asset => {
+                addAssetRow();
+                const assetId = assetCount;
+
+                // Set asset type
+                const typeSelect = document.querySelector(`#asset-row-${assetId} .asset-type-select`);
+                if (typeSelect) {
+                    typeSelect.value = asset.type;
+                    // Trigger the change event to render fields
+                    typeSelect.dispatchEvent(new Event('change'));
+
+                    // Re-add shares after a short delay to ensure fields are rendered
+                    setTimeout(() => {
+                        const sharesContainer = document.getElementById(`shares-container-${assetId}`);
+                        if (sharesContainer) {
+                            sharesContainer.innerHTML = ''; // Clear default share
+                            asset.shares.forEach(share => {
+                                addShareRow(assetId, share.benId, share.share, share.altId);
+                            });
+                        }
+                    }, 50);
+                }
+            });
+
+            // Update all dropdowns after re-rendering
+            setTimeout(() => {
+                updateAllDropdowns();
+            }, 100);
+        }
+
+        function addResidualShare(benId = '', share = '100', altId = '') {
+            const container = document.getElementById('residual-shares-list');
+            const div = document.createElement('div');
+            // Matches Share Row UI
+            div.className = "residual-row bg-gray-50 p-3 rounded border border-gray-200 mb-2 relative group hover:bg-white hover:shadow-sm transition-all";
+            div.innerHTML = `
+                <div class="grid grid-cols-1 md:grid-cols-12 gap-3 items-start">
+                    <div class="md:col-span-4">
+                         <label class="text-[10px] font-bold uppercase text-gray-500 block mb-1">Beneficiary</label>
+                         <select class="residual-ben-select w-full border p-2 rounded text-sm bg-white focus:border-indigo-500 outline-none" onchange="onResidualPrimaryBenChange(this); saveData()"></select>
+                    </div>
+                    <div class="md:col-span-2">
+                         <label class="text-[10px] font-bold uppercase text-gray-500 block mb-1">% Share</label>
+                         <div class="relative">
+                            <input type="number" class="residual-share-input w-full border p-2 rounded text-sm font-bold text-center bg-white outline-none" value="${share}" min="1" max="100" oninput="saveData()">
+                            <span class="absolute right-2 top-2 text-xs text-gray-400 font-bold">%</span>
+                         </div>
+                    </div>
+                    <div class="md:col-span-5">
+                         <label class="text-[10px] font-bold uppercase text-gray-400 block mb-1">Alternate</label>
+                         <select class="residual-ben-alt-select w-full border p-2 rounded text-sm bg-white text-gray-600 outline-none" onchange="saveData()"></select>
+                    </div>
+                    <div class="md:col-span-1 flex items-end justify-center h-full pb-1">
+                         <button onclick="this.closest('.residual-row').remove(); saveData()" class="text-gray-300 hover:text-red-500 transition" title="Remove Share">
+                             <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16"></path></svg>
+                         </button>
+                    </div>
+                </div>
+            `;
+            container.appendChild(div);
+            populateDropdown(div.querySelector('.residual-ben-select'));
+            populateDropdown(div.querySelector('.residual-ben-alt-select'));
+            div.querySelector('.residual-ben-select').value = benId;
+            div.querySelector('.residual-ben-alt-select').value = altId;
+            saveData();
+        }
+
+        function checkSplitWarning(assetId) {
+            const row = document.getElementById(`asset-row-${assetId}`);
+            const type = row.querySelector('.asset-type-select').value;
+            const shareCount = row.querySelectorAll('.share-row').length;
+            const indivisible = ['flat', 'land', 'shop', 'vehicle', 'jewelry'];
+            if (indivisible.includes(type) && shareCount > 1) document.getElementById(`split-warning-${assetId}`).classList.remove('hidden');
+            else document.getElementById(`split-warning-${assetId}`).classList.add('hidden');
+        }
+
+        function updateAllDropdowns() {
+            document.querySelectorAll('.ben-select-share, .ben-select-alt-share, .residual-ben-select, .residual-ben-alt-select, [id^="ben-defaultAlt-"]').forEach(sel => {
+                const currentVal = sel.value || sel.getAttribute('data-selected') || '';
+                const isInternalAlt = sel.id.startsWith('ben-defaultAlt-');
+                let selfId = isInternalAlt ? sel.id.replace('ben-defaultAlt-', '') : null;
+                sel.innerHTML = '<option value="">' + (isInternalAlt ? '-- No Default Alternate --' : 'Select...') + '</option>';
+                beneficiaries.forEach(b => {
+                    if (isInternalAlt && String(b.id) === String(selfId)) return;
+                    const o = document.createElement('option'); o.value = b.id; o.innerText = b.name; sel.appendChild(o)
+                });
+                sel.value = currentVal;
+            });
+        }
+
+        function populateDropdown(sel) {
+            sel.innerHTML = '<option value="">Select...</option>';
+            beneficiaries.forEach(b => { const o = document.createElement('option'); o.value = b.id; o.innerText = b.name; sel.appendChild(o) });
+        }
+
+        function saveData() {
+            const statusEl = document.getElementById('save-status');
+            statusEl.innerText = "SAVING..."; statusEl.classList.remove('bg-green-600'); statusEl.classList.add('bg-yellow-500');
+            clearTimeout(saveTimeout);
+            saveTimeout = setTimeout(() => { performSave(); statusEl.innerText = "SAVED"; statusEl.classList.remove('bg-yellow-500'); statusEl.classList.add('bg-green-600'); const t = document.getElementById('save-toast'); t.innerText = "Draft Saved"; t.classList.add('show'); setTimeout(() => t.classList.remove('show'), 2000); }, 1000);
+        }
+
+        function performSave() {
+            const scrapedBens = [];
+            document.querySelectorAll('.beneficiary-item').forEach(row => {
+                const uid = row.getAttribute('data-id');
+                const name = document.getElementById(`ben-name-${uid}`).value;
+                if (name) {
+                    scrapedBens.push({
+                        id: uid, name,
+                        rel: document.getElementById(`ben-rel-${uid}`).value,
+                        addr: document.getElementById(`ben-addr-${uid}`).value,
+                        relPrefix: document.getElementById(`ben-relPrefix-${uid}`).value,
+                        father: document.getElementById(`ben-father-${uid}`).value,
+                        defaultAltId: document.getElementById(`ben-defaultAlt-${uid}`).value,
+                        isMinor: document.getElementById(`ben-minor-${uid}`).checked,
+                        gName: document.getElementById(`guardian-name-${uid}`).value,
+                        gRel: document.getElementById(`guardian-rel-${uid}`).value,
+                        gRelPrefix: document.getElementById(`ben-gRelPrefix-${uid}`).value || 'S/o',
+                        gFather: document.getElementById(`guardian-father-${uid}`).value,
+                        gAddr: document.getElementById(`guardian-addr-${uid}`).value
+                    });
+                }
+            });
+            beneficiaries = scrapedBens;
+            updateAllDropdowns();
+
+            const residualShares = [];
+            document.querySelectorAll('.residual-row').forEach(row => {
+                residualShares.push({
+                    benId: row.querySelector('.residual-ben-select').value,
+                    share: row.querySelector('.residual-share-input').value,
+                    altId: row.querySelector('.residual-ben-alt-select').value
+                });
+            });
+
+            const data = {
+                lastStep: lastActiveStep,
+                maxStep: maxReachedStep,
+                language: currentLang, // Save language preference
+                personal: {
+                    religion: document.getElementById('religionSelector').value,
+                    customReligion: document.getElementById('customReligion').value,
+                },
+                myName: document.getElementById('myName').value,
+                myRelPrefix: document.getElementById('myRelPrefix').value,
+                fatherName: document.getElementById('fatherName').value,
+                myDob: document.getElementById('myDob').value,
+                myAddress: document.getElementById('myAddress').value,
+                myPlace: document.getElementById('myPlace').value,
+                executor: {},
+                exName: document.getElementById('exName').value,
+                exRel: document.getElementById('exRel').value,
+                exRelPrefix: document.getElementById('exRelPrefix').value,
+                exParentName: document.getElementById('exParentName').value,
+                exAddress: document.getElementById('exAddress').value,
+                beneficiaries,
+                assets: [],
+                residual: residualShares
+            };
+
+            document.querySelectorAll('.asset-item').forEach(row => {
+                const shares = [];
+                row.querySelectorAll('.share-row').forEach(sr => {
+                    shares.push({
+                        benId: sr.querySelector('.ben-select-share').value,
+                        share: sr.querySelector('.share-input').value,
+                        altId: sr.querySelector('.ben-select-alt-share').value
+                    });
+                });
+                const details = {}; let descString = "";
+                row.querySelectorAll('.dynamic-field-input').forEach(inp => {
+                    const key = inp.getAttribute('data-key'); const label = inp.placeholder;
+                    if (inp.value) { details[key] = inp.value; descString += `${label}: ${inp.value}, `; }
+                });
+                if (descString.length > 2) descString = descString.substring(0, descString.length - 2);
+                data.assets.push({ type: row.querySelector('.asset-type-select').value, desc: descString, details, shares });
+            });
+            localStorage.setItem(STORAGE_KEY, JSON.stringify(data));
+        }
+
+        function loadData() {
+            const raw = localStorage.getItem(STORAGE_KEY); if (!raw) return; const data = JSON.parse(raw);
+            document.getElementById('resume-banner').classList.remove('hidden');
+            const startBtn = document.getElementById('start-btn-container'); if (startBtn) startBtn.style.display = 'none';
+
+            const sV = (id, v) => { if (document.getElementById(id)) document.getElementById(id).value = v || ''; };
+            sV('religionSelector', data.personal.religion); sV('customReligion', data.personal.customReligion);
+            sV('myName', data.myName); sV('myRelPrefix', data.myRelPrefix || 'S/o'); sV('fatherName', data.fatherName); sV('myDob', data.myDob); sV('myAddress', data.myAddress); sV('myPlace', data.myPlace);
+            sV('exName', data.exName); sV('exRel', data.exRel); sV('exRelPrefix', data.exRelPrefix || 'S/o'); sV('exParentName', data.exParentName); sV('exAddress', data.exAddress);
+
+            document.getElementById('beneficiary-container').innerHTML = ''; beneficiaryCount = 0;
+            if (data.beneficiaries && data.beneficiaries.length > 0) {
+                data.beneficiaries.forEach(b => { addBeneficiaryRow(b); }); beneficiaries = data.beneficiaries;
+            }
+            checkReligion();
+
+            const ac = document.getElementById('asset-container'); ac.innerHTML = ''; assetCount = 0;
+            if (data.assets) {
+                data.assets.forEach(a => {
+                    addAssetRow(); const row = ac.lastElementChild; const assetId = row.id.replace('asset-row-', '');
+                    row.querySelector('.asset-type-select').value = a.type;
+                    renderAssetFields(assetId, a.type);
+                    if (a.details) { Object.keys(a.details).forEach(key => { const inp = row.querySelector(`[data-key="${key}"]`); if (inp) inp.value = a.details[key]; }); }
+                    document.getElementById(`shares-container-${assetId}`).innerHTML = '';
+                    if (a.shares) a.shares.forEach(s => addShareRow(assetId, s.benId, s.share, s.altId)); else addShareRow(assetId);
+                    updateAssetHeader(assetId); checkSplitWarning(assetId);
+                    document.getElementById(`asset-body-${assetId}`).classList.add('hidden');
+                    document.getElementById(`asset-row-${assetId}`).classList.remove('ring-2', 'ring-indigo-100');
+                });
+            }
+            document.getElementById('residual-shares-list').innerHTML = '';
+            if (Array.isArray(data.residual)) data.residual.forEach(r => addResidualShare(r.benId, r.share, r.altId)); else addResidualShare();
+            updateAllDropdowns(); savedStepIndex = data.lastStep || 1;
+            maxReachedStep = data.maxStep !== undefined ? data.maxStep : (data.lastStep || 0);
+
+            // Restore language preference
+            if (data.language) {
+                currentLang = data.language;
+            }
+        }
+
+        function finishJourney() {
+            const assets = document.querySelectorAll('.asset-item'); let isValid = true;
+            assets.forEach(row => {
+                const uniqueId = row.id.replace('asset-row-', '');
+                let totalShare = 0;
+                row.querySelectorAll('.share-row').forEach(sr => {
+                    const bId = sr.querySelector('.ben-select-share').value; const share = parseFloat(sr.querySelector('.share-input').value) || 0;
+                    if (!bId) { document.getElementById(`asset-body-${uniqueId}`).classList.remove('hidden'); sr.querySelector('.ben-select-share').classList.add('error-border'); isValid = false; }
+                    totalShare += share;
+                });
+                if (totalShare !== 100) { document.getElementById(`asset-body-${uniqueId}`).classList.remove('hidden'); alert(`Error: Total share must be 100%.`); isValid = false; return; }
+            });
+
+            let residualTotal = 0; let hasResBen = false;
+            document.querySelectorAll('.residual-row').forEach(row => {
+                if (row.querySelector('.residual-ben-select').value) hasResBen = true;
+                residualTotal += parseFloat(row.querySelector('.residual-share-input').value) || 0;
+            });
+
+            if (!hasResBen) { alert("Please select at least one Residual Beneficiary."); closePreview(); goToStep(4); return; }
+            if (residualTotal !== 100) { alert(`Residual shares must total 100%.`); closePreview(); goToStep(4); return; }
+            if (!isValid) { closePreview(); goToStep(4); return; }
+
+            performSave(); // Force save before generation
+
+            // Just show the success overlay with options, do not auto-generate PDF
+            updateMaxReached(5);
+            document.querySelectorAll('.step-section').forEach(el => el.classList.remove('active'));
+            document.getElementById('preview-overlay').classList.add('hidden');
+            document.getElementById('success-overlay').classList.remove('hidden');
+            updateProgressBar(5);
+            window.scrollTo(0, 0);
+        }
+
+        async function generatePDF() {
+            if (currentLang === 'hi') {
+                alert("PDF generation is currently not supported for Hindi. Please download the Editable (.rtf) version.");
+                return;
+            }
+            const { jsPDF } = window.jspdf;
+            const doc = new jsPDF({ orientation: 'p', unit: 'mm', format: 'a4' });
+            const margin = 25, topMargin = 25, bottomMargin = 35, pageWidth = 210, contentWidth = pageWidth - (margin * 2), lineHeight = 6;
+            let y = topMargin;
+
+            const checkY = (h) => { if (y + h > (297 - bottomMargin)) { doc.addPage(); y = topMargin; } };
+            const printBlock = (text, isBold = false) => {
+                doc.setFont("times", isBold ? "bold" : "normal"); doc.setFontSize(12);
+                const lines = doc.splitTextToSize(text, contentWidth);
+                checkY(lines.length * lineHeight); doc.text(lines, margin, y); y += (lines.length * lineHeight) + 2;
+            };
+            const printSectionHeader = (text) => { y += 5; checkY(10); doc.setFont("times", "bold"); doc.setFontSize(14); doc.text(text, margin, y); y += 8; };
+            const printAssetDetail = (label, value) => {
+                doc.setFontSize(12); doc.setFont("times", "bold"); const lw = doc.getTextWidth(label + ": ");
+                checkY(lineHeight); doc.text(label + ":", margin + 5, y); doc.setFont("times", "normal");
+                const valLines = doc.splitTextToSize(value, contentWidth - 5 - lw); doc.text(valLines, margin + 5 + lw, y); y += (valLines.length * lineHeight);
+            };
+
+            const gV = (id) => document.getElementById(id).value;
+            const gB = (id) => beneficiaries.find(b => b.id == id);
+            const rShares = JSON.parse(localStorage.getItem(STORAGE_KEY)).residual || [];
+
+            doc.setFont("times", "bold"); doc.setFontSize(22); doc.text("LAST WILL AND TESTAMENT", pageWidth / 2, y, { align: 'center' }); y += 8;
+            doc.setLineWidth(0.5); doc.line(margin, y, pageWidth - margin, y); y += 15;
+
+            let religionTxt = gV('religionSelector'); if (religionTxt === 'Other') religionTxt = gV('customReligion') || 'Other';
+
+            const myName = gV('myName').toUpperCase();
+            const fatherName = gV('fatherName').trim();
+            const myRelPrefix = gV('myRelPrefix') || 'S/o';
+
+            let preamble = `I, ${myName}`;
+            if (fatherName) preamble += `, ${myRelPrefix} ${fatherName}`;
+            preamble += `, residing at ${gV('myAddress')} (Religion: ${religionTxt}), being of sound mind and memory, do hereby make, publish and declare this to be my Last Will and Testament.`;
+            printBlock(preamble);
+
+            printSectionHeader("1. REVOCATION OF PRIOR WILLS");
+            printBlock(`I hereby revoke all former Wills and Codicils made by me. I declare I am in good health and sound mind, making this Will voluntarily.`);
+
+            printSectionHeader("2. APPOINTMENT OF EXECUTOR");
+
+            const exName = gV('exName').toUpperCase();
+            const exRel = gV('exRel');
+            const exParentName = gV('exParentName').trim();
+            const exRelPrefix = gV('exRelPrefix') || 'S/o';
+            const exAddress = gV('exAddress');
+
+            let execText = `I appoint ${exName} (Rel: ${exRel})`;
+            if (exParentName) execText += `, ${exRelPrefix} ${exParentName}`;
+            execText += `, residing at ${exAddress}, to be the sole Executor of this Will.`;
+            printBlock(execText);
+
+            printSectionHeader("3. DISTRIBUTION OF ASSETS");
+            doc.setFont("times", "normal"); doc.setFontSize(12); doc.text("I bequeath my assets as follows:", margin, y); y += 8;
+
+            const assets = JSON.parse(localStorage.getItem(STORAGE_KEY)).assets || [];
+            const getBenString = (b) => {
+                if (!b) return "Unknown";
+                let s = `${b.name} (${b.rel})`;
+                if (b.addr) s += `, R/o ${b.addr}`;
+                if (b.father && b.father.trim()) s += `, ${b.relPrefix || 'S/o'} ${b.father}`;
+                if (b.isMinor && b.gName) {
+                    s += ` [Minor. Guardian: ${b.gName}`;
+                    if (b.gRel) s += ` (${b.gRel})`;
+                    if (b.gFather && b.gFather.trim()) s += `, ${b.relPrefix || 'S/o'} ${b.gFather}`;
+                    if (b.gAddr) s += `, R/o ${b.gAddr}`;
+                    s += `]`;
+                }
+                return s;
+            };
+
+            assets.forEach((asset, idx) => {
+                checkY(30);
+                doc.setFont("times", "bold"); doc.setFontSize(13); doc.text(`${idx + 1}. ${asset.type.toUpperCase()}`, margin, y); y += 6;
+                printAssetDetail("Description", asset.desc);
+                doc.setFont("times", "italic"); doc.setFontSize(11); doc.text("Beneficiaries:", margin + 5, y); y += 6;
+                doc.setFont("times", "normal"); doc.setFontSize(12);
+                asset.shares.forEach((share, sIdx) => {
+                    const p = gB(share.benId); const a = gB(share.altId); if (!p) return;
+                    const lines = doc.splitTextToSize(`(${String.fromCharCode(97 + sIdx)}) ${share.share}% to ${getBenString(p)}`, contentWidth - 15);
+                    checkY(lines.length * 6); doc.text(lines, margin + 10, y); y += (lines.length * 6);
+                    if (a) {
+                        doc.setFontSize(10); doc.setTextColor(80);
+                        const altLines = doc.splitTextToSize(`Alternate: ${getBenString(a)}`, contentWidth - 15);
+                        checkY(altLines.length * 5); doc.text(altLines, margin + 15, y); y += (altLines.length * 5) + 2;
+                        doc.setTextColor(0); doc.setFontSize(12);
+                    } else y += 2;
+                });
+                y += 4;
+            });
+
+            printSectionHeader("4. RESIDUAL CLAUSE");
+            printBlock("All other property (Rest, Residue, and Remainder) I bequeath to:");
+            rShares.forEach((r, idx) => {
+                const p = gB(r.benId); const a = gB(r.altId); if (!p) return;
+
+                // Primary Beneficiary - use splitTextToSize to prevent overflow
+                const shareText = `(${String.fromCharCode(97 + idx)}) ${r.share}% to ${getBenString(p)}`;
+                const shareLines = doc.splitTextToSize(shareText, contentWidth - 5);
+                checkY(shareLines.length * lineHeight);
+                doc.text(shareLines, margin + 5, y);
+                y += (shareLines.length * lineHeight) + 2;
+
+                // Alternate Beneficiary - use splitTextToSize to prevent overflow
+                if (a) {
+                    doc.setFontSize(10); doc.setTextColor(80);
+                    const altText = `Alternate: ${getBenString(a)}`;
+                    const altLines = doc.splitTextToSize(altText, contentWidth - 10);
+                    checkY(altLines.length * 5);
+                    doc.text(altLines, margin + 10, y);
+                    y += (altLines.length * 5) + 2;
+                    doc.setTextColor(0); doc.setFontSize(12);
+                }
+            });
+            y += 5;
+
+            checkY(135);
+            doc.setFont("times", "bold"); doc.setFontSize(12); doc.text("IN WITNESS WHEREOF,", margin, y); y += 6;
+            doc.setFont("times", "normal");
+            const signingDate = new Date().toLocaleDateString('en-IN', { year: 'numeric', month: 'long', day: 'numeric' });
+            printBlock(`I have set my hand to this Will at ${gV('myPlace')} on ${signingDate}.`);
+            y += 20;
+
+            doc.setLineWidth(0.5); doc.line(margin, y, margin + 60, y); y += 5;
+            doc.setFont("times", "bold"); doc.text("TESTATOR SIGNATURE", margin, y); doc.setFont("times", "normal"); doc.text(`(${gV('myName')})`, margin, y + 6); y += 20;
+
+            doc.setFont("times", "bold"); doc.text("SIGNED BY THE WITNESSES", margin, y); doc.setFont("times", "normal"); y += 6;
+            const witLines = doc.splitTextToSize("We certify that the Testator signed this Will in our presence, and we have signed as witnesses in their presence.", contentWidth);
+            doc.text(witLines, margin, y); y += (witLines.length * 6) + 10;
+
+            const col1 = margin, col2 = margin + 90;
+            doc.setFont("times", "bold"); doc.text("Witness 1:", col1, y); doc.text("Witness 2:", col2, y); doc.setFont("times", "normal"); y += 15;
+            doc.setLineWidth(0.2); doc.line(col1, y, col1 + 50, y); doc.line(col2, y, col2 + 50, y); y += 5;
+            doc.text("Signature", col1, y); doc.text("Signature", col2, y); y += 12;
+            doc.text("Name: ___________________", col1, y); doc.text("Name: ___________________", col2, y); y += 8;
+            doc.text("Address: _________________", col1, y); doc.text("Address: _________________", col2, y);
+
+            const totalPages = doc.internal.getNumberOfPages();
+            for (let i = 1; i <= totalPages; i++) {
+                doc.setPage(i);
+                doc.setFontSize(8); doc.setTextColor(150); doc.text(`Page ${i} of ${totalPages}`, pageWidth - margin, 290, { align: "right" });
+                if (i < totalPages) {
+                    doc.setDrawColor(150); doc.line(margin, 265, pageWidth - margin, 265);
+                    doc.setFontSize(8); doc.setTextColor(100); doc.text("Signatures required on every page:", margin, 270);
+                    const footerY = 280; doc.setTextColor(0); doc.setFontSize(10);
+                    doc.setDrawColor(0); doc.setLineWidth(0.2);
+                    doc.line(margin, footerY - 5, margin + 50, footerY - 5); doc.line(margin + 65, footerY - 5, margin + 115, footerY - 5); doc.line(margin + 130, footerY - 5, margin + 180, footerY - 5);
+                    doc.text("TESTATOR", margin, footerY); doc.text("WITNESS 1", margin + 65, footerY); doc.text("WITNESS 2", margin + 130, footerY);
+                }
+            }
+            doc.save(`Will_${gV('myName').replace(/\s+/g, '_')}.pdf`);
+        }
+
+        function generateRTF() {
+            // Get translations for current language
+            const t = TRANSLATIONS[currentLang];
+
+            // Helpers
+            const escapeRTF = (text) => {
+                if (!text) return "";
+                // Basic RTF escaping
+                return text.toString()
+                    .replace(/\\/g, "\\\\")
+                    .replace(/\{/g, "\\{")
+                    .replace(/\}/g, "\\}")
+                    .replace(/\n/g, "\\par "); // Newlines to par
+            };
+
+            // To handle unicode characters, we need to escape them as \uN?
+            const encodeRTF = (str) => {
+                return escapeRTF(str).replace(/[^\x00-\x7F]/g, function (c) {
+                    return '\\u' + c.charCodeAt(0) + '?';
+                });
+            };
+
+            const gV = (id) => document.getElementById(id).value;
+            const gB = (id) => beneficiaries.find(b => b.id == id);
+            const data = JSON.parse(localStorage.getItem(STORAGE_KEY));
+
+            // RTF Header with Margins (1 inch)
+            let rtf = `{\\rtf1\\ansi\\deff0{\\fonttbl{\\f0 Times New Roman;}}\\margl1440\\margr1440\\margt1440\\margb1440\\f0\\fs24 \n`;
+
+            // Empty Header (to prevent default header box)
+            rtf += `{\\header \\pard \\par}\n`;
+
+            // Footer definition - Simplified for compatibility
+            // Using \ql (left align) and explicit spaces instead of tabs for better control
+            const footerText = currentLang === 'en'
+                ? `Signatures required on every page:\\par \\pard\\fs20\\sa100 \\par ____________________      ____________________      ____________________\\par ${t.pdfTestatorLabel}                  ${t.pdfWitness1Label}                  ${t.pdfWitness2Label}\\par`
+                : `हर पेज पर हस्ताक्षर आवश्यक:\\par \\pard\\fs20\\sa100 \\par ____________________      ____________________      ____________________\\par ${encodeRTF(t.pdfTestatorLabel)}                  ${encodeRTF(t.pdfWitness1Label)}                  ${encodeRTF(t.pdfWitness2Label)}\\par`;
+            rtf += `{\\footer \\pard\\fs16\\cf1 ${footerText}}\n`;
+
+            // Initialize Section
+            rtf += `\\sectd\\margl1440\\margr1440\\margt1440\\margb1440\\headery720\\footery720\n`;
+
+            // Title
+            rtf += `\\pard\\qc\\b\\fs44 ${encodeRTF(t.pdfTitle)}\\b0\\fs24\\par \n`;
+            rtf += `\\brdrb\\brdrs\\brdrw10\\brsp20 \\par \\pard\\sa180\\sl276\\slmult1 \\par \n`; // Line and reset paragraph
+
+            // Preamble
+            let religionTxt = gV('religionSelector');
+            if (religionTxt === 'Other') religionTxt = gV('customReligion') || 'Other';
+            const myName = gV('myName').toUpperCase();
+            const fatherName = gV('fatherName').trim();
+            const myRelPrefix = gV('myRelPrefix') || 'S/o';
+
+            let preamble = currentLang === 'en'
+                ? `I, \\b ${encodeRTF(myName)}\\b0`
+                : `${encodeRTF(t.pdfIAppoint.split(' ')[0])}, \\b ${encodeRTF(myName)}\\b0`;
+            if (fatherName) preamble += `, ${encodeRTF(myRelPrefix)} ${encodeRTF(fatherName)}`;
+            preamble += `, ${encodeRTF(t.pdfResidingAt)} ${encodeRTF(gV('myAddress'))} (${encodeRTF(t.pdfReligionLabel)}: ${encodeRTF(religionTxt)}), ${encodeRTF(t.pdfBeingOfSound)}`;
+
+            rtf += `${preamble}\\par\\par \n`;
+
+            // 1. Revocation
+            rtf += `\\b\\fs28 ${encodeRTF(t.pdfRevocationTitle)}\\b0\\fs24\\par \n`;
+            rtf += `${encodeRTF(t.pdfRevocationText)}\\par\\par \n`;
+
+            // 2. Executor
+            rtf += `\\b\\fs28 ${encodeRTF(t.pdfExecutorTitle)}\\b0\\fs24\\par \n`;
+            const exName = gV('exName').toUpperCase();
+            let execText = `${encodeRTF(t.pdfIAppoint)} \\b ${encodeRTF(exName)} \\b0 (${encodeRTF(t.pdfRelLabel)}: ${encodeRTF(gV('exRel'))})`;
+            if (gV('exParentName')) execText += `, ${encodeRTF(gV('exRelPrefix') || 'S/o')} ${encodeRTF(gV('exParentName'))}`;
+            execText += `, ${encodeRTF(t.pdfResidingAt)} ${encodeRTF(gV('exAddress'))}, ${encodeRTF(t.pdfToBeThe)}`;
+            rtf += `${execText}\\par\\par \n`;
+
+            // 3. Assets
+            rtf += `\\b\\fs28 ${encodeRTF(t.pdfDistributionTitle)}\\b0\\fs24\\par \n`;
+            rtf += `${encodeRTF(t.pdfDistributionIntro)}\\par\\par \n`;
+
+            const assets = data.assets || [];
+
+            const getBenStringRTF = (b) => {
+                if (!b) return "Unknown";
+                let s = `\\b ${encodeRTF(b.name)}\\b0 (${encodeRTF(b.rel)})`;
+                if (b.addr) s += `, R/o ${encodeRTF(b.addr)}`;
+                if (b.father && b.father.trim()) s += `, ${encodeRTF(b.relPrefix || 'S/o')} ${encodeRTF(b.father)}`;
+                if (b.isMinor && b.gName) {
+                    s += ` [${encodeRTF(t.pdfMinorLabel)}. ${encodeRTF(t.pdfGuardianLabel)}: ${encodeRTF(b.gName)}`;
+                    if (b.gRel) s += ` (${encodeRTF(b.gRel)})`;
+                    if (b.gFather && b.gFather.trim()) s += `, ${encodeRTF(b.gRelPrefix || 'S/o')} ${encodeRTF(b.gFather)}`;
+                    if (b.gAddr) s += `, R/o ${encodeRTF(b.gAddr)}`;
+                    s += `]`;
+                }
+                return s;
+            };
+
+            assets.forEach((asset, idx) => {
+                rtf += `\\b ${idx + 1}. ${encodeRTF(asset.type.toUpperCase())}\\b0\\par \n`;
+                rtf += `\\b ${encodeRTF(t.pdfDescriptionLabel)}: \\b0 ${encodeRTF(asset.desc)}\\par \n`;
+                rtf += `\\i ${encodeRTF(t.pdfBeneficiariesLabel)}:\\i0\\par \n`;
+
+                asset.shares.forEach((share, sIdx) => {
+                    const p = gB(share.benId);
+                    const a = gB(share.altId);
+                    if (!p) return;
+                    rtf += `\\tab (${String.fromCharCode(97 + sIdx)}) ${share.share}% to ${getBenStringRTF(p)}\\par \n`;
+                    if (a) {
+                        rtf += `\\tab\\tab ${encodeRTF(t.pdfAlternateLabel)}: ${getBenStringRTF(a)}\\par \n`;
+                    }
+                });
+                rtf += `\\par \n`;
+            });
+
+            // 4. Residual
+            rtf += `\\b\\fs28 ${encodeRTF(t.pdfResidualTitle)}\\b0\\fs24\\par \n`;
+            rtf += `${encodeRTF(t.pdfResidualIntro)}\\par \n`;
+            const rShares = data.residual || [];
+            rShares.forEach((r, idx) => {
+                const p = gB(r.benId);
+                const a = gB(r.altId);
+                if (!p) return;
+                rtf += `\\tab (${String.fromCharCode(97 + idx)}) ${r.share}% to ${getBenStringRTF(p)}\\par \n`;
+                if (a) {
+                    rtf += `\\tab\\tab ${encodeRTF(t.pdfAlternateLabel)}: ${getBenStringRTF(a)}\\par \n`;
+                }
+            });
+            rtf += `\\par \n`;
+
+            // Signatures
+            rtf += `\\par\\par \n`;
+            rtf += `\\b ${encodeRTF(t.pdfSignatureText)}\\b0\\par \n`;
+            const today = new Date().toLocaleDateString(currentLang === 'en' ? 'en-IN' : 'hi-IN', { year: 'numeric', month: 'long', day: 'numeric' });
+            const witnessText = currentLang === 'en'
+                ? `I have set my hand to this Will at ${encodeRTF(gV('myPlace'))} on ${today}.`
+                : `मैंने ${encodeRTF(gV('myPlace'))} में ${today} को इस वसीयत पर हस्ताक्षर किए हैं।`;
+            rtf += `${witnessText}\\par\\par\\par \n`;
+
+            // Testator Line
+            rtf += `____________________________\\par \n`;
+            const testatorSigLabel = currentLang === 'en' ? 'TESTATOR SIGNATURE' : 'वसीयतकर्ता हस्ताक्षर';
+            rtf += `\\b ${encodeRTF(testatorSigLabel)}\\b0\\par \n`;
+            rtf += `(${encodeRTF(myName)})\\par\\par\\par \n`;
+
+            // Witnesses
+            const witnessesTitle = currentLang === 'en' ? 'SIGNED BY THE WITNESSES' : 'गवाहों द्वारा हस्ताक्षरित';
+            const witnessCert = currentLang === 'en'
+                ? 'We certify that the Testator signed this Will in our presence, and we have signed as witnesses in their presence.'
+                : 'हम प्रमाणित करते हैं कि वसीयतकर्ता ने हमारी उपस्थिति में इस वसीयत पर हस्ताक्षर किए हैं, और हमने उनकी उपस्थिति में गवाहों के रूप में हस्ताक्षर किए हैं।';
+            rtf += `\\b ${encodeRTF(witnessesTitle)}\\b0\\par \n`;
+            rtf += `${encodeRTF(witnessCert)}\\par\\par \n`;
+
+            // Simple Witness Layout for RTF (Table or Tabs)
+            // Using Tabs for simplicity in RTF
+            rtf += `\\b ${encodeRTF(t.pdfWitness1Label)}:\\b0 \\tab\\tab\\tab\\tab\\tab \\b ${encodeRTF(t.pdfWitness2Label)}:\\b0\\par \n`;
+            rtf += `_____________________ \\tab\\tab\\tab _____________________\\par \n`;
+            const sigLabel = currentLang === 'en' ? 'Signature' : 'हस्ताक्षर';
+            const nameLabel = currentLang === 'en' ? 'Name' : 'नाम';
+            const addrLabel = currentLang === 'en' ? 'Addr' : 'पता';
+            rtf += `${encodeRTF(sigLabel)} \\tab\\tab\\tab\\tab\\tab ${encodeRTF(sigLabel)}\\par\\par \n`;
+            rtf += `${encodeRTF(nameLabel)}: _________________ \\tab\\tab\\tab ${encodeRTF(nameLabel)}: _________________\\par \n`;
+            rtf += `${encodeRTF(addrLabel)}: __________________ \\tab\\tab\\tab ${encodeRTF(addrLabel)}: __________________\\par \n`;
+
+            rtf += `}`; // End RTF
+
+            // Download
+            const blob = new Blob([rtf], { type: 'application/rtf' });
+            const url = URL.createObjectURL(blob);
+            const link = document.createElement('a');
+            link.href = url;
+            link.download = `Will_${myName.replace(/\s+/g, '_')}.rtf`;
+            document.body.appendChild(link);
+            link.click();
+            document.body.removeChild(link);
+        }
+    </script>
+    <script type="module" src="/index.tsx"></script>
+</body>
+
+</html>
