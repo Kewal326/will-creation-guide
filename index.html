@@ -1037,6 +1037,21 @@
                 else if (myRelPrefix === 'W/o') myRelPrefixTrans = 'पत्नी';
             }
 
+            // Determine gender for Hindi grammar
+            const isFemale = (myRelPrefix === 'D/o' || myRelPrefix === 'W/o');
+            const fixHindiGender = (text) => {
+                if (currentLang !== 'hi') return text;
+                if (isFemale) {
+                    return text.replace(/करता\/करती/g, 'करती')
+                        .replace(/बनाता\/बनाती/g, 'बनाती')
+                        .replace(/रहा\/रही/g, 'रही');
+                } else {
+                    return text.replace(/करता\/करती/g, 'करता')
+                        .replace(/बनाता\/बनाती/g, 'बनाता')
+                        .replace(/रहा\/रही/g, 'रहा');
+                }
+            };
+
             let preamble = "";
             const myDobVal = document.getElementById('myDob') ? document.getElementById('myDob').value : '';
             let dobText = "";
@@ -1055,7 +1070,8 @@
                 preamble = `मैं, <b>${myName}</b>`;
                 if (fatherName) preamble += `, ${myRelPrefixTrans} ${fatherName}`;
                 if (dobText) preamble += dobText;
-                preamble += `, निवासी ${getValOrPlace('myAddress', t.dynPermAddress)} (धर्म: ${religionTxt}), स्वस्थ मन और स्मृति का होने के नाते, एतद्द्वारा अपनी यह अंतिम वसीयत और वसीयतनामा बनाता हूँ, प्रकाशित करता हूँ और घोषित करता हूँ।`;
+                let preambleText = `, निवासी ${getValOrPlace('myAddress', t.dynPermAddress)} (धर्म: ${religionTxt}), स्वस्थ मन और स्मृति का होने के नाते, एतद्द्वारा अपनी यह अंतिम वसीयत और वसीयतनामा बनाता/बनाती हूँ, प्रकाशित करता/करती हूँ और घोषित करता/करती हूँ।`;
+                preamble += fixHindiGender(preambleText);
             }
             html += `<p style="margin-bottom: 15px;">${preamble}</p>`;
 
@@ -2183,18 +2199,40 @@
                 dobText = currentLang === 'en' ? `, born on ${dobStr}` : `, जन्म तिथि ${dobStr}`;
             }
 
+            // Determine gender for Hindi grammar
+            const isFemale = (myRelPrefix === 'D/o' || myRelPrefix === 'W/o');
+            const fixHindiGender = (text) => {
+                if (currentLang !== 'hi') return text;
+                if (isFemale) {
+                    return text.replace(/करता\/करती/g, 'करती')
+                        .replace(/बनाता\/बनाती/g, 'बनाती')
+                        .replace(/रहा\/रही/g, 'रही');
+                } else {
+                    return text.replace(/करता\/करती/g, 'करता')
+                        .replace(/बनाता\/बनाती/g, 'बनाता')
+                        .replace(/रहा\/रही/g, 'रहा');
+                }
+            };
+
             let preamble = currentLang === 'en'
                 ? `I, \\b ${encodeRTF(myName)}\\b0`
                 : `${encodeRTF(t.pdfIAppoint.split(' ')[0])}, \\b ${encodeRTF(myName)}\\b0`;
             if (fatherName) preamble += `, ${encodeRTF(myRelPrefix)} ${encodeRTF(fatherName)}`;
             if (dobText) preamble += encodeRTF(dobText);
-            preamble += `, ${encodeRTF(t.pdfResidingAt)} ${encodeRTF(gV('myAddress'))} (${encodeRTF(t.pdfReligionLabel)}: ${encodeRTF(religionTxt)}), ${encodeRTF(t.pdfBeingOfSound)}`;
+
+            let preambleEnd = `, ${encodeRTF(t.pdfResidingAt)} ${encodeRTF(gV('myAddress'))} (${encodeRTF(t.pdfReligionLabel)}: ${encodeRTF(religionTxt)}), ${encodeRTF(t.pdfBeingOfSound)}`;
+            if (currentLang === 'hi') {
+                preambleEnd = fixHindiGender(preambleEnd);
+            }
+            preamble += preambleEnd;
 
             rtf += `${preamble}\\par\\par \n`;
 
             // 1. Revocation
             rtf += `\\b\\fs28 ${encodeRTF(t.pdfRevocationTitle)}\\b0\\fs24\\par \n`;
-            rtf += `${encodeRTF(t.pdfRevocationText)}\\par\\par \n`;
+            let revocationText = t.pdfRevocationText;
+            if (currentLang === 'hi') revocationText = fixHindiGender(revocationText);
+            rtf += `${encodeRTF(revocationText)}\\par\\par \n`;
 
             // 2. Executor
             rtf += `\\b\\fs28 ${encodeRTF(t.pdfExecutorTitle)}\\b0\\fs24\\par \n`;
@@ -2202,11 +2240,14 @@
             let execText = `${encodeRTF(t.pdfIAppoint)} \\b ${encodeRTF(exName)} \\b0 (${encodeRTF(t.pdfRelLabel)}: ${encodeRTF(gV('exRel'))})`;
             if (gV('exParentName')) execText += `, ${encodeRTF(gV('exRelPrefix') || 'S/o')} ${encodeRTF(gV('exParentName'))}`;
             execText += `, ${encodeRTF(t.pdfResidingAt)} ${encodeRTF(gV('exAddress'))}, ${encodeRTF(t.pdfToBeThe)}`;
+            if (currentLang === 'hi') execText = fixHindiGender(execText);
             rtf += `${execText}\\par\\par \n`;
 
             // 3. Assets
             rtf += `\\b\\fs28 ${encodeRTF(t.pdfDistributionTitle)}\\b0\\fs24\\par \n`;
-            rtf += `${encodeRTF(t.pdfDistributionIntro)}\\par\\par \n`;
+            let distIntro = t.pdfDistributionIntro;
+            if (currentLang === 'hi') distIntro = fixHindiGender(distIntro);
+            rtf += `${encodeRTF(distIntro)}\\par\\par \n`;
 
             const assets = data.assets || [];
 
@@ -2244,7 +2285,9 @@
 
             // 4. Residual
             rtf += `\\b\\fs28 ${encodeRTF(t.pdfResidualTitle)}\\b0\\fs24\\par \n`;
-            rtf += `${encodeRTF(t.pdfResidualIntro)}\\par \n`;
+            let resIntro = t.pdfResidualIntro;
+            if (currentLang === 'hi') resIntro = fixHindiGender(resIntro);
+            rtf += `${encodeRTF(resIntro)}\\par\\par \n`;
             const rShares = data.residual || [];
             rShares.forEach((r, idx) => {
                 const p = gB(r.benId);
