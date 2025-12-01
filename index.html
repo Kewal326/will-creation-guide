@@ -1038,13 +1038,23 @@
             }
 
             let preamble = "";
+            const myDobVal = document.getElementById('myDob') ? document.getElementById('myDob').value : '';
+            let dobText = "";
+            if (myDobVal) {
+                const dobDate = new Date(myDobVal);
+                const dobStr = dobDate.toLocaleDateString(currentLang === 'hi' ? 'hi-IN' : 'en-IN', { year: 'numeric', month: 'long', day: 'numeric' });
+                dobText = currentLang === 'en' ? `, born on ${dobStr}` : `, जन्म तिथि ${dobStr}`;
+            }
+
             if (currentLang === 'en') {
                 preamble = `I, <b>${myName}</b>`;
                 if (fatherName) preamble += `, ${myRelPrefix} ${fatherName}`;
+                if (dobText) preamble += dobText;
                 preamble += `, residing at ${getValOrPlace('myAddress', 'Permanent Address')} (Religion: ${religionTxt}), being of sound mind and memory, do hereby make, publish and declare this to be my Last Will and Testament.`;
             } else {
                 preamble = `मैं, <b>${myName}</b>`;
                 if (fatherName) preamble += `, ${myRelPrefixTrans} ${fatherName}`;
+                if (dobText) preamble += dobText;
                 preamble += `, निवासी ${getValOrPlace('myAddress', t.dynPermAddress)} (धर्म: ${religionTxt}), स्वस्थ मन और स्मृति का होने के नाते, एतद्द्वारा अपनी यह अंतिम वसीयत और वसीयतनामा बनाता हूँ, प्रकाशित करता हूँ और घोषित करता हूँ।`;
             }
             html += `<p style="margin-bottom: 15px;">${preamble}</p>`;
@@ -1982,9 +1992,17 @@
             const myName = gV('myName').toUpperCase();
             const fatherName = gV('fatherName').trim();
             const myRelPrefix = gV('myRelPrefix') || 'S/o';
+            const myDobVal = gV('myDob');
 
             let preamble = `I, ${myName}`;
             if (fatherName) preamble += `, ${myRelPrefix} ${fatherName}`;
+
+            if (myDobVal) {
+                const dobDate = new Date(myDobVal);
+                const dobStr = dobDate.toLocaleDateString('en-IN', { year: 'numeric', month: 'long', day: 'numeric' });
+                preamble += `, born on ${dobStr}`;
+            }
+
             preamble += `, residing at ${gV('myAddress')} (Religion: ${religionTxt}), being of sound mind and memory, do hereby make, publish and declare this to be my Last Will and Testament.`;
             printBlock(preamble);
 
@@ -2157,11 +2175,19 @@
             const myName = gV('myName').toUpperCase();
             const fatherName = gV('fatherName').trim();
             const myRelPrefix = gV('myRelPrefix') || 'S/o';
+            const myDobVal = gV('myDob');
+            let dobText = "";
+            if (myDobVal) {
+                const dobDate = new Date(myDobVal);
+                const dobStr = dobDate.toLocaleDateString(currentLang === 'hi' ? 'hi-IN' : 'en-IN', { year: 'numeric', month: 'long', day: 'numeric' });
+                dobText = currentLang === 'en' ? `, born on ${dobStr}` : `, जन्म तिथि ${dobStr}`;
+            }
 
             let preamble = currentLang === 'en'
                 ? `I, \\b ${encodeRTF(myName)}\\b0`
                 : `${encodeRTF(t.pdfIAppoint.split(' ')[0])}, \\b ${encodeRTF(myName)}\\b0`;
             if (fatherName) preamble += `, ${encodeRTF(myRelPrefix)} ${encodeRTF(fatherName)}`;
+            if (dobText) preamble += encodeRTF(dobText);
             preamble += `, ${encodeRTF(t.pdfResidingAt)} ${encodeRTF(gV('myAddress'))} (${encodeRTF(t.pdfReligionLabel)}: ${encodeRTF(religionTxt)}), ${encodeRTF(t.pdfBeingOfSound)}`;
 
             rtf += `${preamble}\\par\\par \n`;
