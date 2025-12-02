@@ -1,4 +1,5 @@
 // Internationalization (i18n) System
+// Language translations
 let currentLang = 'en'; // Default language
 
 const TRANSLATIONS = {
@@ -84,8 +85,12 @@ const TRANSLATIONS = {
 
         // Step 2: Executor
         s2Title: "3. The Executor",
-        s2NoteTitle: "Note:",
-        s2NoteText: "The Executor must be a Major (18+ years) and of Sound Mind. They will legally represent you after death.",
+        s2InfoTitle: "What is an Executor?",
+        s2InfoText: "An executor is the person you trust to carry out the instructions in your will. They will manage your estate, pay debts, and distribute assets to beneficiaries. Note: An executor can also be a beneficiary in the same will - this is common and perfectly legal.",
+        s2InfoRequirements: "Requirements:",
+        s2InfoReq1: "Must be 18+ years old (Major)",
+        s2InfoReq2: "Must be of sound mind",
+        s2InfoReq3: "Should be trustworthy and responsible",
         lblExName: "Executor Name",
         phExName: "Full Name",
         lblExRel: "Relationship",
@@ -98,8 +103,12 @@ const TRANSLATIONS = {
 
         // Step 3: Beneficiaries
         s3Title: "4. Your Beneficiaries",
-        s3TipTitle: "Flexible Management:",
-        s3TipText: "Add your heirs below. You can assign assets to them in the next step.",
+        s3InfoTitle: "What are Beneficiaries?",
+        s3InfoText: "Beneficiaries (also called heirs) are people who will receive your assets after your death. They can be family members, friends, or organizations.",
+        s3InfoConditions: "Who can be a beneficiary:",
+        s3InfoCond1: "Any person (including minors with guardians)",
+        s3InfoCond2: "Charitable organizations or trusts",
+        s3InfoCond3: "Multiple people can share assets",
         btnAddBeneficiary: "+ Add New Beneficiary",
         btnNextAssets: "Next: Distribute Assets",
 
@@ -133,7 +142,7 @@ const TRANSLATIONS = {
         nsPrintText: "Print on high-quality A4 paper. Digital signatures are NOT valid for Wills in India.",
         nsSignTitle: "Sign Every Page",
         nsSignText: "To prevent tampering or page swapping, You and your two witnesses must sign the bottom of every single page. A Will without signatures on all pages can be challenged in court.",
-        nsSignReminder: "REMINDER: Beneficiaries must NOT sign the Will.",
+        nsSignReminder: "NOTE: It is strongly advised that beneficiaries not serve as witnesses (may void their inheritance or create legal complications).",
         nsSafeTitle: "Safe Storage",
         nsSafeText: "Store safely and tell your Executor where it is.",
         nsVideoTitle: "Record a Video Will (Pro Tip)",
@@ -222,6 +231,13 @@ const TRANSLATIONS = {
         assetOptValuables: "💍 Valuables",
         assetOptJewelry: "Jewelry / Gold",
         assetOptVehicle: "Vehicle",
+
+        // Bottom Sheet
+        tapToEdit: "Tap to edit",
+        saveAndClose: "Save & Close",
+        editAsset: "Edit Asset",
+        newAsset: "New Asset",
+        beneficiaryCount: "beneficiaries",
     },
     hi: {
         // Header
@@ -305,8 +321,12 @@ const TRANSLATIONS = {
 
         // Step 2: Executor
         s2Title: "3. Executor (निष्पादक)",
-        s2NoteTitle: "नोट:",
-        s2NoteText: "Executor एक वयस्क (18+ वर्ष) और स्वस्थ दिमाग का होना चाहिए। वे मृत्यु के बाद कानूनी रूप से आपका प्रतिनिधित्व करेंगे।",
+        s2InfoTitle: "Executor क्या होता है?",
+        s2InfoText: "Executor वह व्यक्ति है जिस पर आप अपनी वसीयत में दिए गए निर्देशों को पूरा करने के लिए भरोसा करते हैं। वे आपकी संपत्ति का प्रबंधन करेंगे, ऋण चुकाएंगे और लाभार्थियों को संपत्ति वितरित करेंगे। नोट: एक Executor उसी वसीयत में लाभार्थी भी हो सकता है - यह सामान्य और पूरी तरह से कानूनी है।",
+        s2InfoRequirements: "आवश्यकताएं:",
+        s2InfoReq1: "18+ वर्ष की आयु होनी चाहिए (वयस्क)",
+        s2InfoReq2: "स्वस्थ मानसिक स्थिति में होना चाहिए",
+        s2InfoReq3: "भरोसेमंद और जिम्मेदार होना चाहिए",
         lblExName: "Executor का नाम",
         phExName: "पूरा नाम",
         lblExRel: "संबंध (Relationship)",
@@ -319,6 +339,12 @@ const TRANSLATIONS = {
 
         // Step 3: Beneficiaries
         s3Title: "4. आपके Beneficiaries (लाभार्थी)",
+        s3InfoTitle: "लाभार्थी कौन होते हैं?",
+        s3InfoText: "लाभार्थी (जिन्हें उत्तराधिकारी भी कहा जाता है) वे लोग हैं जो आपकी मृत्यु के बाद आपकी संपत्ति प्राप्त करेंगे। वे परिवार के सदस्य, मित्र या संगठन हो सकते हैं।",
+        s3InfoConditions: "लाभार्थी कौन हो सकता है:",
+        s3InfoCond1: "कोई भी व्यक्ति (अभिभावकों के साथ नाबालिग सहित)",
+        s3InfoCond2: "धर्मार्थ संगठन या ट्रस्ट",
+        s3InfoCond3: "कई लोग संपत्ति साझा कर सकते हैं",
         s3TipTitle: "लचीला प्रबंधन:",
         s3TipText: "नीचे अपने वारिसों को जोड़ें। आप अगले चरण में उन्हें Assets आवंटित कर सकते हैं।",
         btnAddBeneficiary: "+ नया Beneficiary जोड़ें",
@@ -354,7 +380,7 @@ const TRANSLATIONS = {
         nsPrintText: "High Quality A4 पेपर पर Print करें। भारत में Will के लिए Digital Signature मान्य (valid) नहीं हैं।",
         nsSignTitle: "हर Page पर Sign करें",
         nsSignText: "Tampering से बचने के लिए, आपको और आपके दो Witnesses को हर Page के नीचे Sign करना होगा। बिना Sign के Will को Court में challenge किया जा सकता है।",
-        nsSignReminder: "Note: Beneficiaries को Will पर Sign नहीं करना चाहिए।",
+        nsSignReminder: "नोट: यह दृढ़ता से सलाह दी जाती है कि Beneficiaries गवाह न बनें (उनकी विरासत रद्द हो सकती है या कानूनी जटिलताएं हो सकती हैं)।",
         nsSafeTitle: "Safe Storage",
         nsSafeText: "Safe जगह पर store करें और अपने Executor को बताएं कि यह कहां है।",
         nsVideoTitle: "Video Will रिकॉर्ड करें (Pro Tip)",
@@ -417,7 +443,7 @@ const TRANSLATIONS = {
         dynDescription: "विवरण",
         dynBeneficiaries: "Beneficiaries",
         dynPercentShare: "% हिस्सा",
-        dynAlternate: "वैकल्पिक (Alternate)",
+        dynAlternate: "वैकल्पिक",
         dynAddShare: "+ हिस्सा जोड़ें",
         dynIndivisibleWarning: "अविभाज्य संपत्ति चेतावनी: अचल संपत्ति या वाहनों जैसी संपत्ति को विभाजित करने से अक्सर विवाद होते हैं।",
 
@@ -443,6 +469,13 @@ const TRANSLATIONS = {
         assetOptValuables: "💍 कीमती सामान",
         assetOptJewelry: "आभूषण / सोना",
         assetOptVehicle: "वाहन",
+
+        // Bottom Sheet
+        tapToEdit: "संपादित करने के लिए टैप करें",
+        saveAndClose: "सहेजें और बंद करें",
+        editAsset: "Asset संपादित करें",
+        newAsset: "नई Asset",
+        beneficiaryCount: "Beneficiaries",
     }
 };
 
@@ -455,52 +488,58 @@ function toggleLanguage() {
 
 // Update all UI text based on current language
 function updateLanguage() {
-    const t = TRANSLATIONS[currentLang];
+    try {
+        const t = TRANSLATIONS[currentLang];
 
-    // Update language toggle button text
-    document.getElementById('lang-toggle-text').textContent = currentLang === 'en' ? 'हिंदी' : 'English';
+        // Update language toggle button text
+        document.getElementById('lang-toggle-text').textContent = currentLang === 'en' ? 'हिंदी' : 'English';
 
-    // Update all elements with data-i18n attribute
-    document.querySelectorAll('[data-i18n]').forEach(el => {
-        const key = el.getAttribute('data-i18n');
-        if (t[key]) {
-            el.textContent = t[key];
+        // Update all elements with data-i18n attribute
+        document.querySelectorAll('[data-i18n]').forEach(el => {
+            const key = el.getAttribute('data-i18n');
+            if (t[key]) {
+                el.textContent = t[key];
+            }
+        });
+
+        // Update all placeholders with data-i18n-placeholder attribute
+        document.querySelectorAll('[data-i18n-placeholder]').forEach(el => {
+            const key = el.getAttribute('data-i18n-placeholder');
+            if (t[key]) {
+                el.placeholder = t[key];
+            }
+        });
+
+        // Update header title
+        const headerTitle = document.querySelector('header h1');
+
+        // Update dynamic headers (beneficiaries, assets)
+        if (typeof updateAllHeaders === 'function') {
+            updateAllHeaders();
         }
-    });
-
-    // Update all placeholders with data-i18n-placeholder attribute
-    document.querySelectorAll('[data-i18n-placeholder]').forEach(el => {
-        const key = el.getAttribute('data-i18n-placeholder');
-        if (t[key]) {
-            el.placeholder = t[key];
+        if (headerTitle) {
+            headerTitle.innerHTML = currentLang === 'en'
+                ? 'Sahay <span class="text-indigo-300 font-normal">| Will Creator</span>'
+                : 'सहाय <span class="text-indigo-300 font-normal">| विल निर्माता</span>';
         }
-    });
 
-    // Update header title
-    const headerTitle = document.querySelector('header h1');
 
-    // Update dynamic headers (beneficiaries, assets)
-    if (typeof updateAllHeaders === 'function') {
-        updateAllHeaders();
-    }
-    if (headerTitle) {
-        headerTitle.innerHTML = currentLang === 'en'
-            ? 'Sahay <span class="text-indigo-300 font-normal">| Will Creator</span>'
-            : 'सहाय <span class="text-indigo-300 font-normal">| विल निर्माता</span>';
-    }
-
-    // Toggle PDF download button visibility based on language
-    const btnPdf = document.getElementById('btn-download-pdf');
-    if (btnPdf) {
-        if (currentLang === 'hi') {
-            btnPdf.style.display = 'none';
-        } else {
-            btnPdf.style.display = 'flex';
+        // Toggle PDF download button visibility based on language
+        const btnPdf = document.getElementById('btn-download-pdf');
+        if (btnPdf) {
+            if (currentLang === 'hi') {
+                btnPdf.classList.add('hidden');
+            } else {
+                btnPdf.classList.remove('hidden');
+            }
         }
-    }
 
-    // Re-render existing beneficiary and asset rows to update their language
-    if (typeof reloadDynamicRows === 'function') {
-        reloadDynamicRows();
+
+        // Re-render existing beneficiary and asset rows to update their language
+        if (typeof reloadDynamicRows === 'function') {
+            reloadDynamicRows();
+        }
+    } catch (error) {
+        console.error('ERROR in updateLanguage:', error);
     }
 }
