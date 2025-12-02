@@ -83,6 +83,17 @@
             border-radius: 2px;
             font-style: italic;
         }
+
+        /* Bottom Sheet Animation */
+        #asset-sheet-container {
+            transform: translateY(100%);
+        }
+
+        @media (max-width: 768px) {
+            .asset-item {
+                cursor: pointer;
+            }
+        }
     </style>
     <link rel="stylesheet" href="/index.css">
     <script type="importmap">
@@ -403,9 +414,22 @@
             <!-- Clean UI, No Box, No ID -->
             <div class="grid gap-4">
 
-                <div class="bg-indigo-50 border-l-4 border-indigo-400 p-2 text-[11px] text-indigo-900 leading-tight">
-                    <strong data-i18n="s2NoteTitle">Note:</strong> <span data-i18n="s2NoteText">The Executor must be a
-                        Major (18+ years) and of Sound Mind. They will legally represent you after death.</span>
+                <div class="bg-indigo-50 border-l-4 border-indigo-400 p-4 text-sm text-indigo-900 shadow-sm">
+                    <div class="mb-3">
+                        <strong class="text-indigo-900" data-i18n="s2InfoTitle">What is an Executor?</strong>
+                        <p class="mt-1" data-i18n="s2InfoText">An executor is the person you trust to carry out the
+                            instructions in your will. They will manage your estate, pay debts, and distribute assets to
+                            beneficiaries. Note: An executor can also be a beneficiary in the same will - this is common
+                            and perfectly legal.</p>
+                    </div>
+                    <div>
+                        <p class="font-semibold text-indigo-900 mb-1" data-i18n="s2InfoRequirements">Requirements:</p>
+                        <ul class="list-disc ml-4 space-y-1">
+                            <li data-i18n="s2InfoReq1">Must be 18+ years old (Major)</li>
+                            <li data-i18n="s2InfoReq2">Must be of sound mind</li>
+                            <li data-i18n="s2InfoReq3">Should be trustworthy and responsible</li>
+                        </ul>
+                    </div>
                 </div>
 
                 <div><label class="text-xs font-bold text-gray-500"><span data-i18n="lblExName">Executor Name</span>
@@ -455,10 +479,25 @@
         <div id="step-3" class="step-section space-y-6 fade-in">
             <h2 class="text-2xl font-bold text-gray-700 border-b pb-2" data-i18n="s3Title">4. Your Beneficiaries</h2>
 
-            <div class="bg-blue-50 border border-blue-200 text-blue-800 text-sm p-3 rounded flex gap-3 items-start">
-                <span class="text-xl">💡</span>
-                <div><strong data-i18n="s3TipTitle">Flexible Management:</strong> <span data-i18n="s3TipText">Add your
-                        heirs below. You can assign assets to them in the next step.</span></div>
+            <div class="bg-blue-50 border border-blue-200 text-blue-800 text-sm p-4 rounded shadow-sm">
+                <div class="flex gap-3 items-start mb-3">
+                    <span class="text-xl">💡</span>
+                    <div>
+                        <strong class="text-blue-900" data-i18n="s3InfoTitle">What are Beneficiaries?</strong>
+                        <p class="mt-1 text-blue-800" data-i18n="s3InfoText">Beneficiaries (also called heirs) are
+                            people who will receive your assets after your death. They can be family members, friends,
+                            or organizations.</p>
+                    </div>
+                </div>
+                <div class="ml-9">
+                    <p class="font-semibold text-blue-900 mb-1" data-i18n="s3InfoConditions">Who can be a beneficiary:
+                    </p>
+                    <ul class="list-disc ml-4 space-y-1 text-blue-800">
+                        <li data-i18n="s3InfoCond1">Any person (including minors with guardians)</li>
+                        <li data-i18n="s3InfoCond2">Charitable organizations or trusts</li>
+                        <li data-i18n="s3InfoCond3">Multiple people can share assets</li>
+                    </ul>
+                </div>
             </div>
 
             <!-- Beneficiary List Container -->
@@ -703,6 +742,108 @@
                             Anyway</button>
                     </div>
                 </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- ASSET BOTTOM SHEET (Mobile Only) -->
+    <div id="asset-bottom-sheet" class="hidden fixed inset-0 z-50">
+        <!-- Backdrop -->
+        <div class="absolute inset-0 bg-black/50 transition-opacity" onclick="closeAssetSheet()"></div>
+
+        <!-- Bottom Sheet Container -->
+        <div id="asset-sheet-container"
+            class="absolute bottom-0 left-0 right-0 bg-white rounded-t-2xl shadow-2xl max-h-[90vh] flex flex-col transform transition-transform duration-300">
+            <!-- Header -->
+            <div class="flex items-center justify-between p-4 border-b border-gray-200 flex-shrink-0">
+                <button onclick="closeAssetSheet()" class="text-gray-600 hover:text-gray-800 p-2 -ml-2">
+                    <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 19l-7-7 7-7" />
+                    </svg>
+                </button>
+                <h2 id="asset-sheet-title" class="text-lg font-bold text-gray-800">New Asset</h2>
+                <div class="w-10"></div> <!-- Spacer for centering -->
+            </div>
+
+            <!-- Scrollable Content -->
+            <div id="asset-sheet-content" class="flex-1 overflow-y-auto p-4">
+                <!-- Content will be dynamically populated -->
+            </div>
+
+            <!-- Footer with Save Button -->
+            <div class="p-4 border-t border-gray-200 bg-white flex-shrink-0">
+                <button onclick="saveAssetSheet()"
+                    class="w-full bg-indigo-600 hover:bg-indigo-700 text-white font-bold py-3 px-4 rounded-lg shadow-lg transition">
+                    Save & Close
+                </button>
+            </div>
+        </div>
+    </div>
+
+    <!-- BENEFICIARY BOTTOM SHEET (Mobile Only) -->
+    <div id="ben-bottom-sheet" class="hidden fixed inset-0 z-50">
+        <!-- Backdrop -->
+        <div class="absolute inset-0 bg-black/50 transition-opacity" onclick="closeBenSheet()"></div>
+
+        <!-- Bottom Sheet Container -->
+        <div id="ben-sheet-container"
+            class="absolute bottom-0 left-0 right-0 bg-white rounded-t-2xl shadow-2xl max-h-[90vh] flex flex-col transform transition-transform duration-300">
+            <!-- Header -->
+            <div class="flex items-center justify-between p-4 border-b border-gray-200 flex-shrink-0">
+                <button onclick="closeBenSheet()" class="text-gray-600 hover:text-gray-800 p-2 -ml-2">
+                    <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 19l-7-7 7-7" />
+                    </svg>
+                </button>
+                <h2 id="ben-sheet-title" class="text-lg font-bold text-gray-800">New Beneficiary</h2>
+                <div class="w-10"></div> <!-- Spacer for centering -->
+            </div>
+
+            <!-- Scrollable Content -->
+            <div id="ben-sheet-content" class="flex-1 overflow-y-auto p-4">
+                <!-- Content will be dynamically populated -->
+            </div>
+
+            <!-- Footer with Save Button -->
+            <div class="p-4 border-t border-gray-200 bg-white flex-shrink-0">
+                <button onclick="saveBenSheet()"
+                    class="w-full bg-indigo-600 hover:bg-indigo-700 text-white font-bold py-3 px-4 rounded-lg shadow-lg transition">
+                    Save & Close
+                </button>
+            </div>
+        </div>
+    </div>
+
+    <!-- RESIDUAL BOTTOM SHEET (Mobile Only) -->
+    <div id="residual-bottom-sheet" class="hidden fixed inset-0 z-50">
+        <!-- Backdrop -->
+        <div class="absolute inset-0 bg-black/50 transition-opacity" onclick="closeResidualSheet()"></div>
+
+        <!-- Bottom Sheet Container -->
+        <div id="residual-sheet-container"
+            class="absolute bottom-0 left-0 right-0 bg-white rounded-t-2xl shadow-2xl max-h-[90vh] flex flex-col transform transition-transform duration-300">
+            <!-- Header -->
+            <div class="flex items-center justify-between p-4 border-b border-gray-200 flex-shrink-0">
+                <button onclick="closeResidualSheet()" class="text-gray-600 hover:text-gray-800 p-2 -ml-2">
+                    <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 19l-7-7 7-7" />
+                    </svg>
+                </button>
+                <h2 id="residual-sheet-title" class="text-lg font-bold text-gray-800">Residual Beneficiary</h2>
+                <div class="w-10"></div> <!-- Spacer for centering -->
+            </div>
+
+            <!-- Scrollable Content -->
+            <div id="residual-sheet-content" class="flex-1 overflow-y-auto p-4">
+                <!-- Content will be dynamically populated -->
+            </div>
+
+            <!-- Footer with Save Button -->
+            <div class="p-4 border-t border-gray-200 bg-white flex-shrink-0">
+                <button onclick="saveResidualSheet()"
+                    class="w-full bg-indigo-600 hover:bg-indigo-700 text-white font-bold py-3 px-4 rounded-lg shadow-lg transition">
+                    Save & Close
+                </button>
             </div>
         </div>
     </div>
@@ -981,6 +1122,897 @@
             document.body.style.overflow = 'auto';
         }
 
+        // --- HELPER: Collect Assets from Both Mobile and Desktop Views ---
+        function collectAllAssets() {
+            const assets = [];
+
+            // 1. Desktop Accordions
+            document.querySelectorAll('.asset-item').forEach(row => {
+                const shares = [];
+                row.querySelectorAll('.share-row').forEach(sr => {
+                    const benId = sr.querySelector('.ben-select-share')?.value;
+                    const share = sr.querySelector('.share-input')?.value;
+                    const altId = sr.querySelector('.ben-select-alt-share')?.value;
+                    if (benId) {
+                        shares.push({ benId, share, altId });
+                    }
+                });
+
+                const details = {};
+                row.querySelectorAll('.dynamic-field-input').forEach(inp => {
+                    const key = inp.getAttribute('data-key');
+                    if (inp.value) {
+                        details[key] = inp.value;
+                    }
+                });
+
+                const typeSelect = row.querySelector('.asset-type-select');
+                if (typeSelect && typeSelect.value) {
+                    assets.push({
+                        type: typeSelect.value,
+                        details: details,
+                        shares: shares
+                    });
+                }
+            });
+
+            // 2. Mobile Summary Cards
+            document.querySelectorAll('.asset-summary-card').forEach(card => {
+                const type = card.getAttribute('data-type');
+                if (!type) return;
+
+                const benData = card.querySelector('.asset-data');
+                let shares = [];
+                if (benData) {
+                    const rawBens = JSON.parse(benData.getAttribute('data-beneficiaries') || '[]');
+                    shares = rawBens.map(b => ({
+                        benId: b.benId,
+                        share: b.share,
+                        altId: b.altId
+                    }));
+                }
+
+                const fieldsData = card.querySelector('.asset-fields-data');
+                let details = {};
+                if (fieldsData) {
+                    details = JSON.parse(fieldsData.getAttribute('data-fields') || '{}');
+                }
+
+                assets.push({
+                    type: type,
+                    details: details,
+                    shares: shares
+                });
+            });
+
+            return assets;
+        }
+
+        function collectResidualShares() {
+            const shares = [];
+            // 1. Desktop Residual Rows
+            document.querySelectorAll('.residual-row').forEach(row => {
+                shares.push({
+                    benId: row.querySelector('.residual-ben-select').value,
+                    share: row.querySelector('.residual-share-input').value,
+                    altId: row.querySelector('.residual-ben-alt-select').value
+                });
+            });
+
+            // 2. Mobile Residual Summary Cards
+            document.querySelectorAll('.residual-summary-card').forEach(card => {
+                const dataDiv = card.querySelector('.residual-data');
+                if (dataDiv) {
+                    const data = JSON.parse(dataDiv.getAttribute('data-json') || '{}');
+                    if (data.benId) {
+                        shares.push({
+                            benId: data.benId,
+                            share: data.share,
+                            altId: data.altId
+                        });
+                    }
+                }
+            });
+            return shares;
+        }
+
+        function collectBeneficiaries() {
+            const bens = [];
+
+            // 1. Desktop Accordions
+            document.querySelectorAll('.beneficiary-item:not(.ben-summary-card)').forEach(row => {
+                const uid = row.getAttribute('data-id');
+                const nameInput = document.getElementById(`ben-name-${uid}`);
+
+                if (nameInput && nameInput.value) {
+                    bens.push({
+                        id: uid,
+                        name: nameInput.value,
+                        rel: document.getElementById(`ben-rel-${uid}`).value,
+                        addr: document.getElementById(`ben-addr-${uid}`).value,
+                        relPrefix: document.getElementById(`ben-relPrefix-${uid}`).value,
+                        father: document.getElementById(`ben-father-${uid}`).value,
+                        defaultAltId: document.getElementById(`ben-defaultAlt-${uid}`).value,
+                        isMinor: document.getElementById(`ben-minor-${uid}`).checked,
+                        gName: document.getElementById(`guardian-name-${uid}`).value,
+                        gRel: document.getElementById(`guardian-rel-${uid}`).value,
+                        gRelPrefix: document.getElementById(`ben-gRelPrefix-${uid}`).value || 'S/o',
+                        gFather: document.getElementById(`guardian-father-${uid}`).value,
+                        gAddr: document.getElementById(`guardian-addr-${uid}`).value
+                    });
+                }
+            });
+
+            // 2. Mobile Summary Cards
+            document.querySelectorAll('.ben-summary-card').forEach(card => {
+                const dataDiv = card.querySelector('.ben-data');
+                if (dataDiv) {
+                    const data = JSON.parse(dataDiv.getAttribute('data-json') || '{}');
+                    if (data.name) {
+                        bens.push(data);
+                    }
+                }
+            });
+
+            return bens;
+        }
+
+        // --- BENEFICIARY BOTTOM SHEET LOGIC (Mobile) ---
+        let currentBenSheetId = null;
+
+        function openBenSheet(benId = null) {
+            currentBenSheetId = benId || Date.now();
+            const sheet = document.getElementById('ben-bottom-sheet');
+            const container = document.getElementById('ben-sheet-container');
+
+            renderBenSheet(currentBenSheetId);
+
+            sheet.classList.remove('hidden');
+            // Small delay to allow display:block to apply before transform
+            setTimeout(() => {
+                container.classList.remove('translate-y-full');
+            }, 10);
+            document.body.style.overflow = 'hidden';
+        }
+
+        function closeBenSheet() {
+            const sheet = document.getElementById('ben-bottom-sheet');
+            const container = document.getElementById('ben-sheet-container');
+
+            container.classList.add('translate-y-full');
+            setTimeout(() => {
+                sheet.classList.add('hidden');
+                document.body.style.overflow = 'auto';
+            }, 300);
+        }
+
+        function renderBenSheet(benId) {
+            const content = document.getElementById('ben-sheet-content');
+            const t = TRANSLATIONS[currentLang];
+
+            // Get existing data if editing
+            let data = null;
+            if (benId) {
+                const benRow = document.getElementById(`ben-row-${benId}`);
+                if (benRow) {
+                    if (benRow.classList.contains('ben-summary-card')) {
+                        // Mobile Summary Card
+                        const storedData = benRow.querySelector('.ben-data');
+                        if (storedData) {
+                            data = JSON.parse(storedData.getAttribute('data-json') || '{}');
+                        }
+                    } else {
+                        // Desktop Accordion (fallback/hybrid)
+                        // We can scrape from DOM if needed, but for now let's assume we use summary cards on mobile
+                    }
+                }
+            }
+
+            const html = `
+                <div class="space-y-4" id="ben-sheet-form">
+                    <!-- Basic Info -->
+                    <div>
+                        <label class="block text-sm font-bold text-gray-700 mb-1">${t.dynFullName}</label>
+                        <input type="text" id="sheet-ben-name" class="w-full border p-3 rounded-lg text-base outline-none focus:border-indigo-500 transition" placeholder="${t.dynFullName}" value="${data ? data.name : ''}">
+                    </div>
+
+                    <div>
+                        <label class="block text-sm font-bold text-gray-700 mb-1">${t.dynRelationship}</label>
+                        <input type="text" id="sheet-ben-rel" class="w-full border p-3 rounded-lg text-base outline-none focus:border-indigo-500 transition" placeholder="${t.dynPhRelationship}" value="${data ? data.rel : ''}">
+                    </div>
+
+                    <!-- Address -->
+                    <div>
+                        <label class="block text-sm font-bold text-gray-700 mb-1">${t.dynPermAddress}</label>
+                        <textarea id="sheet-ben-addr" class="w-full border p-3 rounded-lg text-base outline-none focus:border-indigo-500 transition" rows="3" placeholder="${t.dynPhAddress}">${data ? data.addr : ''}</textarea>
+                    </div>
+
+                    <!-- Parent/Spouse -->
+                    <div>
+                        <label class="block text-sm font-bold text-gray-700 mb-1">${t.dynParentSpouse}</label>
+                        <div class="flex gap-2">
+                            <select id="sheet-ben-relPrefix" class="w-1/3 border p-3 rounded-lg text-base bg-white outline-none">
+                                <option value="S/o" ${data && data.relPrefix === 'S/o' ? 'selected' : ''}>${t.optSonOf}</option>
+                                <option value="D/o" ${data && data.relPrefix === 'D/o' ? 'selected' : ''}>${t.optDaughterOf}</option>
+                                <option value="W/o" ${data && data.relPrefix === 'W/o' ? 'selected' : ''}>${t.optWifeOf}</option>
+                            </select>
+                            <input type="text" id="sheet-ben-father" class="flex-1 border p-3 rounded-lg text-base outline-none" placeholder="${t.dynPhName}" value="${data ? data.father : ''}">
+                        </div>
+                    </div>
+
+                    <!-- Default Alternate Beneficiary -->
+                    <div>
+                        <label class="block text-sm font-bold text-gray-400 mb-1">${t.dynDefaultAlternate}</label>
+                        <select id="sheet-ben-defaultAlt" class="w-full border p-3 rounded-lg text-base bg-white text-gray-600 outline-none">
+                            <option value="">-- ${t.dynDefaultAlternate} --</option>
+                        </select>
+                    </div>
+
+                    <!-- Minor Checkbox -->
+                    <div class="flex items-center bg-gray-50 p-3 rounded-lg">
+                        <input type="checkbox" id="sheet-ben-minor" class="w-5 h-5 text-indigo-600 rounded" onchange="document.getElementById('sheet-guardian-section').classList.toggle('hidden', !this.checked)" ${data && data.isMinor ? 'checked' : ''}>
+                        <label for="sheet-ben-minor" class="ml-3 text-sm font-bold text-gray-700">${t.dynIsMinor}</label>
+                    </div>
+
+                    <!-- Guardian Section -->
+                    <div id="sheet-guardian-section" class="${data && data.isMinor ? '' : 'hidden'} space-y-4 border-l-4 border-indigo-100 pl-4">
+                        <h3 class="text-sm font-bold text-indigo-600 uppercase tracking-wide">Guardian Details</h3>
+                        <div>
+                            <label class="block text-xs font-bold text-gray-500 mb-1">${t.dynGuardianName}</label>
+                            <input type="text" id="sheet-guardian-name" class="w-full border p-2 rounded text-sm outline-none" placeholder="${t.dynPhGuardianName}" value="${data ? data.gName : ''}">
+                        </div>
+                        <div>
+                            <label class="block text-xs font-bold text-gray-500 mb-1">${t.dynGuardianRel}</label>
+                            <input type="text" id="sheet-guardian-rel" class="w-full border p-2 rounded text-sm outline-none" placeholder="${t.dynPhGuardianRel}" value="${data ? data.gRel : ''}">
+                        </div>
+                        <!-- Added Missing Guardian Fields -->
+                        <div>
+                            <label class="block text-xs font-bold text-gray-500 mb-1">${t.dynGuardianParent}</label>
+                            <div class="flex gap-2">
+                                <select id="sheet-ben-gRelPrefix" class="w-1/3 border p-2 rounded text-sm bg-white outline-none">
+                                    <option value="S/o" ${data && data.gRelPrefix === 'S/o' ? 'selected' : ''}>${t.optSonOf}</option>
+                                    <option value="D/o" ${data && data.gRelPrefix === 'D/o' ? 'selected' : ''}>${t.optDaughterOf}</option>
+                                    <option value="W/o" ${data && data.gRelPrefix === 'W/o' ? 'selected' : ''}>${t.optWifeOf}</option>
+                                </select>
+                                <input type="text" id="sheet-guardian-father" class="flex-1 border p-2 rounded text-sm outline-none" placeholder="${t.dynPhName}" value="${data ? data.gFather : ''}">
+                            </div>
+                        </div>
+                        <div>
+                            <label class="block text-xs font-bold text-gray-500 mb-1">${t.dynPermAddress}</label>
+                            <textarea id="sheet-guardian-addr" class="w-full border p-2 rounded text-sm outline-none" rows="2" placeholder="${t.dynPhAddress}">${data ? data.gAddr : ''}</textarea>
+                        </div>
+                    </div>
+                </div>
+            `;
+
+            content.innerHTML = html;
+            document.getElementById('ben-sheet-title').textContent = benId && document.getElementById(`ben-row-${benId}`) ? t.dynEdit : t.dynNewBeneficiary;
+
+            // Populate alternate beneficiary dropdown
+            const altSelect = document.getElementById('sheet-ben-defaultAlt');
+            populateDropdown(altSelect);
+            if (data && data.defaultAltId) {
+                altSelect.value = data.defaultAltId;
+            }
+        }
+
+        function saveBenSheet() {
+            const benId = currentBenSheetId;
+
+            // Collect Data
+            const data = {
+                id: benId,
+                name: document.getElementById('sheet-ben-name').value,
+                rel: document.getElementById('sheet-ben-rel').value,
+                addr: document.getElementById('sheet-ben-addr').value,
+                relPrefix: document.getElementById('sheet-ben-relPrefix').value,
+                father: document.getElementById('sheet-ben-father').value,
+                isMinor: document.getElementById('sheet-ben-minor').checked,
+                gName: document.getElementById('sheet-guardian-name').value,
+                gRel: document.getElementById('sheet-guardian-rel').value,
+                gRelPrefix: document.getElementById('sheet-ben-gRelPrefix').value,
+                gFather: document.getElementById('sheet-guardian-father').value,
+                gAddr: document.getElementById('sheet-guardian-addr').value,
+                defaultAltId: document.getElementById('sheet-ben-defaultAlt').value
+            };
+
+            if (!data.name) {
+                alert('Please enter beneficiary name');
+                return;
+            }
+
+            // Render Summary Card
+            renderBenSummaryCard(benId, data);
+
+            // Update global beneficiaries array if needed (though we usually scrape from DOM)
+            // But for mobile summary cards, we store data in DOM attribute
+
+            closeBenSheet();
+            saveData();
+        }
+
+        // --- RESIDUAL BOTTOM SHEET LOGIC (Mobile) ---
+        let currentResidualSheetId = null;
+
+        function openResidualSheet(residualId = null) {
+            currentResidualSheetId = residualId || Date.now();
+            const sheet = document.getElementById('residual-bottom-sheet');
+            const container = document.getElementById('residual-sheet-container');
+
+            renderResidualSheet(currentResidualSheetId);
+
+            sheet.classList.remove('hidden');
+            setTimeout(() => {
+                container.classList.remove('translate-y-full');
+            }, 10);
+            document.body.style.overflow = 'hidden';
+        }
+
+        function closeResidualSheet() {
+            const sheet = document.getElementById('residual-bottom-sheet');
+            const container = document.getElementById('residual-sheet-container');
+
+            container.classList.add('translate-y-full');
+            setTimeout(() => {
+                sheet.classList.add('hidden');
+                document.body.style.overflow = 'auto';
+            }, 300);
+        }
+
+        function renderResidualSheet(residualId) {
+            const content = document.getElementById('residual-sheet-content');
+            const t = TRANSLATIONS[currentLang];
+
+            // Get existing data if editing
+            let data = null;
+            if (residualId) {
+                const residualCard = document.getElementById(`residual-card-${residualId}`);
+                if (residualCard && residualCard.classList.contains('residual-summary-card')) {
+                    const storedData = residualCard.querySelector('.residual-data');
+                    if (storedData) {
+                        data = JSON.parse(storedData.getAttribute('data-json') || '{}');
+                    }
+                }
+            }
+
+            // Auto-calculate share if new entry
+            let defaultShare = '100';
+            if (data) {
+                defaultShare = data.share;
+            } else {
+                const existingShares = collectResidualShares();
+                let totalShare = 0;
+                existingShares.forEach(s => totalShare += parseFloat(s.share) || 0);
+                const remaining = Math.max(0, 100 - totalShare);
+                defaultShare = remaining > 0 ? remaining : '';
+            }
+
+            const html = `
+                <div class="space-y-4" id="residual-sheet-form">
+                    <!-- Beneficiary -->
+                    <div>
+                        <label class="block text-sm font-bold text-gray-700 mb-1">${t.dynBeneficiaries}</label>
+                        <select id="sheet-residual-ben" class="w-full border p-3 rounded-lg text-base bg-white outline-none focus:border-indigo-500 transition" onchange="onSheetResidualBenChange(this)">
+                            <option value="">Select...</option>
+                        </select>
+                    </div>
+                    
+                    <!-- Share Percentage -->
+                    <div>
+                        <label class="block text-sm font-bold text-gray-700 mb-1">${t.dynPercentShare}</label>
+                        <div class="relative">
+                            <input type="number" id="sheet-residual-share" class="w-full border p-3 rounded-lg text-base font-bold text-center bg-white outline-none focus:border-indigo-500 transition" value="${defaultShare}" min="1" max="100">
+                            <span class="absolute right-4 top-4 text-sm text-gray-400 font-bold">%</span>
+                        </div>
+                    </div>
+
+                    <!-- Alternate Beneficiary -->
+                    <div>
+                        <label class="block text-sm font-bold text-gray-400 mb-1">${t.dynAlternate}</label>
+                        <select id="sheet-residual-alt" class="w-full border p-3 rounded-lg text-base bg-white text-gray-600 outline-none">
+                            <option value="">--</option>
+                        </select>
+                    </div>
+                </div>
+            `;
+
+            content.innerHTML = html;
+
+            // Populate dropdowns
+            const benSelect = document.getElementById('sheet-residual-ben');
+            const altSelect = document.getElementById('sheet-residual-alt');
+            populateDropdown(benSelect);
+            populateDropdown(altSelect);
+
+            if (data) {
+                benSelect.value = data.benId || '';
+                altSelect.value = data.altId || '';
+            }
+        }
+
+        function onSheetResidualBenChange(selectEl) {
+            const benId = selectEl.value;
+            if (!benId) return;
+            const ben = beneficiaries.find(b => b.id == benId);
+            const altSelect = document.getElementById('sheet-residual-alt');
+            if (ben && ben.defaultAltId) altSelect.value = ben.defaultAltId;
+        }
+
+        function saveResidualSheet() {
+            const residualId = currentResidualSheetId;
+
+            const data = {
+                id: residualId,
+                benId: document.getElementById('sheet-residual-ben').value,
+                share: document.getElementById('sheet-residual-share').value,
+                altId: document.getElementById('sheet-residual-alt').value
+            };
+
+            if (!data.benId) {
+                alert('Please select a beneficiary');
+                return;
+            }
+
+            // Render Summary Card
+            renderResidualSummaryCard(residualId, data);
+
+            closeResidualSheet();
+            saveData();
+        }
+
+        function renderResidualSummaryCard(residualId, data) {
+            const container = document.getElementById('residual-shares-list');
+            const t = TRANSLATIONS[currentLang];
+
+            // Remove existing if updating
+            const existing = document.getElementById(`residual-card-${residualId}`);
+            if (existing) existing.remove();
+
+            // Get beneficiary name
+            const ben = beneficiaries.find(b => b.id == data.benId);
+            const benName = ben ? ben.name : 'Unknown';
+
+            const html = `
+                <div id="residual-card-${residualId}" class="residual-summary-card bg-white rounded-lg shadow-sm border border-gray-200 p-4 mb-3 cursor-pointer hover:bg-gray-50 transition" onclick="openResidualSheet('${residualId}')">
+                    <div class="flex items-center justify-between">
+                        <div class="flex-1 min-w-0">
+                            <h3 class="font-bold text-gray-800 text-sm truncate">${benName}</h3>
+                            <p class="text-xs text-gray-500">${data.share}${t.dynPercentShare}</p>
+                        </div>
+                        <button onclick="event.stopPropagation(); removeResidualCard('${residualId}')" class="text-gray-400 hover:text-red-500 p-2 transition ml-2">
+                            <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16"></path></svg>
+                        </button>
+                    </div>
+                    <!-- Hidden Data Storage -->
+                    <div class="hidden residual-data" data-json='${JSON.stringify(data)}'></div>
+                </div>
+            `;
+
+            container.insertAdjacentHTML('beforeend', html);
+        }
+
+        function removeResidualCard(residualId) {
+            const card = document.getElementById(`residual-card-${residualId}`);
+            if (card) {
+                card.remove();
+                saveData();
+            }
+        }
+
+        function renderBenSummaryCard(benId, data) {
+            const container = document.getElementById('beneficiary-container');
+
+            // Remove existing if updating
+            const existing = document.getElementById(`ben-row-${benId}`);
+            if (existing) existing.remove();
+
+            const html = `
+                <div id="ben-row-${benId}" class="ben-summary-card bg-white rounded-lg shadow-sm border border-gray-200 p-4 mb-3 cursor-pointer hover:bg-gray-50 transition" onclick="openBenSheet('${benId}')">
+                    <div class="flex items-center gap-3">
+                        <div class="w-12 h-12 rounded-full bg-blue-50 flex items-center justify-center text-blue-600 font-bold text-xl flex-shrink-0">
+                            ${data.name.charAt(0).toUpperCase()}
+                        </div>
+                        <div class="flex-1 min-w-0">
+                            <h3 class="font-bold text-gray-800 text-sm truncate">${data.name}</h3>
+                            <p class="text-xs text-gray-500 truncate">${data.rel}</p>
+                        </div>
+                        <button onclick="event.stopPropagation(); removeBeneficiaryRow('${benId}')" class="text-gray-400 hover:text-red-500 p-2 transition">
+                            <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16"></path></svg>
+                        </button>
+                    </div>
+                    <!-- Hidden Data Storage -->
+                    <div class="hidden ben-data" data-json='${JSON.stringify(data)}'></div>
+                </div>
+            `;
+
+            container.insertAdjacentHTML('beforeend', html);
+        }
+
+        // --- ASSET BOTTOM SHEET LOGIC (Mobile) ---
+        let currentAssetSheetId = null;
+        let isLoadingData = false; // Prevent bottom sheet from opening during data load
+
+        function isMobile() {
+            return window.innerWidth < 768;
+        }
+
+        function openAssetSheet(assetId = null) {
+            if (!isMobile() || isLoadingData) return; // Only for mobile and not during data load
+
+            currentAssetSheetId = assetId;
+            const t = TRANSLATIONS[currentLang];
+            const sheet = document.getElementById('asset-bottom-sheet');
+            const container = document.getElementById('asset-sheet-container');
+            const title = document.getElementById('asset-sheet-title');
+
+            // Set title
+            title.textContent = assetId ? t.dynEdit + ' ' + t.dynAssetType : t.dynNewAsset;
+
+            // Render content
+            renderAssetSheet(assetId);
+
+            // Show with animation
+            sheet.classList.remove('hidden');
+            document.body.style.overflow = 'hidden';
+
+            // Slide up animation
+            setTimeout(() => {
+                container.style.transform = 'translateY(0)';
+            }, 10);
+        }
+
+        function closeAssetSheet() {
+            const sheet = document.getElementById('asset-bottom-sheet');
+            const container = document.getElementById('asset-sheet-container');
+
+            // Slide down animation
+            container.style.transform = 'translateY(100%)';
+
+            setTimeout(() => {
+                sheet.classList.add('hidden');
+                document.body.style.overflow = 'auto';
+                currentAssetSheetId = null;
+            }, 300);
+        }
+
+        function renderAssetSheet(assetId) {
+            const content = document.getElementById('asset-sheet-content');
+            const t = TRANSLATIONS[currentLang];
+
+            // Get existing asset data if editing
+            let assetData = null;
+            let existingBeneficiaries = [];
+
+            if (assetId) {
+                const assetRow = document.getElementById(`asset-row-${assetId}`);
+                if (assetRow) {
+                    // Check if it's a mobile summary card or desktop accordion
+                    if (assetRow.classList.contains('asset-summary-card')) {
+                        // Mobile summary card
+                        const type = assetRow.getAttribute('data-type');
+                        const benData = assetRow.querySelector('.asset-data');
+                        if (benData) {
+                            existingBeneficiaries = JSON.parse(benData.getAttribute('data-beneficiaries') || '[]');
+                        }
+
+                        const fieldsData = assetRow.querySelector('.asset-fields-data');
+                        let fields = {};
+                        if (fieldsData) {
+                            fields = JSON.parse(fieldsData.getAttribute('data-fields') || '{}');
+                        }
+
+                        assetData = { type, fields };
+                    } else {
+                        // Desktop accordion
+                        const typeSelect = assetRow.querySelector('.asset-type-select');
+                        assetData = {
+                            type: typeSelect ? typeSelect.value : '',
+                            fields: {}
+                        };
+                        // Collect field values
+                        assetRow.querySelectorAll('.dynamic-field-input').forEach(inp => {
+                            assetData.fields[inp.getAttribute('data-key')] = inp.value;
+                        });
+                        // Collect beneficiaries
+                        assetRow.querySelectorAll('.share-row').forEach(row => {
+                            const benId = row.querySelector('.ben-select-share')?.value;
+                            const share = row.querySelector('.share-input')?.value;
+                            const altId = row.querySelector('.ben-select-alt-share')?.value;
+                            if (benId) {
+                                existingBeneficiaries.push({ benId, share, altId });
+                            }
+                        });
+                    }
+                }
+            }
+
+            // Build HTML
+            let html = `
+                <div class="space-y-4">
+                    <!-- Asset Type -->
+                    <div>
+                        <label class="text-xs font-bold text-gray-500 uppercase mb-1 block">${t.dynAssetType}</label>
+                        <select id="sheet-asset-type" class="w-full border p-3 rounded text-sm bg-white outline-none" onchange="updateSheetFields()">
+                            <option value="">${t.dynSelectAssetType}</option>
+                            <optgroup label="${t.assetOptRealEstate}"><option value="flat">${t.assetOptFlat}</option><option value="land">${t.assetOptLand}</option><option value="shop">${t.assetOptShop}</option></optgroup>
+                            <optgroup label="${t.assetOptBankCash}"><option value="savings">${t.assetOptSavings}</option><option value="fd">${t.assetOptFD}</option><option value="locker">${t.assetOptLocker}</option><option value="loan">${t.assetOptLoan}</option></optgroup>
+                            <optgroup label="${t.assetOptInvestments}"><option value="nps">${t.assetOptNPS}</option><option value="mf">${t.assetOptMF}</option><option value="demat">${t.assetOptDemat}</option><option value="crypto">${t.assetOptCrypto}</option><option value="insurance">${t.assetOptInsurance}</option></optgroup>
+                            <optgroup label="${t.assetOptBusiness}"><option value="esop">${t.assetOptESOP}</option><option value="business">${t.assetOptBusinessInt}</option></optgroup>
+                            <optgroup label="${t.assetOptValuables}"><option value="jewelry">${t.assetOptJewelry}</option><option value="vehicle">${t.assetOptVehicle}</option></optgroup>
+                        </select>
+                    </div>
+                    
+                    <!-- Dynamic Fields -->
+                    <div id="sheet-dynamic-fields"></div>
+                    
+                    <!-- Beneficiaries Section -->
+                    <div class="mt-6 pt-6 border-t border-gray-200">
+                        <h3 class="text-sm font-bold text-gray-700 mb-3">${t.dynBeneficiaries}</h3>
+                        <div id="sheet-beneficiaries" class="space-y-2">
+                            <!-- Beneficiaries will be added here -->
+                        </div>
+                        <button onclick="addSheetBeneficiary()" class="mt-3 text-xs flex items-center gap-1 bg-white border border-indigo-200 text-indigo-600 font-bold px-3 py-2 rounded hover:bg-indigo-50 transition w-full justify-center">
+                            ${t.dynAddShare}
+                        </button>
+                    </div>
+                </div>
+            `;
+
+            content.innerHTML = html;
+
+            // Set values if editing
+            if (assetData) {
+                document.getElementById('sheet-asset-type').value = assetData.type;
+                updateSheetFields();
+
+                // Populate field values
+                setTimeout(() => {
+                    Object.keys(assetData.fields).forEach(key => {
+                        const input = document.querySelector(`#sheet-dynamic-fields [data-key="${key}"]`);
+                        if (input) input.value = assetData.fields[key];
+                    });
+
+                    // Populate beneficiaries
+                    existingBeneficiaries.forEach(ben => {
+                        addSheetBeneficiary(ben.benId, ben.share, ben.altId);
+                    });
+                }, 50);
+            }
+        }
+
+        function updateSheetFields() {
+            const type = document.getElementById('sheet-asset-type').value;
+            const container = document.getElementById('sheet-dynamic-fields');
+            const t = TRANSLATIONS[currentLang];
+
+            if (!type) {
+                container.innerHTML = '';
+                return;
+            }
+
+            const schema = ASSET_SCHEMAS[type] || ASSET_SCHEMAS['jewelry'];
+            let html = '';
+
+            schema.forEach(field => {
+                const labelText = currentLang === 'hi' ? (field.labelHi || field.label) : field.label;
+                html += `
+                    <div class="mb-3">
+                        <label class="text-xs font-bold text-gray-500 uppercase mb-1 block">${labelText}</label>
+                        ${field.type === 'textarea'
+                        ? `<textarea data-key="${field.key}" class="w-full border p-3 rounded text-sm outline-none" rows="2" placeholder="${labelText}"></textarea>`
+                        : `<input type="text" data-key="${field.key}" class="w-full border p-3 rounded text-sm outline-none" placeholder="${labelText}">`
+                    }
+                    </div>
+                `;
+            });
+
+            container.innerHTML = html;
+        }
+
+        function addSheetBeneficiary(benIdValue = '', shareValue = '', altIdValue = '') {
+            const container = document.getElementById('sheet-beneficiaries');
+            const t = TRANSLATIONS[currentLang];
+            const rowId = Date.now();
+
+            // Auto-calculate share if not provided
+            if (!shareValue) {
+                let totalShare = 0;
+                container.querySelectorAll('.sheet-share-input').forEach(input => {
+                    totalShare += parseFloat(input.value) || 0;
+                });
+                const remaining = Math.max(0, 100 - totalShare);
+                shareValue = remaining > 0 ? remaining : '';
+            }
+
+            const html = `
+                <div class="sheet-ben-row bg-gray-50 p-3 rounded border border-gray-200" data-id="${rowId}">
+                    <div class="grid grid-cols-12 gap-2 items-start">
+                        <div class="col-span-5">
+                            <label class="text-[10px] font-bold uppercase text-gray-500 block mb-1 truncate">${t.dynBeneficiaries}</label>
+                            <select class="sheet-ben-select w-full border p-2 rounded text-sm bg-white outline-none" onchange="onSheetBenChange(this)">
+                                <option value="">Select...</option>
+                            </select>
+                        </div>
+                        <div class="col-span-3">
+                            <label class="text-[10px] font-bold uppercase text-gray-500 block mb-1 truncate">${t.dynPercentShare}</label>
+                            <input type="number" class="sheet-share-input w-full border p-2 rounded text-sm text-center bg-white outline-none" value="${shareValue}" min="1" max="100">
+                        </div>
+                        <div class="col-span-3">
+                            <label class="text-[10px] font-bold uppercase text-gray-400 block mb-1 truncate">${t.dynAlternate}</label>
+                            <select class="sheet-alt-select w-full border p-2 rounded text-sm bg-white text-gray-600 outline-none">
+                                <option value="">--</option>
+                            </select>
+                        </div>
+                        <div class="col-span-1 flex justify-center mt-5">
+                            <button onclick="this.closest('.sheet-ben-row').remove()" class="text-gray-300 hover:text-red-500 transition p-1">
+                                <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16"></path></svg>
+                            </button>
+                        </div>
+                    </div>
+                </div>
+            `;
+
+            container.insertAdjacentHTML('beforeend', html);
+
+            // Populate dropdowns
+            const newRow = container.querySelector(`[data-id="${rowId}"]`);
+            const benSelect = newRow.querySelector('.sheet-ben-select');
+            const altSelect = newRow.querySelector('.sheet-alt-select');
+
+            beneficiaries.forEach(b => {
+                benSelect.innerHTML += `<option value="${b.id}">${b.name}</option>`;
+                altSelect.innerHTML += `<option value="${b.id}">${b.name}</option>`;
+            });
+
+            // Set values if provided
+            if (benIdValue) benSelect.value = benIdValue;
+            if (altIdValue) altSelect.value = altIdValue;
+        }
+
+        function saveAssetSheet() {
+            const type = document.getElementById('sheet-asset-type').value;
+            if (!type) {
+                alert('Please select an asset type');
+                return;
+            }
+
+            const assetId = currentAssetSheetId;
+            const t = TRANSLATIONS[currentLang];
+
+            // Collect field data
+            const fieldData = {};
+            document.querySelectorAll('#sheet-dynamic-fields [data-key]').forEach(input => {
+                fieldData[input.getAttribute('data-key')] = input.value;
+            });
+
+            // Collect beneficiary data
+            const beneficiaries = [];
+            document.querySelectorAll('.sheet-ben-row').forEach(row => {
+                const benId = row.querySelector('.sheet-ben-select').value;
+                const share = row.querySelector('.sheet-share-input').value;
+                const altId = row.querySelector('.sheet-alt-select').value;
+                if (benId) {
+                    beneficiaries.push({ benId, share, altId });
+                }
+            });
+
+            // Check if asset row exists
+            let assetRow = document.getElementById(`asset-row-${assetId}`);
+
+            if (!assetRow) {
+                // Create new asset row
+                const container = document.getElementById('asset-container');
+
+                if (isMobile()) {
+                    // Mobile: Create minimal summary card
+                    renderMobileSummaryCard(assetId, type, beneficiaries, fieldData);
+                } else {
+                    // Desktop: Create full accordion (reuse existing logic)
+                    createDesktopAssetRow(assetId, type, fieldData, beneficiaries);
+                }
+            } else {
+                // Update existing asset row
+                const assetRow = document.getElementById(`asset-row-${assetId}`);
+
+                if (assetRow.classList.contains('asset-summary-card')) {
+                    // Update mobile card
+                    // We need to re-render it to update details
+                    assetRow.remove();
+                    renderMobileSummaryCard(assetId, type, beneficiaries, fieldData);
+                } else {
+                    // Update desktop accordion
+                    const typeSelect = assetRow.querySelector('.asset-type-select');
+                    if (typeSelect) {
+                        typeSelect.value = type;
+                        renderAssetFields(assetId, type);
+
+                        // Update field values
+                        Object.keys(fieldData).forEach(key => {
+                            const input = assetRow.querySelector(`[data-key="${key}"]`);
+                            if (input) input.value = fieldData[key];
+                        });
+
+                        // Update beneficiaries
+                        const sharesContainer = document.getElementById(`shares-container-${assetId}`);
+                        if (sharesContainer) {
+                            sharesContainer.innerHTML = '';
+                            beneficiaries.forEach(b => {
+                                addShareRow(assetId, b.benId, b.share, b.altId);
+                            });
+                        }
+
+                        updateAssetHeader(assetId);
+                    }
+                }
+            }
+
+            closeAssetSheet();
+            saveData();
+        }
+
+        function renderMobileSummaryCard(assetId, type, beneficiaries, fieldData = {}) {
+            const container = document.getElementById('asset-container');
+            const t = TRANSLATIONS[currentLang];
+            const icon = ASSET_ICONS[type] || '📄';
+
+            // Map asset type values to translation keys
+            const assetTypeMap = {
+                'flat': t.assetOptFlat,
+                'land': t.assetOptLand,
+                'shop': t.assetOptShop,
+                'savings': t.assetOptSavings,
+                'fd': t.assetOptFD,
+                'locker': t.assetOptLocker,
+                'loan': t.assetOptLoan,
+                'nps': t.assetOptNPS,
+                'mf': t.assetOptMF,
+                'demat': t.assetOptDemat,
+                'crypto': t.assetOptCrypto,
+                'insurance': t.assetOptInsurance,
+                'esop': t.assetOptESOP,
+                'business': t.assetOptBusinessInt,
+                'jewelry': t.assetOptJewelry,
+                'vehicle': t.assetOptVehicle
+            };
+
+            const typeLabel = assetTypeMap[type] || type;
+            const benCount = beneficiaries.length;
+
+            const html = `
+                <div id="asset-row-${assetId}" class="asset-summary-card bg-white rounded-lg shadow-sm border border-gray-200 p-4 mb-3 cursor-pointer hover:bg-gray-50 transition" onclick="openAssetSheet(${assetId})" data-type="${type}">
+                    <div class="flex items-center gap-3">
+                        <div class="w-12 h-12 rounded-full bg-indigo-50 flex items-center justify-center text-2xl flex-shrink-0">
+                            ${icon}
+                        </div>
+                        <div class="flex-1 min-w-0">
+                            <h3 class="font-bold text-gray-800 text-sm truncate">${typeLabel}</h3>
+                            <p class="text-xs text-gray-500">→ ${benCount} ${t.dynBeneficiaries}</p>
+                        </div>
+                        <button onclick="event.stopPropagation(); removeMobileAsset(${assetId})" class="text-gray-400 hover:text-red-500 p-2 transition">
+                            <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16"></path></svg>
+                        </button>
+                    </div>
+                    <!-- Hidden data storage -->
+                    <div class="hidden asset-data" data-beneficiaries='${JSON.stringify(beneficiaries)}'></div>
+                    <div class="hidden asset-fields-data" data-fields='${JSON.stringify(fieldData)}'></div>
+                </div>
+            `;
+
+            container.insertAdjacentHTML('beforeend', html);
+        }
+
+        function removeMobileAsset(assetId) {
+            if (confirm('Remove this asset?')) {
+                document.getElementById(`asset-row-${assetId}`)?.remove();
+                saveData();
+            }
+        }
+
+        function createDesktopAssetRow(assetId, type, fieldData, beneficiaries) {
+            // This would be the full accordion creation logic
+            // For now, we'll skip this as desktop keeps the existing accordion
+        }
+
         function getValOrPlace(id, placeholder) {
             const val = document.getElementById(id) ? document.getElementById(id).value : '';
             return val.trim() ? val : `<span class="preview-placeholder">[${placeholder}]</span>`;
@@ -1110,18 +2142,24 @@
             html += `<h3 style="font-size: 14pt; font-weight: bold; margin-top: 20px; margin-bottom: 10px;">${t.pdfDistributionTitle}</h3>`;
             html += `<p style="margin-bottom: 15px;">${t.pdfDistributionIntro}</p>`;
 
-            const assetRows = document.querySelectorAll('.asset-item');
-            if (assetRows.length === 0) {
+            const allAssets = collectAllAssets();
+            if (allAssets.length === 0) {
                 html += `<p class="preview-placeholder" style="margin-left: 20px;">[No assets added yet...]</p>`;
             } else {
-                assetRows.forEach((row, idx) => {
-                    const typeSelect = row.querySelector('.asset-type-select');
-                    const typeLabel = typeSelect.options[typeSelect.selectedIndex].text;
+                allAssets.forEach((asset, idx) => {
+                    // Get type label
+                    const typeKey = `assetOpt${asset.type.charAt(0).toUpperCase() + asset.type.slice(1)}`;
+                    const typeLabel = t[typeKey] || asset.type;
 
                     // Description
                     let desc = "";
-                    row.querySelectorAll('.dynamic-field-input').forEach(inp => {
-                        if (inp.value) desc += `${inp.placeholder}: ${inp.value}, `;
+                    Object.entries(asset.details).forEach(([key, value]) => {
+                        if (value) {
+                            const schema = ASSET_SCHEMAS[asset.type];
+                            const field = schema?.find(f => f.key === key);
+                            const label = currentLang === 'hi' ? (field?.labelHi || field?.label) : field?.label;
+                            desc += `${label || key}: ${value}, `;
+                        }
                     });
                     if (desc.length > 2) desc = desc.substring(0, desc.length - 2);
                     if (!desc) desc = `<span class="preview-placeholder">[Asset Description]</span>`;
@@ -1132,21 +2170,17 @@
                     html += `<div style="font-style: italic; margin-bottom: 5px;">${t.pdfBeneficiariesLabel}:</div>`;
 
                     // Shares
-                    const shares = row.querySelectorAll('.share-row');
-                    if (shares.length === 0) {
+                    if (asset.shares.length === 0) {
                         html += `<div style="margin-left: 20px;" class="preview-placeholder">[No beneficiaries assigned]</div>`;
                     } else {
                         html += `<ul style="list-style-type: none; padding-left: 20px; margin: 0;">`;
-                        shares.forEach((sr, sIdx) => {
-                            const bId = sr.querySelector('.ben-select-share').value;
-                            const shareVal = sr.querySelector('.share-input').value;
-                            const altId = sr.querySelector('.ben-select-alt-share').value;
+                        asset.shares.forEach((share, sIdx) => {
                             const bullet = String.fromCharCode(97 + sIdx);
                             const toStr = currentLang === 'hi' ? 'को' : 'to';
 
-                            html += `<li style="margin-bottom: 5px;">(${bullet}) ${shareVal}% ${toStr} ${getBenString(bId)}`;
-                            if (altId) {
-                                html += `<div style="font-size: 10pt; color: #555; margin-left: 20px;">${t.pdfAlternateLabel}: ${getBenString(altId)}</div>`;
+                            html += `<li style="margin-bottom: 5px;">(${bullet}) ${share.share}% ${toStr} ${getBenString(share.benId)}`;
+                            if (share.altId) {
+                                html += `<div style="font-size: 10pt; color: #555; margin-left: 20px;">${t.pdfAlternateLabel}: ${getBenString(share.altId)}</div>`;
                             }
                             html += `</li>`;
                         });
@@ -1160,21 +2194,18 @@
             html += `<h3 style="font-size: 14pt; font-weight: bold; margin-top: 20px; margin-bottom: 10px;">${t.pdfResidualTitle}</h3>`;
             html += `<p style="margin-bottom: 10px;">${t.pdfResidualIntro}</p>`;
 
-            const resRows = document.querySelectorAll('.residual-row');
-            if (resRows.length === 0) {
+            const resShares = collectResidualShares();
+            if (resShares.length === 0) {
                 html += `<p class="preview-placeholder" style="margin-left: 20px;">[No residual beneficiaries selected...]</p>`;
             } else {
                 html += `<ul style="list-style-type: none; padding-left: 20px; margin: 0;">`;
-                resRows.forEach((row, idx) => {
-                    const bId = row.querySelector('.residual-ben-select').value;
-                    const shareVal = row.querySelector('.residual-share-input').value;
-                    const altId = row.querySelector('.residual-ben-alt-select').value;
+                resShares.forEach((share, idx) => {
                     const bullet = String.fromCharCode(97 + idx);
                     const toStr = currentLang === 'hi' ? 'को' : 'to';
 
-                    html += `<li style="margin-bottom: 5px;">(${bullet}) ${shareVal}% ${toStr} ${getBenString(bId)}`;
-                    if (altId) {
-                        html += `<div style="font-size: 10pt; color: #555; margin-left: 20px;">${t.pdfAlternateLabel}: ${getBenString(altId)}</div>`;
+                    html += `<li style="margin-bottom: 5px;">(${bullet}) ${share.share}% ${toStr} ${getBenString(share.benId)}`;
+                    if (share.altId) {
+                        html += `<div style="font-size: 10pt; color: #555; margin-left: 20px;">${t.pdfAlternateLabel}: ${getBenString(share.altId)}</div>`;
                     }
                     html += `</li>`;
                 });
@@ -1248,7 +2279,15 @@
         function updateBeneficiaryHeader(uniqueId) {
             const t = TRANSLATIONS[currentLang];
             const row = document.getElementById(`ben-row-${uniqueId}`);
-            const nameVal = document.getElementById(`ben-name-${uniqueId}`).value.trim();
+            if (!row) return;
+
+            // Skip mobile summary cards (they are re-rendered by reloadDynamicRows)
+            if (row.classList.contains('ben-summary-card')) return;
+
+            const nameInput = document.getElementById(`ben-name-${uniqueId}`);
+            if (!nameInput) return; // Safety check
+
+            const nameVal = nameInput.value.trim();
             let relVal = document.getElementById(`ben-rel-${uniqueId}`).value.trim();
 
             // Translate common relationship terms
@@ -1263,7 +2302,7 @@
             }
 
             row.querySelector('.ben-title-display').innerText = nameVal || t.dynNewBeneficiary;
-            row.querySelector('.ben-desc-display').innerText = nameVal ? (relVal ? `${t.dynRelation}: ${relVal}` : t.dynRelation + ' not specified') : t.dynExpandDetails;
+            row.querySelector('.ben-desc-display').innerText = relVal || t.dynSelectRel;
             row.querySelector('.ben-icon-display').innerText = nameVal ? nameVal.charAt(0).toUpperCase() : '+';
             saveData();
         }
@@ -1290,11 +2329,21 @@
         }
 
         function addBeneficiaryRow(data = null) {
+            beneficiaryCount++;
             const t = TRANSLATIONS[currentLang]; // Get translations
+
+            if (isMobile()) {
+                if (data) {
+                    renderBenSummaryCard(data.id, data);
+                } else {
+                    openBenSheet();
+                }
+                return;
+            }
 
             document.querySelectorAll('[id^="ben-body-"]').forEach(el => el.classList.add('hidden'));
             document.querySelectorAll('.beneficiary-item').forEach(el => el.classList.remove('ring-2', 'ring-blue-100'));
-            beneficiaryCount++;
+
             const uniqueId = data ? data.id : Date.now();
             const container = document.getElementById('beneficiary-container');
 
@@ -1409,10 +2458,20 @@
         }
 
         function validateAndMoveToAssets() {
-            const bens = document.querySelectorAll('.beneficiary-item');
-            if (bens.length === 0) { alert("Please add at least one beneficiary."); return; }
+            // Check for both desktop and mobile beneficiaries
+            const desktopBens = document.querySelectorAll('.beneficiary-item:not(.ben-summary-card)');
+            const mobileBens = document.querySelectorAll('.ben-summary-card');
+            const totalBens = desktopBens.length + mobileBens.length;
+
+            if (totalBens === 0) {
+                alert("Please add at least one beneficiary.");
+                return;
+            }
+
             let isValid = true;
-            bens.forEach(row => {
+
+            // Validate desktop beneficiaries
+            desktopBens.forEach(row => {
                 const uid = row.getAttribute('data-id');
                 const name = document.getElementById(`ben-name-${uid}`).value.trim();
                 const rel = document.getElementById(`ben-rel-${uid}`).value.trim();
@@ -1426,6 +2485,9 @@
                     document.getElementById(`ben-rel-${uid}`).classList.remove('error-border');
                 }
             });
+
+            // Mobile beneficiaries are always valid (sheet enforces required fields)
+
             if (isValid) {
                 updateMaxReached(4);
                 goToStep(4);
@@ -1452,7 +2514,13 @@
         function updateAssetHeader(uniqueId) {
             const t = TRANSLATIONS[currentLang];
             const row = document.getElementById(`asset-row-${uniqueId}`);
+            if (!row) return;
+
+            // Skip mobile summary cards (they are re-rendered by reloadDynamicRows)
+            if (row.classList.contains('asset-summary-card')) return;
+
             const typeSelect = row.querySelector('.asset-type-select');
+            if (!typeSelect) return; // Safety check
             const inputs = row.querySelectorAll('.dynamic-field-input');
             let desc = "";
             inputs.forEach(inp => { if (inp.value) desc += inp.value + " "; });
@@ -1472,6 +2540,14 @@
         function addAssetRow() {
             const t = TRANSLATIONS[currentLang]; // Get translations
 
+            // Mobile: Open bottom sheet instead of accordion
+            if (isMobile()) {
+                assetCount++;
+                openAssetSheet(assetCount);
+                return;
+            }
+
+            // Desktop: Keep accordion behavior
             document.querySelectorAll('[id^="asset-body-"]').forEach(el => el.classList.add('hidden'));
             document.querySelectorAll('.asset-item').forEach(el => el.classList.remove('ring-2', 'ring-indigo-100'));
 
@@ -1562,6 +2638,13 @@
             if (ben && ben.defaultAltId) altSelect.value = ben.defaultAltId;
         }
 
+        function onSheetBenChange(selectEl) {
+            const benId = selectEl.value; if (!benId) return;
+            const ben = beneficiaries.find(b => b.id == benId);
+            const altSelect = selectEl.closest('.sheet-ben-row').querySelector('.sheet-alt-select');
+            if (ben && ben.defaultAltId) altSelect.value = ben.defaultAltId;
+        }
+
         function onResidualPrimaryBenChange(selectEl) {
             const benId = selectEl.value; if (!benId) return;
             const ben = beneficiaries.find(b => b.id == benId);
@@ -1569,10 +2652,20 @@
             if (ben && ben.defaultAltId) altSelect.value = ben.defaultAltId;
         }
 
-        function addShareRow(assetId, benId = '', shareVal = '100', altId = '') {
+        function addShareRow(assetId, benId = '', shareVal = '', altId = '') {
             const t = TRANSLATIONS[currentLang]; // Get translations
 
             const container = document.getElementById(`shares-container-${assetId}`);
+
+            // Auto-calculate share if not provided
+            if (!shareVal) {
+                let totalShare = 0;
+                container.querySelectorAll('.share-input').forEach(input => {
+                    totalShare += parseFloat(input.value) || 0;
+                });
+                const remaining = Math.max(0, 100 - totalShare);
+                shareVal = remaining > 0 ? remaining : '';
+            }
             const div = document.createElement('div');
             div.className = "share-row bg-gray-50 p-3 rounded border border-gray-200 mb-2 relative group hover:bg-white hover:shadow-sm transition-all";
             div.innerHTML = `
@@ -1618,114 +2711,104 @@
 
         // Function to reload all dynamic rows when language changes
         function reloadDynamicRows() {
-            // Save current data
-            const currentData = {
-                beneficiaries: [],
-                assets: []
-            };
+            // 1. Collect Data
+            const currentBens = collectBeneficiaries();
+            const currentAssets = collectAllAssets();
+            const currentResiduals = collectResidualShares();
 
-            // Collect beneficiary data
-            document.querySelectorAll('.beneficiary-item').forEach(benRow => {
-                const id = benRow.getAttribute('data-id');
-                const ben = {
-                    id: id,
-                    name: document.getElementById(`ben-name-${id}`)?.value || '',
-                    rel: document.getElementById(`ben-rel-${id}`)?.value || '',
-                    addr: document.getElementById(`ben-addr-${id}`)?.value || '',
-                    father: document.getElementById(`ben-father-${id}`)?.value || '',
-                    relPrefix: document.getElementById(`ben-relPrefix-${id}`)?.value || 'S/o',
-                    isMinor: document.getElementById(`ben-minor-${id}`)?.checked || false,
-                    gName: document.getElementById(`guardian-name-${id}`)?.value || '',
-                    gRel: document.getElementById(`guardian-rel-${id}`)?.value || '',
-                    gFather: document.getElementById(`guardian-father-${id}`)?.value || '',
-                    gRelPrefix: document.getElementById(`ben-gRelPrefix-${id}`)?.value || 'S/o',
-                    gAddr: document.getElementById(`guardian-addr-${id}`)?.value || '',
-                    defaultAltId: document.getElementById(`ben-defaultAlt-${id}`)?.getAttribute('data-selected') || ''
-                };
-                currentData.beneficiaries.push(ben);
-            });
-
-            // Collect asset data
-            document.querySelectorAll('.asset-item').forEach(assetRow => {
-                const assetBody = assetRow.querySelector('[id^="asset-body-"]');
-                if (!assetBody) return;
-
-                const assetId = assetBody.id.replace('asset-body-', '');
-                const typeSelect = assetRow.querySelector('.asset-type-select');
-                const type = typeSelect?.value || '';
-
-                if (!type) return;
-
-                const asset = {
-                    id: assetId,
-                    type: type,
-                    shares: []
-                };
-
-                // Collect share data
-                const sharesContainer = document.getElementById(`shares-container-${assetId}`);
-                if (sharesContainer) {
-                    sharesContainer.querySelectorAll('.share-row').forEach(shareRow => {
-                        const benSelect = shareRow.querySelector('.ben-select-share');
-                        const shareInput = shareRow.querySelector('.share-input');
-                        const altSelect = shareRow.querySelector('.ben-select-alt-share');
-
-                        asset.shares.push({
-                            benId: benSelect?.value || '',
-                            share: shareInput?.value || '100',
-                            altId: altSelect?.value || ''
-                        });
-                    });
-                }
-
-                currentData.assets.push(asset);
-            });
-
-            // Clear existing rows
+            // 2. Clear Containers
             document.getElementById('beneficiary-container').innerHTML = '';
             document.getElementById('asset-container').innerHTML = '';
+            document.getElementById('residual-shares-list').innerHTML = '';
 
             // Reset counters
             beneficiaryCount = 0;
             assetCount = 0;
 
-            // Re-render beneficiaries
-            currentData.beneficiaries.forEach(ben => {
+            // 3. Re-render Beneficiaries
+            currentBens.forEach(ben => {
                 addBeneficiaryRow(ben);
             });
 
-            // Re-render assets
-            currentData.assets.forEach(asset => {
-                addAssetRow();
-                const assetId = assetCount;
+            // 4. Re-render Assets
+            currentAssets.forEach(asset => {
+                if (isMobile()) {
+                    // Mobile: Render Summary Card
+                    assetCount++;
+                    const newId = assetCount;
+                    asset.id = newId;
+                    renderMobileSummaryCard(newId, asset.type, asset.shares, asset.details);
+                } else {
+                    // Desktop: Add Row and Populate
+                    addAssetRow();
+                    const assetId = assetCount;
 
-                // Set asset type
-                const typeSelect = document.querySelector(`#asset-row-${assetId} .asset-type-select`);
-                if (typeSelect) {
-                    typeSelect.value = asset.type;
-                    // Trigger the change event to render fields
-                    typeSelect.dispatchEvent(new Event('change'));
+                    // Populate Asset Type
+                    const typeSelect = document.querySelector(`#asset-row-${assetId} .asset-type-select`);
+                    if (typeSelect) {
+                        typeSelect.value = asset.type;
+                        renderAssetFields(assetId, asset.type);
+                    }
 
-                    // Re-add shares after a short delay to ensure fields are rendered
-                    setTimeout(() => {
+                    // Populate Fields
+                    const assetBody = document.getElementById(`asset-body-${assetId}`);
+                    if (assetBody) {
+                        // Populate inputs
+                        const schema = ASSET_SCHEMAS[asset.type] || [];
+                        schema.forEach(field => {
+                            const input = assetBody.querySelector(`.dynamic-field-input[data-key="${field.key}"]`);
+                            if (input && asset.details && asset.details[field.key]) {
+                                input.value = asset.details[field.key];
+                            }
+                        });
+                        updateAssetHeader(assetId);
+
+                        // Populate Shares
                         const sharesContainer = document.getElementById(`shares-container-${assetId}`);
                         if (sharesContainer) {
-                            sharesContainer.innerHTML = ''; // Clear default share
+                            sharesContainer.innerHTML = ''; // Clear default empty share
                             asset.shares.forEach(share => {
                                 addShareRow(assetId, share.benId, share.share, share.altId);
                             });
                         }
-                    }, 50);
+                    }
                 }
             });
 
-            // Update all dropdowns after re-rendering
-            setTimeout(() => {
-                updateAllDropdowns();
-            }, 100);
+            // 5. Re-render Residuals
+            currentResiduals.forEach(res => {
+                addResidualShare(res.benId, res.share, res.altId);
+            });
+
+            updateAllDropdowns();
         }
 
-        function addResidualShare(benId = '', share = '100', altId = '') {
+        function addResidualShare(benId = '', share = '', altId = '') {
+            // Auto-calculate share if not provided
+            if (!share) {
+                const existingShares = collectResidualShares();
+                let totalShare = 0;
+                existingShares.forEach(s => totalShare += parseFloat(s.share) || 0);
+                const remaining = Math.max(0, 100 - totalShare);
+                share = remaining > 0 ? remaining : '';
+            }
+
+            // Mobile Logic
+            if (isMobile()) {
+                if (benId) {
+                    // Loading data - render summary card
+                    // Use random component to avoid collision during rapid re-rendering
+                    const uniqueId = Date.now() + Math.floor(Math.random() * 1000);
+                    const data = { id: uniqueId, benId, share, altId };
+                    renderResidualSummaryCard(data.id, data);
+                } else {
+                    // User adding new - open sheet
+                    openResidualSheet();
+                }
+                return;
+            }
+
+            // Desktop Logic
             const container = document.getElementById('residual-shares-list');
             const div = document.createElement('div');
             // Matches Share Row UI
@@ -1798,37 +2881,34 @@
         }
 
         function performSave() {
-            const scrapedBens = [];
-            document.querySelectorAll('.beneficiary-item').forEach(row => {
-                const uid = row.getAttribute('data-id');
-                const name = document.getElementById(`ben-name-${uid}`).value;
-                if (name) {
-                    scrapedBens.push({
-                        id: uid, name,
-                        rel: document.getElementById(`ben-rel-${uid}`).value,
-                        addr: document.getElementById(`ben-addr-${uid}`).value,
-                        relPrefix: document.getElementById(`ben-relPrefix-${uid}`).value,
-                        father: document.getElementById(`ben-father-${uid}`).value,
-                        defaultAltId: document.getElementById(`ben-defaultAlt-${uid}`).value,
-                        isMinor: document.getElementById(`ben-minor-${uid}`).checked,
-                        gName: document.getElementById(`guardian-name-${uid}`).value,
-                        gRel: document.getElementById(`guardian-rel-${uid}`).value,
-                        gRelPrefix: document.getElementById(`ben-gRelPrefix-${uid}`).value || 'S/o',
-                        gFather: document.getElementById(`guardian-father-${uid}`).value,
-                        gAddr: document.getElementById(`guardian-addr-${uid}`).value
-                    });
-                }
-            });
+            const scrapedBens = collectBeneficiaries();
             beneficiaries = scrapedBens;
             updateAllDropdowns();
 
             const residualShares = [];
+
+            // 1. Desktop Residual Rows
             document.querySelectorAll('.residual-row').forEach(row => {
                 residualShares.push({
                     benId: row.querySelector('.residual-ben-select').value,
                     share: row.querySelector('.residual-share-input').value,
                     altId: row.querySelector('.residual-ben-alt-select').value
                 });
+            });
+
+            // 2. Mobile Residual Summary Cards
+            document.querySelectorAll('.residual-summary-card').forEach(card => {
+                const dataDiv = card.querySelector('.residual-data');
+                if (dataDiv) {
+                    const data = JSON.parse(dataDiv.getAttribute('data-json') || '{}');
+                    if (data.benId) {
+                        residualShares.push({
+                            benId: data.benId,
+                            share: data.share,
+                            altId: data.altId
+                        });
+                    }
+                }
             });
 
             const data = {
@@ -1856,23 +2936,29 @@
                 residual: residualShares
             };
 
-            document.querySelectorAll('.asset-item').forEach(row => {
-                const shares = [];
-                row.querySelectorAll('.share-row').forEach(sr => {
-                    shares.push({
-                        benId: sr.querySelector('.ben-select-share').value,
-                        share: sr.querySelector('.share-input').value,
-                        altId: sr.querySelector('.ben-select-alt-share').value
-                    });
-                });
-                const details = {}; let descString = "";
-                row.querySelectorAll('.dynamic-field-input').forEach(inp => {
-                    const key = inp.getAttribute('data-key'); const label = inp.placeholder;
-                    if (inp.value) { details[key] = inp.value; descString += `${label}: ${inp.value}, `; }
+            // Collect assets from both desktop and mobile views
+            const allAssets = collectAllAssets();
+            data.assets = allAssets.map(asset => {
+                // Generate description string for RTF/PDF
+                let descString = "";
+                Object.entries(asset.details).forEach(([key, value]) => {
+                    if (value) {
+                        const schema = ASSET_SCHEMAS[asset.type];
+                        const field = schema?.find(f => f.key === key);
+                        const label = field?.label || key;
+                        descString += `${label}: ${value}, `;
+                    }
                 });
                 if (descString.length > 2) descString = descString.substring(0, descString.length - 2);
-                data.assets.push({ type: row.querySelector('.asset-type-select').value, desc: descString, details, shares });
+
+                return {
+                    type: asset.type,
+                    desc: descString,
+                    details: asset.details,
+                    shares: asset.shares
+                };
             });
+
             localStorage.setItem(STORAGE_KEY, JSON.stringify(data));
         }
 
@@ -1916,17 +3002,53 @@
 
             const ac = document.getElementById('asset-container'); ac.innerHTML = ''; assetCount = 0;
             if (data.assets) {
+                isLoadingData = true; // Prevent bottom sheet from opening during data load
                 data.assets.forEach(a => {
-                    addAssetRow(); const row = ac.lastElementChild; const assetId = row.id.replace('asset-row-', '');
-                    row.querySelector('.asset-type-select').value = a.type;
-                    renderAssetFields(assetId, a.type);
-                    if (a.details) { Object.keys(a.details).forEach(key => { const inp = row.querySelector(`[data-key="${key}"]`); if (inp) inp.value = a.details[key]; }); }
-                    document.getElementById(`shares-container-${assetId}`).innerHTML = '';
-                    if (a.shares) a.shares.forEach(s => addShareRow(assetId, s.benId, s.share, s.altId)); else addShareRow(assetId);
-                    updateAssetHeader(assetId); checkSplitWarning(assetId);
-                    document.getElementById(`asset-body-${assetId}`).classList.add('hidden');
-                    document.getElementById(`asset-row-${assetId}`).classList.remove('ring-2', 'ring-indigo-100');
+                    assetCount++;
+                    const assetId = assetCount;
+
+                    if (isMobile()) {
+                        // Restore as mobile summary card
+                        // Reconstruct beneficiaries for summary card
+                        const bens = a.shares ? a.shares.map(s => ({
+                            benId: s.benId,
+                            share: s.share,
+                            altId: s.altId
+                        })) : [];
+
+                        renderMobileSummaryCard(assetId, a.type, bens, a.details || {});
+                    } else {
+                        // Restore as desktop accordion
+                        // We need to temporarily bypass the isMobile check in addAssetRow or just manually create the row
+                        // But addAssetRow checks isMobile()...
+                        // Let's manually create the desktop row structure here or modify addAssetRow
+                        // Actually, since we are in loadData, we can just use the existing logic but we need to make sure addAssetRow doesn't return early
+
+                        // Wait, addAssetRow checks isMobile(). If we are on mobile, it returns early.
+                        // So we can't use addAssetRow() here if we want to force desktop view (e.g. testing)
+                        // But if we are on mobile, we WANT summary cards.
+
+                        // So the logic above handles mobile. Now handle desktop.
+                        // If !isMobile(), addAssetRow() creates the accordion.
+
+                        // Reset assetCount because addAssetRow increments it
+                        assetCount--;
+                        addAssetRow();
+
+                        const row = ac.lastElementChild;
+                        // const assetId = row.id.replace('asset-row-', ''); // Already have assetId
+
+                        row.querySelector('.asset-type-select').value = a.type;
+                        renderAssetFields(assetId, a.type);
+                        if (a.details) { Object.keys(a.details).forEach(key => { const inp = row.querySelector(`[data-key="${key}"]`); if (inp) inp.value = a.details[key]; }); }
+                        document.getElementById(`shares-container-${assetId}`).innerHTML = '';
+                        if (a.shares) a.shares.forEach(s => addShareRow(assetId, s.benId, s.share, s.altId)); else addShareRow(assetId);
+                        updateAssetHeader(assetId); checkSplitWarning(assetId);
+                        document.getElementById(`asset-body-${assetId}`).classList.add('hidden');
+                        document.getElementById(`asset-row-${assetId}`).classList.remove('ring-2', 'ring-indigo-100');
+                    }
                 });
+                isLoadingData = false; // Re-enable bottom sheet
             }
             document.getElementById('residual-shares-list').innerHTML = '';
             if (Array.isArray(data.residual)) data.residual.forEach(r => addResidualShare(r.benId, r.share, r.altId)); else addResidualShare();
@@ -1953,9 +3075,21 @@
             });
 
             let residualTotal = 0; let hasResBen = false;
+
+            // 1. Desktop Residual Rows
             document.querySelectorAll('.residual-row').forEach(row => {
                 if (row.querySelector('.residual-ben-select').value) hasResBen = true;
                 residualTotal += parseFloat(row.querySelector('.residual-share-input').value) || 0;
+            });
+
+            // 2. Mobile Residual Summary Cards
+            document.querySelectorAll('.residual-summary-card').forEach(card => {
+                const dataDiv = card.querySelector('.residual-data');
+                if (dataDiv) {
+                    const data = JSON.parse(dataDiv.getAttribute('data-json') || '{}');
+                    if (data.benId) hasResBen = true;
+                    residualTotal += parseFloat(data.share) || 0;
+                }
             });
 
             if (!hasResBen) { alert("Please select at least one Residual Beneficiary."); closePreview(); goToStep(4); return; }
@@ -1970,6 +3104,17 @@
             document.getElementById('preview-overlay').classList.add('hidden');
             document.getElementById('success-overlay').classList.remove('hidden');
             updateProgressBar(5);
+
+            // Explicitly set PDF button visibility based on current language
+            const btnPdf = document.getElementById('btn-download-pdf');
+            if (btnPdf) {
+                if (currentLang === 'hi') {
+                    btnPdf.classList.add('hidden');
+                } else {
+                    btnPdf.classList.remove('hidden');
+                }
+            }
+
             window.scrollTo(0, 0);
         }
 
@@ -1998,7 +3143,7 @@
 
             const gV = (id) => document.getElementById(id).value;
             const gB = (id) => beneficiaries.find(b => b.id == id);
-            const rShares = JSON.parse(localStorage.getItem(STORAGE_KEY)).residual || [];
+            const rShares = collectResidualShares();
 
             doc.setFont("times", "bold"); doc.setFontSize(22); doc.text("LAST WILL AND TESTAMENT", pageWidth / 2, y, { align: 'center' }); y += 8;
             doc.setLineWidth(0.5); doc.line(margin, y, pageWidth - margin, y); y += 15;
@@ -2288,7 +3433,7 @@
             let resIntro = t.pdfResidualIntro;
             if (currentLang === 'hi') resIntro = fixHindiGender(resIntro);
             rtf += `${encodeRTF(resIntro)}\\par\\par \n`;
-            const rShares = data.residual || [];
+            const rShares = collectResidualShares();
             rShares.forEach((r, idx) => {
                 const p = gB(r.benId);
                 const a = gB(r.altId);
