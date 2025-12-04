@@ -86,7 +86,7 @@ const TRANSLATIONS = {
         // Step 2: Executor
         s2Title: "3. The Executor",
         s2InfoTitle: "What is an Executor?",
-        s2InfoText: "An executor is the person you trust to carry out the instructions in your will. They will manage your estate, pay debts, and distribute assets to beneficiaries. Note: An executor can also be a beneficiary in the same will - this is common and perfectly legal.",
+        s2InfoText: "An executor is the person you trust to carry out the instructions in your will. They will manage your estate, pay debts, and distribute assets to beneficiaries. Note: An executor can also be a beneficiary in the same will - this is common and perfectly legal. <br><br><b>Jointly and Severally:</b> This means if you appoint multiple executors, they can act together (jointly) or independently (severally) if one is unavailable.",
         s2InfoRequirements: "Requirements:",
         s2InfoReq1: "Must be 18+ years old (Major)",
         s2InfoReq2: "Must be of sound mind",
@@ -101,6 +101,42 @@ const TRANSLATIONS = {
         lblExParentName: "Executor's Parent / Spouse Name",
         btnNextBeneficiaries: "Next: Beneficiaries",
 
+        // Multiple Executors
+        s2PrimaryExecutors: "Primary Executor(s)",
+        s2AddPrimary: "+ Add Another Primary Executor",
+        s2TipMultiple: "Tip: Most wills have 1-3 executors. Having many can slow decision-making.",
+        s2AlternateSection: "Alternate Executor (Optional)",
+        s2AddAlternate: "Add an alternate executor",
+        s2AlternateInfo: "Recommended: An alternate ensures someone can serve if your primary executor(s) cannot.",
+        s2RemoveAlternate: "Remove Alternate Executor",
+        s2ExecutorNum: "Primary Executor",
+        s2AlternateExecutor: "Alternate Executor",
+        btnEditExecutor: "Edit",
+        btnRemoveExecutor: "Remove",
+        sheetExecutorTitle: "Manage Executor",
+        sheetEditExecutor: "Edit Executor",
+        sheetAddPrimary: "Add Primary Executor",
+        sheetAddAlternate: "Add Alternate Executor",
+        alertExecutorRequired: "Please enter executor name and relationship.",
+        confirmDeleteExecutor: "Are you sure you want to remove this executor?",
+        prefixSo: "S/o",
+        prefixDo: "D/o",
+        prefixWo: "W/o",
+
+        // Preview Keys
+        previewPrimaryExecutors: "Primary Executor(s)",
+        previewExecutorClause: "I appoint the following person(s) as the Executor(s) of this Will:",
+        previewJointSeveral: "The Executors shall act jointly and severally.",
+        previewAlternateExecutor: "Alternate Executor",
+        previewAlternateClause: "If the above Executor(s) are unable or unwilling to act, I appoint the following person as Alternate Executor:",
+        btnRemoveExecutor: "Remove",
+
+        // Preview Keys
+        previewPrimaryExecutors: "Primary Executor(s)",
+        previewExecutorClause: "I appoint the following person(s) as the Executor(s) of this Will:",
+        previewJointSeveral: "The Executors shall act jointly and severally.",
+        previewAlternateExecutor: "Alternate Executor",
+        previewAlternateClause: "If the above Executor(s) are unable or unwilling to act, I appoint the following person as Alternate Executor:",
         // Step 3: Beneficiaries
         s3Title: "4. Your Beneficiaries",
         s3InfoTitle: "What are Beneficiaries?",
@@ -322,7 +358,7 @@ const TRANSLATIONS = {
         // Step 2: Executor
         s2Title: "3. Executor (निष्पादक)",
         s2InfoTitle: "Executor क्या होता है?",
-        s2InfoText: "Executor वह व्यक्ति है जिस पर आप अपनी वसीयत में दिए गए निर्देशों को पूरा करने के लिए भरोसा करते हैं। वे आपकी संपत्ति का प्रबंधन करेंगे, ऋण चुकाएंगे और लाभार्थियों को संपत्ति वितरित करेंगे। नोट: एक Executor उसी वसीयत में लाभार्थी भी हो सकता है - यह सामान्य और पूरी तरह से कानूनी है।",
+        s2InfoText: "Executor वह व्यक्ति है जिस पर आप अपनी वसीयत के निर्देशों का पालन करने के लिए भरोसा करते हैं। वे आपकी संपत्ति का प्रबंधन करेंगे, ऋण चुकाएंगे और लाभार्थियों को संपत्ति वितरित करेंगे। नोट: एक Executor उसी वसीयत में लाभार्थी भी हो सकता है - यह सामान्य और पूरी तरह से कानूनी है। <br><br><b>Jointly and Severally:</b> इसका मतलब है कि यदि आप कई Executors नियुक्त करते हैं, तो वे एक साथ (Jointly) या स्वतंत्र रूप से (Severally) कार्य कर सकते हैं यदि कोई उपलब्ध नहीं है।",
         s2InfoRequirements: "आवश्यकताएं:",
         s2InfoReq1: "18+ वर्ष की आयु होनी चाहिए (वयस्क)",
         s2InfoReq2: "स्वस्थ मानसिक स्थिति में होना चाहिए",
@@ -336,6 +372,35 @@ const TRANSLATIONS = {
         phExAddress: "वर्तमान पता",
         lblExParentName: "Executor के माता-पिता / जीवनसाथी का नाम",
         btnNextBeneficiaries: "अगला: Beneficiaries (लाभार्थी)",
+
+        // Multiple Executors
+        s2PrimaryExecutors: "प्राथमिक Executor(s)",
+        s2AddPrimary: "+ एक और Primary Executor जोड़ें",
+        s2TipMultiple: "सुझाव: अधिकांश वसीयतों में 1-3 Executor होते हैं। बहुत सारे होने से निर्णय लेने में देरी हो सकती है।",
+        s2AlternateSection: "वैकल्पिक Executor (Optional)",
+        s2AddAlternate: "वैकल्पिक Executor जोड़ें",
+        s2AlternateInfo: "अनुशंसित: यदि आपके प्राथमिक Executor सेवा नहीं कर सकते तो वैकल्पिक Executor सुनिश्चित करता है कि कोई सेवा कर सके।",
+        s2RemoveAlternate: "Alternate Executor हटाएं",
+        s2ExecutorNum: "Primary Executor",
+        s2AlternateExecutor: "Alternate Executor",
+        btnEditExecutor: "Edit",
+        btnRemoveExecutor: "हटाएं",
+        sheetExecutorTitle: "Executor प्रबंधित करें",
+        sheetEditExecutor: "Executor संपादित करें",
+        sheetAddPrimary: "प्राथमिक Executor जोड़ें",
+        sheetAddAlternate: "वैकल्पिक Executor जोड़ें",
+        alertExecutorRequired: "कृपया Executor का नाम और संबंध दर्ज करें।",
+        confirmDeleteExecutor: "क्या आप वाकई इस Executor को हटाना चाहते हैं?",
+        prefixSo: "पुत्र",
+        prefixDo: "पुत्री",
+        prefixWo: "पत्नी",
+
+        // Preview Keys
+        previewPrimaryExecutors: "प्राथमिक Executor(s)",
+        previewExecutorClause: "मैं निम्नलिखित व्यक्ति(यों) को इस वसीयत का Executor नियुक्त करता/करती हूँ:",
+        previewJointSeveral: "Executors संयुक्त रूप से और अलग-अलग (Jointly and Severally) कार्य करेंगे।",
+        previewAlternateExecutor: "वैकल्पिक Executor",
+        previewAlternateClause: "यदि उपरोक्त Executor कार्य करने में असमर्थ या अनिच्छुक हैं, तो मैं निम्नलिखित व्यक्ति को वैकल्पिक Executor नियुक्त करता/करती हूँ:",
 
         // Step 3: Beneficiaries
         s3Title: "4. आपके Beneficiaries (लाभार्थी)",
@@ -498,7 +563,12 @@ function updateLanguage() {
         document.querySelectorAll('[data-i18n]').forEach(el => {
             const key = el.getAttribute('data-i18n');
             if (t[key]) {
-                el.textContent = t[key];
+                // Use innerHTML for keys that contain HTML formatting
+                if (key === 's2InfoText') {
+                    el.innerHTML = t[key];
+                } else {
+                    el.textContent = t[key];
+                }
             }
         });
 
@@ -526,6 +596,25 @@ function updateLanguage() {
 
         // Toggle PDF download button visibility based on language
         const btnPdf = document.getElementById('btn-download-pdf');
+        if (btnPdf) {
+            if (currentLang === 'hi') {
+                btnPdf.classList.add('hidden');
+            } else {
+                btnPdf.classList.remove('hidden');
+            }
+        }
+
+        // Update Executor Sheet Prefix Dropdown
+        const prefixSelect = document.getElementById('sheet-ex-prefix');
+        if (prefixSelect) {
+            const currentVal = prefixSelect.value; // Preserve selection if possible (though value is key)
+            prefixSelect.innerHTML = `
+                <option value="S/o">${t.prefixSo}</option>
+                <option value="D/o">${t.prefixDo}</option>
+                <option value="W/o">${t.prefixWo}</option>
+            `;
+            prefixSelect.value = currentVal;
+        }
         if (btnPdf) {
             if (currentLang === 'hi') {
                 btnPdf.classList.add('hidden');
