@@ -432,46 +432,87 @@
                     </div>
                 </div>
 
-                <div><label class="text-xs font-bold text-gray-500"><span data-i18n="lblExName">Executor Name</span>
-                        <span class="text-red-500">*</span></label><input type="text" id="exName"
-                        oninput="removeError(this); saveData()" class="w-full border p-3 rounded required-field"
-                        placeholder="Full Name" data-i18n-placeholder="phExName"></div>
-                <div class="grid grid-cols-1 gap-4">
-                    <div>
-                        <label class="text-xs font-bold text-gray-500"><span data-i18n="lblExRel">Relationship</span>
-                            <span class="text-red-500">*</span></label>
-                        <input type="text" id="exRel" oninput="removeError(this); saveData()"
-                            class="w-full border p-3 rounded required-field" placeholder="e.g. Brother"
-                            data-i18n-placeholder="phExRel">
-                        <p class="text-[10px] text-gray-400 mt-1" data-i18n="exRelHelper">Helps distinguish them from
-                            others with similar names.</p>
+                <!-- Mobile Executor Cards Container -->
+                <div id="mobile-executor-cards-container" class="md:hidden space-y-3 mb-4"></div>
+
+                <!-- Desktop View -->
+                <div id="desktop-executor-view" class="hidden md:block space-y-6">
+                    <!-- Primary Executors Card -->
+                    <div
+                        class="bg-white rounded-lg shadow-sm border border-gray-200 overflow-hidden ring-2 ring-transparent hover:ring-indigo-50 transition-all">
+                        <!-- Header -->
+                        <div class="bg-white p-4 border-b border-gray-100 flex items-center gap-3 select-none">
+                            <div
+                                class="w-10 h-10 rounded-full bg-indigo-50 flex items-center justify-center text-indigo-600 font-bold text-xl">
+                                P</div>
+                            <div>
+                                <h3 class="font-bold text-gray-800 text-sm" data-i18n="s2PrimaryExecutors">Primary
+                                    Executor(s)</h3>
+                                <p class="text-xs text-gray-500" data-i18n="s2TipMultiple">Tip: Most wills have 1-3
+                                    executors. Having many can slow decision-making.</p>
+                            </div>
+                        </div>
+
+                        <!-- Body -->
+                        <div class="p-4 md:p-6 bg-slate-50">
+                            <!-- Primary Executors Container -->
+                            <div id="primary-executors-container" class="space-y-4 mb-4"></div>
+
+                            <!-- Add Primary Executor Button -->
+                            <button onclick="addExecutorRow(true)"
+                                class="w-full py-3 border-2 border-dashed border-indigo-300 text-indigo-600 font-semibold rounded hover:bg-indigo-50 transition flex items-center justify-center gap-2"
+                                data-i18n="s2AddPrimary">
+                                <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                        d="M12 4v16m8-8H4"></path>
+                                </svg>
+                                + Add Another Primary Executor
+                            </button>
+                        </div>
+                    </div>
+
+                    <!-- Alternate Executor Card -->
+                    <div
+                        class="bg-white rounded-lg shadow-sm border border-gray-200 overflow-hidden ring-2 ring-transparent hover:ring-indigo-50 transition-all">
+                        <!-- Header -->
+                        <div class="bg-white p-4 border-b border-gray-100 flex items-center gap-3 select-none">
+                            <div
+                                class="w-10 h-10 rounded-full bg-gray-50 flex items-center justify-center text-gray-500 font-bold text-xl">
+                                A</div>
+                            <div>
+                                <h3 class="font-bold text-gray-800 text-sm" data-i18n="s2AlternateSection">Alternate
+                                    Executor (Optional)</h3>
+                                <p class="text-xs text-gray-500" data-i18n="s2AlternateInfo">Recommended: An alternate
+                                    ensures someone can serve if your primary executor(s) cannot.</p>
+                            </div>
+                        </div>
+
+                        <!-- Body -->
+                        <div class="p-4 md:p-6 bg-slate-50">
+                            <!-- Alternate Executor Container -->
+                            <div id="alternate-executor-container" class="mb-4"></div>
+
+                            <!-- Add Alternate Button (shown when no alternate exists) -->
+                            <button id="btn-add-alternate" onclick="addExecutorRow(false)"
+                                class="w-full py-3 border-2 border-dashed border-gray-300 text-gray-600 font-semibold rounded hover:bg-gray-50 transition flex items-center justify-center gap-2"
+                                data-i18n="s2AddAlternate">
+                                <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                        d="M12 4v16m8-8H4"></path>
+                                </svg>
+                                + Add Alternate Executor
+                            </button>
+                        </div>
                     </div>
                 </div>
 
-                <div><label class="text-xs font-bold text-gray-500"><span data-i18n="lblExAddress">Executor
-                            Address</span> <span class="text-red-500">*</span></label><input type="text" id="exAddress"
-                        oninput="removeError(this); saveData()" class="w-full border p-3 rounded required-field"
-                        placeholder="Current Address" data-i18n-placeholder="phExAddress"></div>
-
-                <div>
-                    <label class="text-xs font-bold text-gray-500"><span data-i18n="lblExParentName">Executor's Parent /
-                            Spouse Name</span> <span class="text-red-500">*</span></label>
-                    <div class="flex gap-2">
-                        <select id="exRelPrefix" onchange="saveData()" class="w-28 border p-3 rounded bg-white text-sm">
-                            <option value="S/o" data-i18n="optSonOf">Son of</option>
-                            <option value="D/o" data-i18n="optDaughterOf">Daughter of</option>
-                            <option value="W/o" data-i18n="optWifeOf">Wife of</option>
-                        </select>
-                        <input type="text" id="exParentName" oninput="removeError(this); saveData()"
-                            class="w-full border p-3 rounded required-field" placeholder="Name"
-                            data-i18n-placeholder="phFatherName">
-                    </div>
+                <!-- Navigation -->
+                <div class="flex justify-between pt-4">
+                    <button onclick="goToStep(1)" class="text-gray-500" data-i18n="btnBack">← Back</button>
+                    <button onclick="validateAndMoveToBeneficiaries()"
+                        class="bg-indigo-600 text-white px-6 py-2 rounded" data-i18n="btnNextBeneficiaries">Next:
+                        Beneficiaries</button>
                 </div>
-            </div>
-            <div class="flex justify-between pt-4">
-                <button onclick="goToStep(1)" class="text-gray-500" data-i18n="btnBack">← Back</button>
-                <button onclick="validateAndNext(2, 3)" class="bg-indigo-600 text-white px-6 py-2 rounded"
-                    data-i18n="btnNextBeneficiaries">Next: Beneficiaries</button>
             </div>
         </div>
 
@@ -525,16 +566,14 @@
                 <h3 class="font-bold text-blue-900 mb-2" data-i18n="s4TipsTitle">💡 Asset Identification Tips</h3>
                 <p class="text-blue-800 mb-2" data-i18n="s4TipsText">You can describe assets in general terms or include
                     specific details to help your executor locate them.</p>
-                <div class="bg-yellow-50 border border-yellow-200 rounded p-3 mt-2">
-                    <p class="text-yellow-900 text-xs"><strong data-i18n="s4PrivacyTitle">⚠️ Privacy Note:</strong>
-                        <span data-i18n="s4PrivacyText">Wills may become public records during probate. Consider:</span>
-                    </p>
-                    <ul class="text-yellow-900 text-xs ml-4 mt-1 list-disc">
-                        <li data-i18n="s4PrivacyPt1">Using partial identifiers (e.g. "Account ending in 1234")</li>
-                        <li data-i18n="s4PrivacyPt2">Keeping full details in a separate private Asset Inventory document
-                            that you give directly to your executor (not filed with the Will)</li>
-                    </ul>
-                </div>
+                <p class="text-blue-800 text-xs mt-3"><strong data-i18n="s4PrivacyTitle">⚠️ Privacy Note:</strong>
+                    <span data-i18n="s4PrivacyText">Wills may become public records during probate. Consider:</span>
+                </p>
+                <ul class="text-blue-800 text-xs ml-4 mt-1 list-disc">
+                    <li data-i18n="s4PrivacyPt1">Using partial identifiers (e.g. "Account ending in 1234")</li>
+                    <li data-i18n="s4PrivacyPt2">Keeping full details in a separate private Asset Inventory document
+                        that you give directly to your executor (not filed with the Will)</li>
+                </ul>
             </div>
 
             <!-- PRIMARY ASSETS CARD -->
@@ -851,6 +890,8 @@
     <script src="translations.js"></script>
     <script>
         let beneficiaries = [];
+        let executors = [];
+        let executorCount = 0;
         let assetCount = 0;
         let beneficiaryCount = 0;
         let lastActiveStep = 0;
@@ -941,7 +982,11 @@
             ]
         };
 
-        // --- UTILITIES ---
+        // --- UTILS ---
+        let globalIdCounter = 0;
+        function generateUniqueId() {
+            return String(Date.now()) + String(globalIdCounter++).padStart(3, '0');
+        }
 
         function escapeHtml(text) {
             if (!text) return "";
@@ -967,10 +1012,565 @@
             }
         };
 
+        // --- Multiple Executors Functions ---
+
+        function addExecutorRow(isPrimary = true) {
+            executorCount++;
+            const executor = {
+                id: executorCount,
+                name: '',
+                relationship: '',
+                address: '',
+                parentName: '',
+                isPrimary: isPrimary
+            };
+            executors.push(executor);
+            renderExecutorRow(executor);
+            renderExecutorSummaryCard(); // Update mobile summary
+            saveData();
+        }
+
+        function renderExecutorRow(executor) {
+            const container = executor.isPrimary
+                ? document.getElementById('primary-executors-container')
+                : document.getElementById('alternate-executor-container');
+
+            if (!container) return; // Safety check
+
+            const t = TRANSLATIONS[currentLang];
+            const primaryCount = executors.filter(e => e.isPrimary && e.id <= executor.id).length;
+            const label = executor.isPrimary
+                ? `${t.s2ExecutorNum} ${primaryCount}`
+                : t.s2AlternateExecutor;
+
+            // Split parent name if needed
+            let relPrefix = 'S/o';
+            let parentNameOnly = executor.parentName;
+            if (executor.parentName) {
+                const parts = executor.parentName.split(' ');
+                if (['S/o', 'D/o', 'W/o'].includes(parts[0])) {
+                    relPrefix = parts[0];
+                    parentNameOnly = parts.slice(1).join(' ');
+                }
+            }
+
+            const html = `
+                <div id="executor-row-${executor.id}" class="executor-item border rounded-lg bg-white shadow-sm mb-3 overflow-hidden">
+                    <!-- Header (Always Visible) -->
+                    <div class="flex items-center justify-between p-4 bg-gray-50 cursor-pointer" onclick="toggleExecutorRow(${executor.id})">
+                        <div class="flex items-center gap-3">
+                            <div class="bg-indigo-100 text-indigo-700 w-8 h-8 rounded-full flex items-center justify-center font-bold text-sm">
+                                ${executor.isPrimary ? primaryCount : 'A'}
+                            </div>
+                            <div>
+                                <h4 class="font-bold text-gray-800 text-sm">${executor.name || label}</h4>
+                                <p class="text-xs text-gray-500">${executor.relationship || t.lblExRel}</p>
+                            </div>
+                        </div>
+                        <div class="flex items-center gap-2">
+                            <button onclick="event.stopPropagation(); toggleExecutorRow(${executor.id})" class="text-indigo-600 text-sm font-semibold hover:underline">
+                                ${t.btnEditExecutor || 'Edit'}
+                            </button>
+                            <button onclick="event.stopPropagation(); removeExecutorRow(${executor.id})" class="text-red-500 hover:text-red-700 p-1">
+                                <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16"></path></svg>
+                            </button>
+                        </div>
+                    </div>
+
+                    <!-- Body (Collapsible) -->
+                    <div id="executor-body-${executor.id}" class="p-4 border-t ${executor.name ? 'hidden' : ''}">
+                        <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                            <div>
+                                <label class="text-xs font-bold text-gray-500">${t.lblExName} <span class="text-red-500">*</span></label>
+                                <input type="text" id="ex-name-${executor.id}"
+                                    class="w-full border p-3 rounded"
+                                    placeholder="${t.phExName}"
+                                    value="${executor.name}"
+                                    oninput="updateExecutorHeader(${executor.id}); saveData()">
+                            </div>
+                            <div>
+                                <label class="text-xs font-bold text-gray-500">${t.lblExRel} <span class="text-red-500">*</span></label>
+                                <input type="text" id="ex-rel-${executor.id}"
+                                    class="w-full border p-3 rounded"
+                                    placeholder="${t.phExRel}"
+                                    value="${executor.relationship}"
+                                    oninput="updateExecutorHeader(${executor.id}); saveData()">
+                            </div>
+                            <div class="md:col-span-2">
+                                <label class="text-xs font-bold text-gray-500">${t.lblExAddress}</label>
+                                <textarea id="ex-address-${executor.id}"
+                                    class="w-full border p-3 rounded"
+                                    rows="2"
+                                    placeholder="${t.phExAddress}"
+                                    oninput="saveData()">${executor.address}</textarea>
+                            </div>
+                            <div class="md:col-span-2">
+                                <label class="text-xs font-bold text-gray-500">${t.lblExParentName}</label>
+                                <div class="flex gap-2">
+                                    <select id="ex-prefix-${executor.id}" onchange="saveData()" class="w-24 border p-3 rounded bg-white text-sm">
+                                        <option value="S/o" ${relPrefix === 'S/o' ? 'selected' : ''}>${t.optSonOf || 'S/o'}</option>
+                                        <option value="D/o" ${relPrefix === 'D/o' ? 'selected' : ''}>${t.optDaughterOf || 'D/o'}</option>
+                                        <option value="W/o" ${relPrefix === 'W/o' ? 'selected' : ''}>${t.optWifeOf || 'W/o'}</option>
+                                    </select>
+                                    <input type="text" id="ex-parent-${executor.id}"
+                                        class="w-full border p-3 rounded"
+                                        placeholder="Parent/Spouse Name"
+                                        value="${parentNameOnly || ''}"
+                                        oninput="saveData()">
+                            </div>
+                        </div>
+                    </div> <!-- End Grid -->
+                    
+                    <div class="text-center mt-6">
+                        <button onclick="toggleExecutorRow(${executor.id})" class="text-sm font-bold text-white bg-indigo-600 hover:bg-indigo-700 px-8 py-2 rounded shadow transition">
+                            ${t.dynEdit === 'Edit' ? 'Done & Collapse' : 'पूर्ण और संक्षिप्त करें'}
+                        </button>
+                    </div>
+                </div>
+            `;
+
+            container.insertAdjacentHTML('beforeend', html);
+
+            // Hide "Add Alternate" button if alternate exists
+            if (!executor.isPrimary) {
+                const btn = document.getElementById('btn-add-alternate');
+                if (btn) btn.classList.add('hidden');
+            }
+        }
+
+        // Toggle executor row expansion
+        function toggleExecutorRow(id) {
+            const body = document.getElementById(`executor-body-${id}`);
+            if (body) {
+                body.classList.toggle('hidden');
+            }
+        }
+
+        // Update header text dynamically
+        function updateExecutorHeader(id) {
+            const name = document.getElementById(`ex-name-${id}`).value;
+            const rel = document.getElementById(`ex-rel-${id}`).value;
+            const row = document.getElementById(`executor-row-${id}`);
+            const t = TRANSLATIONS[currentLang];
+
+            if (row) {
+                const title = row.querySelector('h4');
+                const subtitle = row.querySelector('p');
+                if (title) title.textContent = name || (row.id.includes('primary') ? t.s2ExecutorNum : t.s2AlternateExecutor);
+                if (subtitle) subtitle.textContent = rel || t.lblExRel;
+            }
+        }
+
+        function removeExecutorRow(executorId) {
+            const executor = executors.find(e => e.id === executorId);
+            if (!executor) return;
+
+            executors = executors.filter(e => e.id !== executorId);
+            const row = document.getElementById(`executor-row-${executorId}`);
+            if (row) row.remove();
+
+            if (!executor.isPrimary) {
+                const btn = document.getElementById('btn-add-alternate');
+                if (btn) btn.classList.remove('hidden');
+            }
+
+            renderExecutorSummaryCard(); // Update mobile summary
+            saveData();
+        }
+
+        function collectExecutors() {
+            // Collect from desktop rows
+            // Note: Mobile collection logic will be added in Phase 2
+            document.querySelectorAll('.executor-item').forEach(row => {
+                const id = parseInt(row.id.replace('executor-row-', ''));
+                const executor = executors.find(e => e.id === id);
+                if (executor) {
+                    const nameInput = document.getElementById(`ex-name-${id}`);
+                    const relInput = document.getElementById(`ex-rel-${id}`);
+                    const addrInput = document.getElementById(`ex-address-${id}`);
+                    const prefixInput = document.getElementById(`ex-prefix-${id}`);
+                    const parentInput = document.getElementById(`ex-parent-${id}`);
+
+                    if (nameInput) executor.name = nameInput.value.trim();
+                    if (relInput) executor.relationship = relInput.value.trim();
+                    if (addrInput) executor.address = addrInput.value.trim();
+
+                    // Combine prefix and parent name
+                    if (prefixInput && parentInput) {
+                        const prefix = prefixInput.value;
+                        const parentName = parentInput.value.trim();
+                        if (parentName) {
+                            executor.parentName = `${prefix} ${parentName}`;
+                        } else {
+                            executor.parentName = '';
+                        }
+                    }
+                }
+            });
+
+            // Collect from mobile summary cards
+            document.querySelectorAll('.executor-summary-card').forEach(card => {
+                const id = parseInt(card.getAttribute('data-id'));
+                const dataDiv = card.querySelector('.executor-data');
+                if (dataDiv) {
+                    const data = JSON.parse(dataDiv.getAttribute('data-json') || '{}');
+                    const existingExecutor = executors.find(e => e.id === id);
+                    if (existingExecutor) {
+                        Object.assign(existingExecutor, data);
+                    } else {
+                        executors.push(data);
+                    }
+                }
+            });
+
+            return executors;
+        }
+
+        // --- MOBILE EXECUTOR SHEET FUNCTIONS ---
+        let currentExecutorSheetId = null;
+        let currentExecutorSheetIsPrimary = true;
+
+        function renderExecutorSummaryCard() {
+            const container = document.getElementById('mobile-executor-cards-container');
+            if (!container) return;
+            container.innerHTML = ''; // Clear existing cards
+
+            const t = TRANSLATIONS[currentLang];
+
+            const primary = executors.filter(e => e.isPrimary);
+            const alternate = executors.find(e => !e.isPrimary);
+
+            // Primary Executors Card
+            let html = `
+                <div class="bg-white rounded-lg shadow-sm border border-gray-200 overflow-hidden ring-2 ring-transparent hover:ring-indigo-50 transition-all mb-6">
+                    <!-- Header -->
+                    <div class="bg-white p-4 border-b border-gray-100 flex items-center gap-3 select-none">
+                        <div class="w-10 h-10 rounded-full bg-indigo-50 flex items-center justify-center text-indigo-600 font-bold text-xl">P</div>
+                        <div>
+                            <h3 class="font-bold text-gray-800 text-sm">${t.s2PrimaryExecutors}</h3>
+                            <p class="text-xs text-gray-500">${t.s2TipMultiple}</p>
+                        </div>
+                    </div>
+
+                    <!-- Body -->
+                    <div class="p-4 bg-slate-50">
+                        <div class="space-y-3 mb-4">
+            `;
+
+            primary.forEach((ex, idx) => {
+                html += `
+                    <div id="executor-summary-card-${ex.id}" class="executor-summary-card bg-white p-4 rounded-lg border border-gray-200 shadow-sm cursor-pointer" onclick="openExecutorSheet(${ex.id}, true)" data-id="${ex.id}">
+                        <div class="flex justify-between items-center">
+                            <div class="flex items-center gap-3">
+                                <div class="bg-indigo-100 text-indigo-700 w-8 h-8 rounded-full flex items-center justify-center font-bold text-sm">${idx + 1}</div>
+                                <div>
+                                    <h3 class="font-bold text-gray-800 text-sm">${ex.name || t.s2ExecutorNum + ' ' + (idx + 1)}</h3>
+                                    <p class="text-xs text-gray-500">${ex.relationship || t.lblExRel}</p>
+                                </div>
+                            </div>
+                            <button onclick="event.stopPropagation(); removeExecutorRow(${ex.id})" class="text-red-500 hover:text-red-700 p-1">
+                                <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16"></path></svg>
+                            </button>
+                        </div>
+                        <div class="hidden executor-data" data-json='${JSON.stringify(ex)}'></div>
+                    </div>
+                `;
+            });
+
+            html += `
+                        </div>
+                        <button onclick="openExecutorSheet(null, true)"
+                            class="w-full py-3 border-2 border-dashed border-indigo-300 text-indigo-600 font-semibold rounded hover:bg-indigo-50 transition flex items-center justify-center gap-2"
+                            data-i18n="s2AddPrimary">
+                            <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4"></path></svg>
+                            ${t.s2AddPrimary}
+                        </button>
+                    </div>
+                </div>
+            `;
+
+            // Alternate Executor Card
+            html += `
+                <div class="bg-white rounded-lg shadow-sm border border-gray-200 overflow-hidden ring-2 ring-transparent hover:ring-indigo-50 transition-all">
+                    <!-- Header -->
+                    <div class="bg-white p-4 border-b border-gray-100 flex items-center gap-3 select-none">
+                        <div class="w-10 h-10 rounded-full bg-gray-50 flex items-center justify-center text-gray-500 font-bold text-xl">A</div>
+                        <div>
+                            <h3 class="font-bold text-gray-800 text-sm">${t.s2AlternateSection}</h3>
+                            <p class="text-xs text-gray-500">${t.s2AlternateInfo}</p>
+                        </div>
+                    </div>
+
+                    <!-- Body -->
+                    <div class="p-4 bg-slate-50">
+                        <div class="mb-4">
+            `;
+
+            if (alternate) {
+                html += `
+                    <div id="executor-summary-card-${alternate.id}" class="executor-summary-card bg-white p-4 rounded-lg border border-gray-200 shadow-sm cursor-pointer" onclick="openExecutorSheet(${alternate.id}, false)" data-id="${alternate.id}">
+                        <div class="flex justify-between items-center">
+                            <div class="flex items-center gap-3 flex-1">
+                                <div class="bg-gray-100 text-gray-600 w-8 h-8 rounded-full flex items-center justify-center font-bold text-sm">A</div>
+                                <div class="flex-1">
+                                    <div class="flex items-center gap-2">
+                                        <h3 class="font-bold text-gray-800 text-sm">${alternate.name || t.s2AlternateExecutor}</h3>
+                                    </div>
+                                    <p class="text-xs text-gray-500">${alternate.relationship || t.lblExRel}</p>
+                                </div>
+                            </div>
+                            <button onclick="event.stopPropagation(); removeExecutorRow(${alternate.id})" class="text-red-500 hover:text-red-700 p-1">
+                                <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16"></path></svg>
+                            </button>
+                        </div>
+                        <div class="hidden executor-data" data-json='${JSON.stringify(alternate)}'></div>
+                    </div>
+                `;
+            }
+
+            html += `
+                        </div>
+            `;
+
+            if (!alternate) {
+                html += `
+                        <button id="mobile-btn-add-alternate" onclick="openExecutorSheet(null, false)"
+                            class="w-full py-3 border-2 border-dashed border-gray-300 text-gray-600 font-semibold rounded hover:bg-gray-50 transition flex items-center justify-center gap-2"
+                            data-i18n="s2AddAlternate">
+                            <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4"></path></svg>
+                            ${t.s2AddAlternate}
+                        </button>
+                `;
+            }
+
+            html += `
+                    </div>
+                </div>
+            `;
+
+            container.innerHTML = html;
+        }
+
+        function openExecutorSheet(executorId = null, isPrimary = true) {
+            currentExecutorSheetId = executorId;
+            currentExecutorSheetIsPrimary = isPrimary;
+
+            const sheet = document.getElementById('executor-sheet');
+            const container = document.getElementById('executor-sheet'); // It's the same element for the sheet and container
+            const titleEl = document.getElementById('sheet-executor-title');
+            const t = TRANSLATIONS[currentLang];
+
+            let executorData = {
+                name: '',
+                relationship: '',
+                address: '',
+                parentName: '',
+                isPrimary: isPrimary
+            };
+
+            if (executorId) {
+                const existingExecutor = executors.find(e => e.id === executorId);
+                if (existingExecutor) {
+                    executorData = { ...existingExecutor };
+                }
+                titleEl.textContent = t.sheetEditExecutor;
+            } else {
+                titleEl.textContent = isPrimary ? t.sheetAddPrimary : t.sheetAddAlternate;
+            }
+
+            // Populate form fields
+            document.getElementById('sheet-ex-name').value = executorData.name;
+            document.getElementById('sheet-ex-rel').value = executorData.relationship;
+            document.getElementById('sheet-ex-address').value = executorData.address;
+
+            // Handle parentName (prefix + name)
+            let parentNameOnly = '';
+            let prefix = 'S/o';
+            if (executorData.parentName) {
+                const parts = executorData.parentName.split(' ');
+                if (['S/o', 'D/o', 'W/o'].includes(parts[0])) {
+                    prefix = parts[0];
+                    parentNameOnly = parts.slice(1).join(' ');
+                } else {
+                    parentNameOnly = executorData.parentName; // Fallback if no prefix
+                }
+            }
+            document.getElementById('sheet-ex-parent').value = parentNameOnly;
+            document.getElementById('sheet-ex-prefix').value = prefix;
+
+            sheet.classList.remove('hidden');
+            setTimeout(() => {
+                container.classList.remove('translate-y-full');
+            }, 10);
+            document.body.style.overflow = 'hidden';
+        }
+
+        function closeExecutorSheet() {
+            const sheet = document.getElementById('executor-sheet');
+            const container = document.getElementById('executor-sheet');
+
+            container.classList.add('translate-y-full');
+            setTimeout(() => {
+                sheet.classList.add('hidden');
+                document.body.style.overflow = 'auto';
+                currentExecutorSheetId = null;
+            }, 300);
+        }
+
+        function saveExecutorSheet() {
+            const t = TRANSLATIONS[currentLang];
+            const name = document.getElementById('sheet-ex-name').value.trim();
+            const relationship = document.getElementById('sheet-ex-rel').value.trim();
+            const address = document.getElementById('sheet-ex-address').value.trim();
+            const parentNameInput = document.getElementById('sheet-ex-parent').value.trim();
+            const prefix = document.getElementById('sheet-ex-prefix').value;
+
+            let parentName = '';
+            if (parentNameInput) {
+                parentName = `${prefix} ${parentNameInput}`;
+            }
+
+            if (!name || !relationship) {
+                alert(t.alertExecutorRequired);
+                return;
+            }
+
+            let executor = null;
+            if (currentExecutorSheetId) {
+                executor = executors.find(e => e.id === currentExecutorSheetId);
+            }
+
+            if (executor) {
+                // Update existing executor
+                executor.name = name;
+                executor.relationship = relationship;
+                executor.address = address;
+                executor.parentName = parentName;
+                executor.isPrimary = currentExecutorSheetIsPrimary; // Ensure primary status is maintained
+            } else {
+                // Add new executor
+                executorCount++;
+                executor = {
+                    id: executorCount,
+                    name: name,
+                    relationship: relationship,
+                    address: address,
+                    parentName: parentName,
+                    isPrimary: currentExecutorSheetIsPrimary
+                };
+                executors.push(executor);
+            }
+
+            renderDesktopExecutors(); // Re-render desktop view to reflect changes
+            renderExecutorSummaryCard(); // Re-render mobile summary cards
+            saveData();
+            closeExecutorSheet();
+        }
+
+        function deleteExecutorFromSheet() {
+            if (currentExecutorSheetId && confirm(TRANSLATIONS[currentLang].confirmDeleteExecutor)) {
+                removeExecutorRow(currentExecutorSheetId);
+                closeExecutorSheet();
+            }
+        }
+
+        function renderDesktopExecutors() {
+            const pContainer = document.getElementById('primary-executors-container');
+            const aContainer = document.getElementById('alternate-executor-container');
+            if (pContainer) pContainer.innerHTML = '';
+            if (aContainer) aContainer.innerHTML = '';
+
+            executors.sort((a, b) => a.id - b.id); // Maintain order
+            executors.forEach(ex => {
+                renderExecutorRow(ex);
+            });
+
+            // Update Add Alternate Button visibility
+            const hasAlternate = executors.some(e => !e.isPrimary);
+            const btnAddAlt = document.getElementById('btn-add-alternate');
+            if (btnAddAlt) {
+                if (hasAlternate) btnAddAlt.classList.add('hidden');
+                else btnAddAlt.classList.remove('hidden');
+            }
+        }
+
+        function renderSheetExecutorList() {
+            // This function is no longer needed as the sheet is for a single executor
+            // The mobile summary cards are rendered by renderExecutorSummaryCard()
+        }
+
+        function validateAndMoveToBeneficiaries() {
+            collectExecutors();
+
+            const primaryExecutors = executors.filter(e => e.isPrimary);
+            if (primaryExecutors.length === 0) {
+                alert("Please add at least one Primary Executor.");
+                return;
+            }
+
+            let isValid = true;
+            executors.forEach(ex => {
+                if (!ex.name || !ex.relationship) {
+                    isValid = false;
+                    // Expand the row with error for desktop
+                    const body = document.getElementById(`executor-body-${ex.id}`);
+                    if (body && body.classList.contains('hidden')) {
+                        toggleExecutorRow(ex.id);
+                    }
+                    // Highlight empty fields for desktop
+                    const nameInput = document.getElementById(`ex-name-${ex.id}`);
+                    const relInput = document.getElementById(`ex-rel-${ex.id}`);
+                    if (nameInput && !nameInput.value) nameInput.classList.add('border-red-500');
+                    if (relInput && !relInput.value) relInput.classList.add('border-red-500');
+
+                    // For mobile, we can't highlight directly, but the sheet will show the error
+                }
+            });
+
+            if (!isValid) {
+                alert("Please fill in Name and Relationship for all executors.");
+                return;
+            }
+
+            updateMaxReached(3);
+            goToStep(3);
+        }
+
         function initApp() {
             loadData();
             // Restore language preference if saved
             updateLanguage();
+            // Initialize mobile executor summary card (this may hide the button)
+            renderExecutorSummaryCard();
+            // Force button visibility after renderExecutorSummaryCard (to override any hiding)
+            const hasAlternate = executors.some(e => !e.isPrimary);
+            const btnAddAlt = document.getElementById('btn-add-alternate');
+            const mobileBtnAddAlt = document.getElementById('mobile-btn-add-alternate');
+
+            console.log('InitApp - Has alternate executor:', hasAlternate);
+            console.log('InitApp - Mobile button exists:', !!mobileBtnAddAlt);
+
+            // Desktop button
+            if (btnAddAlt) {
+                if (hasAlternate) {
+                    btnAddAlt.classList.add('hidden');
+                } else {
+                    btnAddAlt.classList.remove('hidden');
+                }
+            }
+
+            // Mobile button - aggressively ensure it's visible if no alternate
+            if (mobileBtnAddAlt) {
+                if (hasAlternate) {
+                    mobileBtnAddAlt.classList.add('hidden');
+                    mobileBtnAddAlt.style.display = 'none';
+                } else {
+                    mobileBtnAddAlt.classList.remove('hidden');
+                    mobileBtnAddAlt.style.display = '';
+                    console.log('InitApp - Mobile button should now be visible');
+                }
+            }
+
             // Check for auto-start flag set by startFresh()
             if (sessionStorage.getItem('SAHAY_AUTO_START') === 'true') {
                 sessionStorage.removeItem('SAHAY_AUTO_START');
@@ -1247,13 +1847,13 @@
             document.querySelectorAll('.ben-summary-card').forEach(card => {
                 const dataDiv = card.querySelector('.ben-data');
                 if (dataDiv) {
-                    const data = JSON.parse(dataDiv.getAttribute('data-json') || '{}');
-                    if (data.name) {
+                    const json = dataDiv.getAttribute('data-json');
+                    if (json) {
+                        const data = JSON.parse(json);
                         bens.push(data);
                     }
                 }
             });
-
             return bens;
         }
 
@@ -1261,7 +1861,7 @@
         let currentBenSheetId = null;
 
         function openBenSheet(benId = null) {
-            currentBenSheetId = benId || Date.now();
+            currentBenSheetId = benId || generateUniqueId();
             const sheet = document.getElementById('ben-bottom-sheet');
             const container = document.getElementById('ben-sheet-container');
 
@@ -1435,7 +2035,7 @@
         let currentResidualSheetId = null;
 
         function openResidualSheet(residualId = null) {
-            currentResidualSheetId = residualId || Date.now();
+            currentResidualSheetId = residualId || generateUniqueId();
             const sheet = document.getElementById('residual-bottom-sheet');
             const container = document.getElementById('residual-sheet-container');
 
@@ -1600,6 +2200,7 @@
         }
 
         function renderBenSummaryCard(benId, data) {
+            console.log(`[RenderBenSummaryCard] benId param: ${benId}, data.id: ${data.id}, type: ${typeof benId}`);
             const container = document.getElementById('beneficiary-container');
 
             // Remove existing if updating
@@ -1621,7 +2222,8 @@
                         </button>
                     </div>
                     <!-- Hidden Data Storage -->
-                    <div class="hidden ben-data" data-json='${JSON.stringify(data)}'></div>
+                    <!-- Hidden Data Storage -->
+                    <div class="hidden ben-data" data-json='${JSON.stringify({ ...data, id: String(data.id) })}'></div>
                 </div>
             `;
 
@@ -1713,7 +2315,24 @@
                         assetRow.querySelectorAll('.dynamic-field-input').forEach(inp => {
                             assetData.fields[inp.getAttribute('data-key')] = inp.value;
                         });
-                        // Collect beneficiaries
+                        // Reload Executors
+                        const currentExecutors = collectExecutors();
+                        document.getElementById('primary-executors-container').innerHTML = '';
+                        document.getElementById('alternate-executor-container').innerHTML = '';
+
+                        currentExecutors.forEach(ex => {
+                            renderExecutorRow(ex);
+                        });
+
+                        // Show/hide alternate button
+                        const hasAlternate = currentExecutors.some(e => !e.isPrimary);
+                        const altBtn = document.getElementById('btn-add-alternate');
+                        if (altBtn) {
+                            if (hasAlternate) altBtn.classList.add('hidden');
+                            else altBtn.classList.remove('hidden');
+                        }
+
+                        // Reload Beneficiaries
                         assetRow.querySelectorAll('.share-row').forEach(row => {
                             const benId = row.querySelector('.ben-select-share')?.value;
                             const share = row.querySelector('.share-input')?.value;
@@ -1812,7 +2431,7 @@
         function addSheetBeneficiary(benIdValue = '', shareValue = '', altIdValue = '') {
             const container = document.getElementById('sheet-beneficiaries');
             const t = TRANSLATIONS[currentLang];
-            const rowId = Date.now();
+            const rowId = generateUniqueId();
 
             // Auto-calculate share if not provided
             if (!shareValue) {
@@ -1835,7 +2454,10 @@
                         </div>
                         <div class="col-span-3">
                             <label class="text-[10px] font-bold uppercase text-gray-500 block mb-1 truncate">${t.dynPercentShare}</label>
-                            <input type="number" class="sheet-share-input w-full border p-2 rounded text-sm text-center bg-white outline-none" value="${shareValue}" min="1" max="100">
+                            <div class="relative">
+                                <input type="number" class="sheet-share-input w-full border p-2 rounded text-sm text-center bg-white outline-none" value="${shareValue}" min="1" max="100">
+                                <span class="absolute right-4 top-1/2 -translate-y-1/2 text-sm text-gray-400 font-bold">%</span>
+                            </div>
                         </div>
                         <div class="col-span-3">
                             <label class="text-[10px] font-bold uppercase text-gray-400 block mb-1 truncate">${t.dynAlternate}</label>
@@ -1859,14 +2481,32 @@
             const benSelect = newRow.querySelector('.sheet-ben-select');
             const altSelect = newRow.querySelector('.sheet-alt-select');
 
-            beneficiaries.forEach(b => {
-                benSelect.innerHTML += `<option value="${b.id}">${b.name}</option>`;
-                altSelect.innerHTML += `<option value="${b.id}">${b.name}</option>`;
+            // CRITICAL FIX: Fetch fresh beneficiaries directly from DOM instead of relying on global variable
+            // The global variable seems to be corrupted with simple IDs (1, 3, 5, 7) in some cases
+            const freshBeneficiaries = collectBeneficiaries();
+
+            freshBeneficiaries.forEach(b => {
+                const o = document.createElement('option');
+                o.value = String(b.id);
+                o.textContent = b.name;
+                benSelect.appendChild(o);
+
+                const oa = document.createElement('option');
+                oa.value = String(b.id);
+                oa.textContent = b.name;
+                altSelect.appendChild(oa);
             });
 
-            // Set values if provided
-            if (benIdValue) benSelect.value = benIdValue;
-            if (altIdValue) altSelect.value = altIdValue;
+            // Set values if provided - ensure type conversion
+            if (benIdValue) {
+                const strId = String(benIdValue);
+                benSelect.value = strId;
+            }
+
+            if (altIdValue) {
+                const strAltId = String(altIdValue);
+                altSelect.value = strAltId;
+            }
         }
 
         function saveAssetSheet() {
@@ -1915,10 +2555,22 @@
                 const assetRow = document.getElementById(`asset-row-${assetId}`);
 
                 if (assetRow.classList.contains('asset-summary-card')) {
-                    // Update mobile card
-                    // We need to re-render it to update details
+                    // Update mobile card - preserve position
+                    const container = assetRow.parentElement;
+                    const nextSibling = assetRow.nextSibling;
                     assetRow.remove();
+
+                    // Temporarily render to get the HTML
                     renderMobileSummaryCard(assetId, type, beneficiaries, fieldData);
+
+                    // Insert at the same position
+                    const newCard = document.getElementById(`asset-row-${assetId}`);
+                    if (newCard && nextSibling) {
+                        container.insertBefore(newCard, nextSibling);
+                    } else if (newCard && !nextSibling) {
+                        // Was the last card, append it back
+                        container.appendChild(newCard);
+                    }
                 } else {
                     // Update desktop accordion
                     const typeSelect = assetRow.querySelector('.asset-type-select');
@@ -2080,7 +2732,7 @@
                 } else {
                     return text.replace(/करता\/करती/g, 'करता')
                         .replace(/बनाता\/बनाती/g, 'बनाता')
-                        .replace(/रहा\/रही/g, 'रहा');
+                        .replace(/रहा\/रही/g, 'रही');
                 }
             };
 
@@ -2114,29 +2766,46 @@
             // 4. Executor
             html += `<h3 style="font-size: 14pt; font-weight: bold; margin-top: 20px; margin-bottom: 10px;">${t.pdfExecutorTitle}</h3>`;
 
-            const exName = getValOrPlace('exName', t.lblExName).toUpperCase();
-            const exRel = getValOrPlace('exRel', t.lblExRel);
-            const exParentName = document.getElementById('exParentName') ? document.getElementById('exParentName').value.trim() : '';
-            const exRelPrefix = document.getElementById('exRelPrefix') ? document.getElementById('exRelPrefix').value : 'S/o';
-            let exRelPrefixTrans = exRelPrefix;
-            if (currentLang === 'hi') {
-                if (exRelPrefix === 'S/o') exRelPrefixTrans = 'पुत्र';
-                else if (exRelPrefix === 'D/o') exRelPrefixTrans = 'पुत्री';
-                else if (exRelPrefix === 'W/o') exRelPrefixTrans = 'पत्नी';
-            }
-            const exAddress = getValOrPlace('exAddress', t.lblExAddress);
+            // Ensure we have the latest executor data
+            const currentExecutors = collectExecutors();
+            const primaryExecutors = currentExecutors.filter(e => e.isPrimary);
+            const alternateExecutor = currentExecutors.find(e => !e.isPrimary);
 
-            let execText = "";
-            if (currentLang === 'en') {
-                execText = `I appoint <b>${exName}</b> (Rel: ${exRel})`;
-                if (exParentName) execText += `, ${exRelPrefix} ${exParentName}`;
-                execText += `, residing at ${exAddress}, to be the sole Executor of this Will.`;
-            } else {
-                execText = `मैं <b>${exName}</b> (संबंध: ${exRel})`;
-                if (exParentName) execText += `, ${exRelPrefixTrans} ${exParentName}`;
-                execText += `, निवासी ${exAddress}, को इस वसीयत का एकमात्र निष्पादक नियुक्त करता हूँ।`;
+            if (primaryExecutors.length > 0) {
+                // Only show "Primary Executor(s)" heading when alternate exists (to distinguish from alternate)
+                if (alternateExecutor) {
+                    html += `<h3 style="font-size: 14pt; font-weight: bold; margin-top: 20px; margin-bottom: 10px;">${t.previewPrimaryExecutors}</h3>`;
+                }
+
+                if (primaryExecutors.length === 1) {
+                    const ex = primaryExecutors[0];
+                    let exText = `I appoint <b>${ex.name}</b> (${t.lblExRel}: ${ex.relationship})`;
+                    if (ex.parentName) exText += `, ${ex.parentName}`;
+                    if (ex.address) exText += `, ${t.lblExAddress}: ${ex.address}`;
+                    exText += `, to be the sole Executor of this Will.`;
+                    html += `<p style="margin-bottom: 10px;">${exText}</p>`;
+                } else {
+                    // Multiple executors
+                    html += `<p style="margin-bottom: 10px;"><b>${t.previewExecutorClause}</b></p>`;
+                    primaryExecutors.forEach((ex, index) => {
+                        let exText = `(${String.fromCharCode(97 + index)}) <b>${ex.name}</b> (${t.lblExRel}: ${ex.relationship})`;
+                        if (ex.parentName) exText += `, ${ex.parentName}`;
+                        if (ex.address) exText += `, ${t.lblExAddress}: ${ex.address}`;
+                        html += `<p style="margin-bottom: 5px; margin-left: 20px;">${exText}</p>`;
+                    });
+                    html += `<p style="margin-top: 10px; font-style: italic;">${t.previewJointSeveral}</p>`;
+                }
             }
-            html += `<p style="margin-bottom: 15px;">${execText}</p>`;
+
+            if (alternateExecutor) {
+                html += `<h3 style="font-size: 14pt; font-weight: bold; margin-top: 20px; margin-bottom: 10px;">${t.previewAlternateExecutor}</h3>`;
+                html += `<p style="margin-bottom: 10px;"><b>${t.previewAlternateClause}</b></p>`;
+
+                let altText = `<b>${alternateExecutor.name}</b> (${t.lblExRel}: ${alternateExecutor.relationship})`;
+                if (alternateExecutor.parentName) altText += `, ${alternateExecutor.parentName}`;
+                if (alternateExecutor.address) altText += `, ${t.lblExAddress}: ${alternateExecutor.address}`;
+                html += `<p style="margin-bottom: 15px;">${altText}</p>`;
+            }
 
             // 5. Assets
             html += `<h3 style="font-size: 14pt; font-weight: bold; margin-top: 20px; margin-bottom: 10px;">${t.pdfDistributionTitle}</h3>`;
@@ -2302,7 +2971,7 @@
             }
 
             row.querySelector('.ben-title-display').innerText = nameVal || t.dynNewBeneficiary;
-            row.querySelector('.ben-desc-display').innerText = relVal || t.dynSelectRel;
+            row.querySelector('.ben-desc-display').innerText = relVal || t.dynExpandDetails;
             row.querySelector('.ben-icon-display').innerText = nameVal ? nameVal.charAt(0).toUpperCase() : '+';
             saveData();
         }
@@ -2330,10 +2999,13 @@
 
         function addBeneficiaryRow(data = null) {
             beneficiaryCount++;
+
             const t = TRANSLATIONS[currentLang]; // Get translations
 
             if (isMobile()) {
                 if (data) {
+                    console.log(`[AddBeneficiaryRow] Calling renderBenSummaryCard with data.id: ${data.id}, beneficiaryCount: ${beneficiaryCount}`);
+                    // CRITICAL: Use the ID from data, not beneficiaryCount
                     renderBenSummaryCard(data.id, data);
                 } else {
                     openBenSheet();
@@ -2344,7 +3016,7 @@
             document.querySelectorAll('[id^="ben-body-"]').forEach(el => el.classList.add('hidden'));
             document.querySelectorAll('.beneficiary-item').forEach(el => el.classList.remove('ring-2', 'ring-blue-100'));
 
-            const uniqueId = data ? data.id : Date.now();
+            const uniqueId = data ? data.id : generateUniqueId();
             const container = document.getElementById('beneficiary-container');
 
             const html = `
@@ -2530,10 +3202,14 @@
             row.querySelector('.asset-title-display').innerText = typeVal ? typeSelect.options[typeSelect.selectedIndex].text : t.dynNewAsset;
 
             // Better UX: if type is selected but no description, show "Expand to add details"
+            const sharesContainer = document.getElementById(`shares-container-${uniqueId}`);
+            const benCount = sharesContainer ? sharesContainer.querySelectorAll('.share-row').length : 0;
+            const benCountText = benCount > 0 ? ` • ${benCount} ${t.dynBeneficiaries}` : '';
+
             if (typeVal && !desc.trim()) {
-                row.querySelector('.asset-desc-display').innerText = t.dynExpandDetails;
+                row.querySelector('.asset-desc-display').innerText = t.dynExpandDetails + benCountText;
             } else {
-                row.querySelector('.asset-desc-display').innerText = desc.trim() || t.dynSelectType;
+                row.querySelector('.asset-desc-display').innerText = (desc.trim() || t.dynSelectType) + benCountText;
             }
         }
 
@@ -2693,17 +3369,28 @@
                 </div>
             `;
             container.appendChild(div);
+            console.log(`[AddShareRow] Asset ${assetId}, Ben ${benId}. Beneficiaries count: ${beneficiaries.length}`);
+            console.log(`[AddShareRow] Beneficiaries array:`, beneficiaries);
             populateDropdown(div.querySelector('.ben-select-share'));
             populateDropdown(div.querySelector('.ben-select-alt-share'));
-            div.querySelector('.ben-select-share').value = benId;
-            div.querySelector('.ben-select-alt-share').value = altId;
-            checkSplitWarning(assetId); saveData();
+            div.querySelector('.ben-select-share').value = String(benId || '');
+            div.querySelector('.ben-select-alt-share').value = String(altId || '');
+            div.querySelector('.ben-select-alt-share').value = String(altId || '');
+            console.log(`[AddShareRow] Set dropdown value to ${benId}. Actual value: ${div.querySelector('.ben-select-share').value}`);
+            checkSplitWarning(assetId);
+            updateAssetHeader(assetId); // Update header count
+            saveData();
         }
 
         function removeShareRow(btn) {
             const row = btn.closest('.share-row');
             const assetId = row.parentElement.id.split('-')[2];
-            if (row.parentElement.children.length > 1) { row.remove(); checkSplitWarning(assetId); saveData(); }
+            if (row.parentElement.children.length > 1) {
+                row.remove();
+                checkSplitWarning(assetId);
+                updateAssetHeader(assetId); // Update header count
+                saveData();
+            }
             else alert("Asset must have at least one beneficiary.");
         }
 
@@ -2712,12 +3399,35 @@
         // Function to reload all dynamic rows when language changes
         function reloadDynamicRows() {
             // 1. Collect Data
+            const currentExecutors = collectExecutors();
             const currentBens = collectBeneficiaries();
             const currentAssets = collectAllAssets();
             const currentResiduals = collectResidualShares();
 
             // 2. Clear Containers
+            document.getElementById('primary-executors-container').innerHTML = '';
+            document.getElementById('alternate-executor-container').innerHTML = '';
             document.getElementById('beneficiary-container').innerHTML = '';
+            document.getElementById('mobile-executor-cards-container').innerHTML = ''; // Clear mobile executor cards
+
+            // Reload Executors
+            executors = []; // Clear global executors array before re-populating
+            executorCount = 0; // Reset counter
+            currentExecutors.forEach(ex => {
+                executorCount++;
+                ex.id = executorCount; // Reassign IDs to ensure uniqueness and sequence
+                executors.push(ex);
+                renderExecutorRow(ex); // Render desktop view
+            });
+            renderExecutorSummaryCard(); // Render mobile view
+
+            // Show/hide alternate button
+            const hasAlternate = executors.some(e => !e.isPrimary);
+            const altBtn = document.getElementById('btn-add-alternate');
+            if (altBtn) {
+                if (hasAlternate) altBtn.classList.add('hidden');
+                else altBtn.classList.remove('hidden');
+            }
             document.getElementById('asset-container').innerHTML = '';
             document.getElementById('residual-shares-list').innerHTML = '';
 
@@ -2726,7 +3436,11 @@
             assetCount = 0;
 
             // 3. Re-render Beneficiaries
+            beneficiaries = []; // Clear global beneficiaries array
             currentBens.forEach(ben => {
+                // CRITICAL FIX: Do NOT reassign IDs. Keep the timestamp IDs.
+                // ben.id = beneficiaryCount; 
+                beneficiaries.push(ben);
                 addBeneficiaryRow(ben);
             });
 
@@ -2776,6 +3490,7 @@
             });
 
             // 5. Re-render Residuals
+            document.getElementById('residual-shares-list').innerHTML = ''; // Clear existing
             currentResiduals.forEach(res => {
                 addResidualShare(res.benId, res.share, res.altId);
             });
@@ -2798,7 +3513,7 @@
                 if (benId) {
                     // Loading data - render summary card
                     // Use random component to avoid collision during rapid re-rendering
-                    const uniqueId = Date.now() + Math.floor(Math.random() * 1000);
+                    const uniqueId = generateUniqueId();
                     const data = { id: uniqueId, benId, share, altId };
                     renderResidualSummaryCard(data.id, data);
                 } else {
@@ -2870,7 +3585,12 @@
 
         function populateDropdown(sel) {
             sel.innerHTML = '<option value="">Select...</option>';
-            beneficiaries.forEach(b => { const o = document.createElement('option'); o.value = b.id; o.innerText = b.name; sel.appendChild(o) });
+            beneficiaries.forEach(b => {
+                const o = document.createElement('option');
+                o.value = String(b.id); // Ensure ID is string
+                o.innerText = b.name;
+                sel.appendChild(o);
+            });
         }
 
         function saveData() {
@@ -2882,6 +3602,7 @@
 
         function performSave() {
             const scrapedBens = collectBeneficiaries();
+            console.log('[PerformSave] Scraped beneficiaries from DOM. IDs:', scrapedBens.map(b => b.id));
             beneficiaries = scrapedBens;
             updateAllDropdowns();
 
@@ -2925,12 +3646,8 @@
                 myDob: document.getElementById('myDob').value,
                 myAddress: document.getElementById('myAddress').value,
                 myPlace: document.getElementById('myPlace').value,
-                executor: {},
-                exName: document.getElementById('exName').value,
-                exRel: document.getElementById('exRel').value,
-                exRelPrefix: document.getElementById('exRelPrefix').value,
-                exParentName: document.getElementById('exParentName').value,
-                exAddress: document.getElementById('exAddress').value,
+                myPlace: document.getElementById('myPlace').value,
+                executors: collectExecutors(),
                 beneficiaries,
                 assets: [],
                 residual: residualShares
@@ -2964,13 +3681,18 @@
 
         function loadData() {
             const raw = localStorage.getItem(STORAGE_KEY);
-            if (!raw) return;
+            if (!raw) {
+                console.log('[LoadData] No data in localStorage');
+                return;
+            }
 
             let data;
             try {
                 data = JSON.parse(raw);
+                console.log('[LoadData] Data loaded from localStorage:', data);
             } catch (e) {
                 // Corrupted data, clear it
+                console.error('[LoadData] Corrupted data, clearing:', e);
                 localStorage.removeItem(STORAGE_KEY);
                 return;
             }
@@ -2992,22 +3714,77 @@
             const sV = (id, v) => { if (document.getElementById(id)) document.getElementById(id).value = v || ''; };
             sV('religionSelector', data.personal.religion); sV('customReligion', data.personal.customReligion);
             sV('myName', data.myName); sV('myRelPrefix', data.myRelPrefix || 'S/o'); sV('fatherName', data.fatherName); sV('myDob', data.myDob); sV('myAddress', data.myAddress); sV('myPlace', data.myPlace);
-            sV('exName', data.exName); sV('exRel', data.exRel); sV('exRelPrefix', data.exRelPrefix || 'S/o'); sV('exParentName', data.exParentName); sV('exAddress', data.exAddress);
+            sV('religionSelector', data.personal.religion); sV('customReligion', data.personal.customReligion);
+            sV('myName', data.myName); sV('myRelPrefix', data.myRelPrefix || 'S/o'); sV('fatherName', data.fatherName); sV('myDob', data.myDob); sV('myAddress', data.myAddress); sV('myPlace', data.myPlace);
 
-            document.getElementById('beneficiary-container').innerHTML = ''; beneficiaryCount = 0;
+            // Load Executors
+            document.getElementById('primary-executors-container').innerHTML = '';
+            document.getElementById('alternate-executor-container').innerHTML = '';
+            document.getElementById('mobile-executor-cards-container').innerHTML = ''; // Clear mobile executor cards
+            executors = [];
+            executorCount = 0;
+
+            if (data.executors && data.executors.length > 0) {
+                executors = data.executors;
+                executorCount = Math.max(...executors.map(e => e.id));
+                executors.forEach(ex => renderExecutorRow(ex));
+                renderExecutorSummaryCard(); // Update mobile summary
+            } else if (data.exName) {
+                // Migration: Convert legacy single executor to new format
+                addExecutorRow(true); // Adds a primary executor
+                const ex = executors[0];
+                ex.name = data.exName;
+                ex.relationship = data.exRel;
+                ex.address = data.exAddress;
+                ex.parentName = (data.exRelPrefix || '') + ' ' + (data.exParentName || '');
+
+                // Re-render to show data
+                document.getElementById('primary-executors-container').innerHTML = '';
+                renderExecutorRow(ex);
+                renderExecutorSummaryCard(); // Update mobile summary
+            } else {
+                // No executors, add one empty primary row by default
+                addExecutorRow(true);
+            }
+
+            document.getElementById('beneficiary-container').innerHTML = '';
+            beneficiaryCount = 0;
+
             if (data.beneficiaries && data.beneficiaries.length > 0) {
-                data.beneficiaries.forEach(b => { addBeneficiaryRow(b); }); beneficiaries = data.beneficiaries;
+                // CRITICAL: Set global beneficiaries array FIRST before rendering
+                // This ensures dropdowns in assets can find beneficiaries
+                beneficiaries = data.beneficiaries;
+
+                console.log('[LoadData] Beneficiaries from localStorage:', data.beneficiaries.map(b => ({ id: b.id, type: typeof b.id })));
+
+                // Render each beneficiary card
+                data.beneficiaries.forEach(b => {
+                    addBeneficiaryRow(b);
+                });
+
+                // DEBUG: Check what's actually in the DOM
+                setTimeout(() => {
+                    const cards = document.querySelectorAll('.ben-summary-card');
+                    console.log('[LoadData] Beneficiary cards in DOM after rendering:',
+                        Array.from(cards).map(c => c.id));
+                }, 100);
             }
             checkReligion();
 
             const ac = document.getElementById('asset-container'); ac.innerHTML = ''; assetCount = 0;
+            console.log('[LoadData] Starting asset loading. Assets count:', data.assets ? data.assets.length : 0);
             if (data.assets) {
                 isLoadingData = true; // Prevent bottom sheet from opening during data load
+                console.log('[LoadData] About to iterate through assets. Array:', data.assets);
                 data.assets.forEach(a => {
+                    console.log('[LoadData] Processing asset:', a);
                     assetCount++;
                     const assetId = assetCount;
 
-                    if (isMobile()) {
+                    const mobileCheck = isMobile();
+                    console.log(`[LoadData] isMobile() = ${mobileCheck}, window.innerWidth = ${window.innerWidth}`);
+
+                    if (mobileCheck) {
                         // Restore as mobile summary card
                         // Reconstruct beneficiaries for summary card
                         const bens = a.shares ? a.shares.map(s => ({
@@ -3018,34 +3795,36 @@
 
                         renderMobileSummaryCard(assetId, a.type, bens, a.details || {});
                     } else {
-                        // Restore as desktop accordion
-                        // We need to temporarily bypass the isMobile check in addAssetRow or just manually create the row
-                        // But addAssetRow checks isMobile()...
-                        // Let's manually create the desktop row structure here or modify addAssetRow
-                        // Actually, since we are in loadData, we can just use the existing logic but we need to make sure addAssetRow doesn't return early
+                        // Desktop path
+                        console.log(`[LoadData] Processing desktop asset ${assetId}, type: ${a.type}`);
 
-                        // Wait, addAssetRow checks isMobile(). If we are on mobile, it returns early.
-                        // So we can't use addAssetRow() here if we want to force desktop view (e.g. testing)
-                        // But if we are on mobile, we WANT summary cards.
+                        try {
+                            // Reset assetCount because addAssetRow increments it
+                            assetCount--;
+                            addAssetRow();
 
-                        // So the logic above handles mobile. Now handle desktop.
-                        // If !isMobile(), addAssetRow() creates the accordion.
+                            const row = ac.lastElementChild;
+                            console.log(`[LoadData] Created row for asset ${assetId}`);
 
-                        // Reset assetCount because addAssetRow increments it
-                        assetCount--;
-                        addAssetRow();
-
-                        const row = ac.lastElementChild;
-                        // const assetId = row.id.replace('asset-row-', ''); // Already have assetId
-
-                        row.querySelector('.asset-type-select').value = a.type;
-                        renderAssetFields(assetId, a.type);
-                        if (a.details) { Object.keys(a.details).forEach(key => { const inp = row.querySelector(`[data-key="${key}"]`); if (inp) inp.value = a.details[key]; }); }
-                        document.getElementById(`shares-container-${assetId}`).innerHTML = '';
-                        if (a.shares) a.shares.forEach(s => addShareRow(assetId, s.benId, s.share, s.altId)); else addShareRow(assetId);
-                        updateAssetHeader(assetId); checkSplitWarning(assetId);
-                        document.getElementById(`asset-body-${assetId}`).classList.add('hidden');
-                        document.getElementById(`asset-row-${assetId}`).classList.remove('ring-2', 'ring-indigo-100');
+                            row.querySelector('.asset-type-select').value = a.type;
+                            renderAssetFields(assetId, a.type);
+                            if (a.details) { Object.keys(a.details).forEach(key => { const inp = row.querySelector(`[data-key="${key}"]`); if (inp) inp.value = a.details[key]; }); }
+                            document.getElementById(`shares-container-${assetId}`).innerHTML = '';
+                            console.log(`[LoadData] Adding shares for asset ${assetId}. Shares:`, a.shares);
+                            if (a.shares) {
+                                a.shares.forEach(s => {
+                                    console.log(`[LoadData] Adding share row: Asset ${assetId}, Ben ${s.benId}`);
+                                    addShareRow(assetId, s.benId, s.share, s.altId);
+                                });
+                            } else {
+                                addShareRow(assetId);
+                            }
+                            updateAssetHeader(assetId); checkSplitWarning(assetId);
+                            document.getElementById(`asset-body-${assetId}`).classList.add('hidden');
+                            document.getElementById(`asset-row-${assetId}`).classList.remove('ring-2', 'ring-indigo-100');
+                        } catch (error) {
+                            console.error(`[LoadData] Error loading asset ${assetId}:`, error);
+                        }
                     }
                 });
                 isLoadingData = false; // Re-enable bottom sheet
@@ -3123,6 +3902,7 @@
                 alert("PDF generation is currently not supported for Hindi. Please download the Editable (.rtf) version.");
                 return;
             }
+            const t = TRANSLATIONS[currentLang]; // Define translation helper
             const { jsPDF } = window.jspdf;
             const doc = new jsPDF({ orientation: 'p', unit: 'mm', format: 'a4' });
             const margin = 25, topMargin = 25, bottomMargin = 35, pageWidth = 210, contentWidth = pageWidth - (margin * 2), lineHeight = 6;
@@ -3172,16 +3952,59 @@
 
             printSectionHeader("2. APPOINTMENT OF EXECUTOR");
 
-            const exName = gV('exName').toUpperCase();
-            const exRel = gV('exRel');
-            const exParentName = gV('exParentName').trim();
-            const exRelPrefix = gV('exRelPrefix') || 'S/o';
-            const exAddress = gV('exAddress');
+            // Ensure we have the latest executor data
+            const currentExecutors = collectExecutors();
+            const primaryExecutors = currentExecutors.filter(e => e.isPrimary);
+            const alternateExecutor = currentExecutors.find(e => !e.isPrimary);
 
-            let execText = `I appoint ${exName} (Rel: ${exRel})`;
-            if (exParentName) execText += `, ${exRelPrefix} ${exParentName}`;
-            execText += `, residing at ${exAddress}, to be the sole Executor of this Will.`;
-            printBlock(execText);
+            if (primaryExecutors.length > 0) {
+                // Only show "Primary Executor(s)" heading when alternate exists (to distinguish from alternate)
+                if (alternateExecutor) {
+                    checkY(10);
+                    doc.setFont("times", "bold"); doc.setFontSize(12);
+                    doc.text(t.previewPrimaryExecutors, margin, y); y += 6;
+                    doc.setFont("times", "normal");
+                }
+
+                if (primaryExecutors.length === 1) {
+                    const ex = primaryExecutors[0];
+                    let execText = `I appoint ${ex.name.toUpperCase()} (Rel: ${ex.relationship})`;
+                    if (ex.parentName) execText += `, ${ex.parentName}`;
+                    if (ex.address) execText += `, residing at ${ex.address}`;
+                    execText += `, to be the sole Executor of this Will.`;
+                    printBlock(execText);
+                } else {
+                    printBlock("I appoint the following person(s) as the Executor(s) of this Will:");
+                    primaryExecutors.forEach((ex, index) => {
+                        let execText = `(${String.fromCharCode(97 + index)}) ${ex.name.toUpperCase()} (Rel: ${ex.relationship})`;
+                        if (ex.parentName) execText += `, ${ex.parentName}`;
+                        if (ex.address) execText += `, residing at ${ex.address}`;
+
+                        // Manual indentation logic
+                        const lines = doc.splitTextToSize(execText, contentWidth - 10);
+                        checkY(lines.length * lineHeight);
+                        doc.text(lines, margin + 10, y);
+                        y += (lines.length * lineHeight) + 2;
+                    });
+                    doc.setFont("times", "italic");
+                    printBlock("The Executors shall act jointly and severally.");
+                    doc.setFont("times", "normal");
+                }
+            }
+
+            if (alternateExecutor) {
+                y += 6;
+                checkY(10);
+                doc.setFont("times", "bold"); doc.setFontSize(12);
+                doc.text(t.previewAlternateExecutor, margin, y); y += 6;
+                doc.setFont("times", "normal");
+
+                printBlock("If the above Executor(s) are unable or unwilling to act, I appoint the following person as Alternate Executor:");
+                let altText = `${alternateExecutor.name.toUpperCase()} (Rel: ${alternateExecutor.relationship})`;
+                if (alternateExecutor.parentName) altText += `, ${alternateExecutor.parentName}`;
+                altText += `, residing at ${alternateExecutor.address}.`;
+                printBlock(altText);
+            }
 
             printSectionHeader("3. DISTRIBUTION OF ASSETS");
             doc.setFont("times", "normal"); doc.setFontSize(12); doc.text("I bequeath my assets as follows:", margin, y); y += 8;
@@ -3355,7 +4178,7 @@
                 } else {
                     return text.replace(/करता\/करती/g, 'करता')
                         .replace(/बनाता\/बनाती/g, 'बनाता')
-                        .replace(/रहा\/रही/g, 'रहा');
+                        .replace(/रहा\/रही/g, 'रही');
                 }
             };
 
@@ -3365,7 +4188,7 @@
             if (fatherName) preamble += `, ${encodeRTF(myRelPrefix)} ${encodeRTF(fatherName)}`;
             if (dobText) preamble += encodeRTF(dobText);
 
-            let preambleEnd = `, ${encodeRTF(t.pdfResidingAt)} ${encodeRTF(gV('myAddress'))} (${encodeRTF(t.pdfReligionLabel)}: ${encodeRTF(religionTxt)}), ${encodeRTF(t.pdfBeingOfSound)}`;
+            let preambleEnd = `, ${encodeRTF(t.pdfResidingAt)} ${encodeRTF(gV('myAddress'))} (धर्म: ${encodeRTF(religionTxt)}), ${encodeRTF(t.pdfBeingOfSound)}`;
             if (currentLang === 'hi') {
                 preambleEnd = fixHindiGender(preambleEnd);
             }
@@ -3381,12 +4204,44 @@
 
             // 2. Executor
             rtf += `\\b\\fs28 ${encodeRTF(t.pdfExecutorTitle)}\\b0\\fs24\\par \n`;
-            const exName = gV('exName').toUpperCase();
-            let execText = `${encodeRTF(t.pdfIAppoint)} \\b ${encodeRTF(exName)} \\b0 (${encodeRTF(t.pdfRelLabel)}: ${encodeRTF(gV('exRel'))})`;
-            if (gV('exParentName')) execText += `, ${encodeRTF(gV('exRelPrefix') || 'S/o')} ${encodeRTF(gV('exParentName'))}`;
-            execText += `, ${encodeRTF(t.pdfResidingAt)} ${encodeRTF(gV('exAddress'))}, ${encodeRTF(t.pdfToBeThe)}`;
-            if (currentLang === 'hi') execText = fixHindiGender(execText);
-            rtf += `${execText}\\par\\par \n`;
+            // Ensure we have the latest executor data
+            const currentExecutors = collectExecutors();
+            const primaryExecutors = currentExecutors.filter(e => e.isPrimary);
+            const alternateExecutor = currentExecutors.find(e => !e.isPrimary);
+
+            if (primaryExecutors.length > 0) {
+                // Only show "Primary Executor(s)" heading when alternate exists (to distinguish from alternate)
+                if (alternateExecutor) {
+                    rtf += `\\b\\fs24 ${encodeRTF(t.previewPrimaryExecutors)}\\b0\\par \n`;
+                }
+                if (primaryExecutors.length === 1) {
+                    const ex = primaryExecutors[0];
+                    let execText = `${encodeRTF(t.pdfIAppoint)} \\b ${encodeRTF(ex.name.toUpperCase())} \\b0 (${encodeRTF(t.pdfRelLabel)}: ${encodeRTF(ex.relationship)})`;
+                    if (ex.parentName) execText += `, ${encodeRTF(ex.parentName)}`;
+                    if (ex.address) execText += `, ${encodeRTF(t.pdfResidingAt)} ${encodeRTF(ex.address)}`;
+                    execText += `, ${encodeRTF(t.pdfToBeThe)}`;
+                    if (currentLang === 'hi') execText = fixHindiGender(execText);
+                    rtf += `${execText}\\par\\par \n`;
+                } else {
+                    rtf += `${encodeRTF(t.previewExecutorClause)}\\par \n`;
+                    primaryExecutors.forEach((ex, index) => {
+                        let execText = `${index + 1}. \\b ${encodeRTF(ex.name.toUpperCase())} \\b0 (${encodeRTF(t.pdfRelLabel)}: ${encodeRTF(ex.relationship)})`;
+                        if (ex.parentName) execText += `, ${encodeRTF(ex.parentName)}`;
+                        if (ex.address) execText += `, ${encodeRTF(t.pdfResidingAt)} ${encodeRTF(ex.address)}`;
+                        rtf += `\\li720 ${execText}\\par \n`; // Indent list items
+                    });
+                    rtf += `\\li0 \\i ${encodeRTF(t.previewJointSeveral)}\\i0 \\par\\par \n`; // Reset indent
+                }
+            }
+
+            if (alternateExecutor) {
+                rtf += `\\par \\b\\fs24 ${encodeRTF(t.previewAlternateExecutor)}\\b0\\par \n`;
+                rtf += `${encodeRTF(t.previewAlternateClause)}\\par \n`;
+                let altText = `\\b ${encodeRTF(alternateExecutor.name.toUpperCase())} \\b0 (${encodeRTF(t.pdfRelLabel)}: ${encodeRTF(alternateExecutor.relationship)})`;
+                if (alternateExecutor.parentName) altText += `, ${encodeRTF(alternateExecutor.parentName)}`;
+                if (alternateExecutor.address) altText += `, ${encodeRTF(t.pdfResidingAt)} ${encodeRTF(alternateExecutor.address)}`;
+                rtf += `${altText}\\par\\par \n`;
+            }
 
             // 3. Assets
             rtf += `\\b\\fs28 ${encodeRTF(t.pdfDistributionTitle)}\\b0\\fs24\\par \n`;
@@ -3492,6 +4347,73 @@
             document.body.removeChild(link);
         }
     </script>
+    <!-- Executor Bottom Sheet (Single Executor Form) -->
+    <div id="executor-sheet-overlay"
+        class="fixed inset-0 bg-black bg-opacity-50 z-40 hidden transition-opacity duration-300"
+        onclick="closeExecutorSheet()"></div>
+    <div id="executor-sheet"
+        class="fixed bottom-0 left-0 right-0 bg-white rounded-t-2xl z-50 transform translate-y-full transition-transform duration-300 max-h-[90vh] overflow-y-auto">
+        <!-- Header -->
+        <div class="flex items-center justify-between p-4 border-b border-gray-200">
+            <button onclick="closeExecutorSheet()" class="text-gray-600 hover:text-gray-800 p-2 -ml-2">
+                <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 19l-7-7 7-7" />
+                </svg>
+            </button>
+            <h3 class="text-lg font-bold text-gray-800" id="sheet-executor-title" data-i18n="sheetExecutorTitle">Manage
+                Executor</h3>
+            <div class="w-10"></div> <!-- Spacer for centering -->
+        </div>
+
+        <!-- Single Executor Form -->
+        <div class="p-4 space-y-4 mb-6">
+            <div>
+                <label class="block text-sm font-medium text-gray-700 mb-1" data-i18n="lblExName">Executor Name
+                    <span class="text-red-500">*</span></label>
+                <input type="text" id="sheet-ex-name"
+                    class="w-full p-3 border rounded-lg focus:ring-2 focus:ring-indigo-500 outline-none"
+                    placeholder="Full Name">
+            </div>
+
+            <div>
+                <label class="block text-sm font-medium text-gray-700 mb-1" data-i18n="lblExRel">Relationship <span
+                        class="text-red-500">*</span></label>
+                <input type="text" id="sheet-ex-rel"
+                    class="w-full p-3 border rounded-lg focus:ring-2 focus:ring-indigo-500 outline-none"
+                    placeholder="e.g. Brother">
+            </div>
+
+            <div>
+                <label class="block text-sm font-medium text-gray-700 mb-1" data-i18n="lblExParentName">Parent /
+                    Spouse Name</label>
+                <div class="flex gap-2">
+                    <select id="sheet-ex-prefix"
+                        class="p-3 border rounded-lg focus:ring-2 focus:ring-indigo-500 outline-none bg-white">
+                        <option value="S/o">S/o</option>
+                        <option value="D/o">D/o</option>
+                        <option value="W/o">W/o</option>
+                    </select>
+                    <input type="text" id="sheet-ex-parent"
+                        class="w-full p-3 border rounded-lg focus:ring-2 focus:ring-indigo-500 outline-none"
+                        placeholder="Father's / Husband's Name">
+                </div>
+            </div>
+
+            <div>
+                <label class="block text-sm font-medium text-gray-700 mb-1" data-i18n="lblExAddress">Address</label>
+                <textarea id="sheet-ex-address"
+                    class="w-full p-3 border rounded-lg focus:ring-2 focus:ring-indigo-500 outline-none" rows="3"
+                    placeholder="Current Address"></textarea>
+            </div>
+        </div>
+
+        <div class="p-4 border-t border-gray-200">
+            <button onclick="saveExecutorSheet()"
+                class="w-full bg-indigo-600 text-white py-3 rounded-lg font-bold text-lg shadow-lg"
+                data-i18n="btnDone">Save Executor</button>
+        </div>
+    </div>
+
     <script type="module" src="/index.tsx"></script>
 </body>
 
