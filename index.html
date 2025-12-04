@@ -1588,6 +1588,12 @@
 
         function initApp() {
             loadData();
+            // Restore language preference if saved separately (e.g., after starting fresh)
+            const savedLangPref = localStorage.getItem('SAHAY_LANG_PREF');
+            if (savedLangPref && (savedLangPref === 'en' || savedLangPref === 'hi')) {
+                currentLang = savedLangPref;
+                localStorage.removeItem('SAHAY_LANG_PREF'); // Clear the flag after using it
+            }
             // Restore language preference if saved
             updateLanguage();
             // Initialize mobile executor summary card (this may hide the button)
@@ -1621,15 +1627,31 @@
                 }
             }
 
-            // Check for auto-start flag set by startFresh()
+            // Check if auto-start flag is set (from startFresh)
             if (sessionStorage.getItem('SAHAY_AUTO_START') === 'true') {
                 sessionStorage.removeItem('SAHAY_AUTO_START');
-                updateMaxReached(1);
-                goToStep(1); // Go directly to Step 2 (Index 1)
+                goToStep(1);
             } else {
-                updateProgressBar(lastActiveStep);
+                // Check URL hash for step navigation
+                const hash = window.location.hash.substring(1);
+                const stepMap = { 'welcome': 0, 'you': 1, 'executor': 2, 'heirs': 3, 'assets': 4, 'generate': 5 };
+                if (hash && stepMap[hash] !== undefined) {
+                    goToStep(stepMap[hash], true); // Skip history to avoid duplicate entry
+                } else {
+                    // Initialize history with current step
+                    const currentStep = lastActiveStep || 0;
+                    const stepName = ['welcome', 'you', 'executor', 'heirs', 'assets', 'generate'][currentStep] || 'welcome';
+                    history.replaceState({ step: currentStep }, '', `#${stepName}`);
+                }
             }
         }
+
+        // Handle browser back/forward buttons
+        window.addEventListener('popstate', (event) => {
+            if (event.state && event.state.step !== undefined) {
+                goToStep(event.state.step, true); // Skip history to avoid duplicate entry
+            }
+        });
 
         function startFresh() {
             showCustomWarning(
@@ -1637,7 +1659,11 @@
                 "You are about to delete your saved draft. All previous progress will be permanently lost.\n\nAre you sure?",
                 false,
                 () => {
+                    // Save current language before clearing data
+                    const savedLang = currentLang;
                     localStorage.removeItem(STORAGE_KEY);
+                    // Restore language preference
+                    localStorage.setItem('SAHAY_LANG_PREF', savedLang);
                     // Set flag so initApp knows to jump to Step 1 after reload
                     sessionStorage.setItem('SAHAY_AUTO_START', 'true');
                     location.reload();
@@ -1675,7 +1701,7 @@
             }
         }
 
-        function goToStep(step) {
+        function goToStep(step, skipHistory = false) {
             lastActiveStep = step;
             document.querySelectorAll('.step-section').forEach(el => el.classList.remove('active'));
 
@@ -1690,6 +1716,12 @@
 
             updateProgressBar(step);
             window.scrollTo(0, 0);
+
+            // Update browser history so back button works correctly on mobile
+            if (!skipHistory) {
+                const stepName = ['welcome', 'you', 'executor', 'heirs', 'assets', 'generate'][step] || 'step';
+                history.pushState({ step: step }, '', `#${stepName}`);
+            }
         }
 
         function navigateToStep(step) {
@@ -2726,17 +2758,29 @@
             const today = new Date().toLocaleDateString(currentLang === 'hi' ? 'hi-IN' : 'en-IN', { year: 'numeric', month: 'long', day: 'numeric' });
 
             // Helper for beneficiaries
+            // Helper function to translate relationship prefixes to Hindi
+            const translateRelPrefix = (prefix) => {
+                if (currentLang !== 'hi') return prefix;
+                const translations = {
+                    'S/o': 'पुत्र',
+                    'D/o': 'पुत्री',
+                    'W/o': 'पत्नी',
+                    'R/o': 'निवासी'
+                };
+                return translations[prefix] || prefix;
+            };
+
             const getBenString = (bId) => {
                 const b = beneficiaries.find(x => x.id == bId);
                 if (!b) return `<span class="preview-placeholder">[Beneficiary]</span>`;
                 let s = `<b>${b.name}</b> (${b.rel})`;
-                if (b.addr) s += `, R/o ${b.addr}`;
-                if (b.father && b.father.trim()) s += `, ${b.relPrefix || 'S/o'} ${b.father}`;
+                if (b.addr) s += `, ${translateRelPrefix('R/o')} ${b.addr}`;
+                if (b.father && b.father.trim()) s += `, ${translateRelPrefix(b.relPrefix || 'S/o')} ${b.father}`;
                 if (b.isMinor && b.gName) {
                     s += ` [Minor. Guardian: ${b.gName}`;
                     if (b.gRel) s += ` (${b.gRel})`;
-                    if (b.gFather && b.gFather.trim()) s += `, ${b.gRelPrefix || 'S/o'} ${b.gFather}`;
-                    if (b.gAddr) s += `, R/o ${b.gAddr}`;
+                    if (b.gFather && b.gFather.trim()) s += `, ${translateRelPrefix(b.gRelPrefix || 'S/o')} ${b.gFather}`;
+                    if (b.gAddr) s += `, ${translateRelPrefix('R/o')} ${b.gAddr}`;
                     s += `]`;
                 }
                 return s;
@@ -2778,11 +2822,12 @@
                 if (isFemale) {
                     return text.replace(/करता\/करती/g, 'करती')
                         .replace(/बनाता\/बनाती/g, 'बनाती')
-                        .replace(/रहा\/रही/g, 'रही');
+                        .replace(/रहा\/रही/g, 'रही')
+                        .replace(/हूं/g, 'हूं'); // Keep as is for female
                 } else {
                     return text.replace(/करता\/करती/g, 'करता')
                         .replace(/बनाता\/बनाती/g, 'बनाता')
-                        .replace(/रहा\/रही/g, 'रही');
+                        .replace(/रहा\/रही/g, 'रहा'); // FIX: was 'रही', should be 'रहा' for male
                 }
             };
 
@@ -2802,7 +2847,7 @@
                 preamble += `, residing at ${getValOrPlace('myAddress', 'Permanent Address')} (Religion: ${religionTxt}), being of sound mind and memory, do hereby make, publish and declare this to be my Last Will and Testament.`;
             } else {
                 preamble = `मैं, <b>${myName}</b>`;
-                if (fatherName) preamble += `, ${myRelPrefixTrans} ${fatherName}`;
+                if (fatherName) preamble += `, ${translateRelPrefix(myRelPrefix)} ${fatherName}`;
                 if (dobText) preamble += dobText;
                 let preambleText = `, निवासी ${getValOrPlace('myAddress', t.dynPermAddress)} (धर्म: ${religionTxt}), स्वस्थ मन और स्मृति का होने के नाते, एतद्द्वारा अपनी यह अंतिम वसीयत और वसीयतनामा बनाता/बनाती हूँ, प्रकाशित करता/करती हूँ और घोषित करता/करती हूँ।`;
                 preamble += fixHindiGender(preambleText);
@@ -2811,7 +2856,7 @@
 
             // 3. Revocation
             html += `<h3 style="font-size: 14pt; font-weight: bold; margin-top: 20px; margin-bottom: 10px;">${t.pdfRevocationTitle}</h3>`;
-            html += `<p style="margin-bottom: 15px;">${t.pdfRevocationText}</p>`;
+            html += `<p style="margin-bottom: 15px;">${fixHindiGender(t.pdfRevocationText)}</p>`;
 
             // 4. Executor
             html += `<h3 style="font-size: 14pt; font-weight: bold; margin-top: 20px; margin-bottom: 10px;">${t.pdfExecutorTitle}</h3>`;
@@ -2820,6 +2865,20 @@
             const currentExecutors = collectExecutors();
             const primaryExecutors = currentExecutors.filter(e => e.isPrimary);
             const alternateExecutor = currentExecutors.find(e => !e.isPrimary);
+
+            // Helper to translate "S/o Name" -> "पुत्र Name"
+            const translateParentName = (fullString) => {
+                if (!fullString || currentLang !== 'hi') return fullString;
+                const parts = fullString.split(' ');
+                if (parts.length > 1) {
+                    const prefix = parts[0];
+                    const translatedPrefix = translateRelPrefix(prefix);
+                    if (translatedPrefix !== prefix) {
+                        return translatedPrefix + ' ' + parts.slice(1).join(' ');
+                    }
+                }
+                return fullString;
+            };
 
             if (primaryExecutors.length > 0) {
                 // Only show "Primary Executor(s)" heading when alternate exists (to distinguish from alternate)
@@ -2830,16 +2889,16 @@
                 if (primaryExecutors.length === 1) {
                     const ex = primaryExecutors[0];
                     let exText = `I appoint <b>${ex.name}</b> (${t.lblExRel}: ${ex.relationship})`;
-                    if (ex.parentName) exText += `, ${ex.parentName}`;
+                    if (ex.parentName) exText += `, ${translateParentName(ex.parentName)}`;
                     if (ex.address) exText += `, ${t.lblExAddress}: ${ex.address}`;
                     exText += `, to be the sole Executor of this Will.`;
                     html += `<p style="margin-bottom: 10px;">${exText}</p>`;
                 } else {
                     // Multiple executors
-                    html += `<p style="margin-bottom: 10px;"><b>${t.previewExecutorClause}</b></p>`;
+                    html += `<p style="margin-bottom: 10px;"><b>${fixHindiGender(t.previewExecutorClause)}</b></p>`;
                     primaryExecutors.forEach((ex, index) => {
                         let exText = `(${String.fromCharCode(97 + index)}) <b>${ex.name}</b> (${t.lblExRel}: ${ex.relationship})`;
-                        if (ex.parentName) exText += `, ${ex.parentName}`;
+                        if (ex.parentName) exText += `, ${translateParentName(ex.parentName)}`;
                         if (ex.address) exText += `, ${t.lblExAddress}: ${ex.address}`;
                         html += `<p style="margin-bottom: 5px; margin-left: 20px;">${exText}</p>`;
                     });
@@ -2849,17 +2908,17 @@
 
             if (alternateExecutor) {
                 html += `<h3 style="font-size: 14pt; font-weight: bold; margin-top: 20px; margin-bottom: 10px;">${t.previewAlternateExecutor}</h3>`;
-                html += `<p style="margin-bottom: 10px;"><b>${t.previewAlternateClause}</b></p>`;
+                html += `<p style="margin-bottom: 10px;"><b>${fixHindiGender(t.previewAlternateClause)}</b></p>`;
 
                 let altText = `<b>${alternateExecutor.name}</b> (${t.lblExRel}: ${alternateExecutor.relationship})`;
-                if (alternateExecutor.parentName) altText += `, ${alternateExecutor.parentName}`;
+                if (alternateExecutor.parentName) altText += `, ${translateParentName(alternateExecutor.parentName)}`;
                 if (alternateExecutor.address) altText += `, ${t.lblExAddress}: ${alternateExecutor.address}`;
                 html += `<p style="margin-bottom: 15px;">${altText}</p>`;
             }
 
             // 5. Assets
             html += `<h3 style="font-size: 14pt; font-weight: bold; margin-top: 20px; margin-bottom: 10px;">${t.pdfDistributionTitle}</h3>`;
-            html += `<p style="margin-bottom: 15px;">${t.pdfDistributionIntro}</p>`;
+            html += `<p style="margin-bottom: 15px;">${fixHindiGender(t.pdfDistributionIntro)}</p>`;
 
             const allAssets = collectAllAssets();
             if (allAssets.length === 0) {
@@ -2911,7 +2970,7 @@
 
             // 6. Residual
             html += `<h3 style="font-size: 14pt; font-weight: bold; margin-top: 20px; margin-bottom: 10px;">${t.pdfResidualTitle}</h3>`;
-            html += `<p style="margin-bottom: 10px;">${t.pdfResidualIntro}</p>`;
+            html += `<p style="margin-bottom: 10px;">${fixHindiGender(t.pdfResidualIntro)}</p>`;
 
             const resShares = collectResidualShares();
             if (resShares.length === 0) {
@@ -4231,18 +4290,44 @@
                 if (isFemale) {
                     return text.replace(/करता\/करती/g, 'करती')
                         .replace(/बनाता\/बनाती/g, 'बनाती')
-                        .replace(/रहा\/रही/g, 'रही');
+                        .replace(/रहा\/रही/g, 'रही')
+                        .replace(/हूं/g, 'हूं'); // Keep as is for female
                 } else {
                     return text.replace(/करता\/करती/g, 'करता')
                         .replace(/बनाता\/बनाती/g, 'बनाता')
-                        .replace(/रहा\/रही/g, 'रही');
+                        .replace(/रहा\/रही/g, 'रहा'); // FIX: was 'रही', should be 'रहा' for male
                 }
+            };
+            // Helper function to translate relationship prefixes to Hindi
+            const translateRelPrefix = (prefix) => {
+                if (currentLang !== 'hi') return prefix;
+                const translations = {
+                    'S/o': 'पुत्र',
+                    'D/o': 'पुत्री',
+                    'W/o': 'पत्नी',
+                    'R/o': 'निवासी'
+                };
+                return translations[prefix] || prefix;
+            };
+
+            // Helper to translate "S/o Name" -> "पुत्र Name"
+            const translateParentName = (fullString) => {
+                if (!fullString || currentLang !== 'hi') return fullString;
+                const parts = fullString.split(' ');
+                if (parts.length > 1) {
+                    const prefix = parts[0];
+                    const translatedPrefix = translateRelPrefix(prefix);
+                    if (translatedPrefix !== prefix) {
+                        return translatedPrefix + ' ' + parts.slice(1).join(' ');
+                    }
+                }
+                return fullString;
             };
 
             let preamble = currentLang === 'en'
                 ? `I, \\b ${encodeRTF(myName)}\\b0`
                 : `${encodeRTF(t.pdfIAppoint.split(' ')[0])}, \\b ${encodeRTF(myName)}\\b0`;
-            if (fatherName) preamble += `, ${encodeRTF(myRelPrefix)} ${encodeRTF(fatherName)}`;
+            if (fatherName) preamble += `, ${encodeRTF(translateRelPrefix(myRelPrefix))} ${encodeRTF(fatherName)}`;
             if (dobText) preamble += encodeRTF(dobText);
 
             let preambleEnd = `, ${encodeRTF(t.pdfResidingAt)} ${encodeRTF(gV('myAddress'))} (धर्म: ${encodeRTF(religionTxt)}), ${encodeRTF(t.pdfBeingOfSound)}`;
@@ -4274,7 +4359,7 @@
                 if (primaryExecutors.length === 1) {
                     const ex = primaryExecutors[0];
                     let execText = `${encodeRTF(t.pdfIAppoint)} \\b ${encodeRTF(ex.name.toUpperCase())} \\b0 (${encodeRTF(t.pdfRelLabel)}: ${encodeRTF(ex.relationship)})`;
-                    if (ex.parentName) execText += `, ${encodeRTF(ex.parentName)}`;
+                    if (ex.parentName) execText += `, ${encodeRTF(translateParentName(ex.parentName))}`;
                     if (ex.address) execText += `, ${encodeRTF(t.pdfResidingAt)} ${encodeRTF(ex.address)}`;
                     execText += `, ${encodeRTF(t.pdfToBeThe)}`;
                     if (currentLang === 'hi') execText = fixHindiGender(execText);
@@ -4283,7 +4368,7 @@
                     rtf += `${encodeRTF(t.previewExecutorClause)}\\par \n`;
                     primaryExecutors.forEach((ex, index) => {
                         let execText = `${index + 1}. \\b ${encodeRTF(ex.name.toUpperCase())} \\b0 (${encodeRTF(t.pdfRelLabel)}: ${encodeRTF(ex.relationship)})`;
-                        if (ex.parentName) execText += `, ${encodeRTF(ex.parentName)}`;
+                        if (ex.parentName) execText += `, ${encodeRTF(translateParentName(ex.parentName))}`;
                         if (ex.address) execText += `, ${encodeRTF(t.pdfResidingAt)} ${encodeRTF(ex.address)}`;
                         rtf += `\\li720 ${execText}\\par \n`; // Indent list items
                     });
@@ -4295,7 +4380,7 @@
                 rtf += `\\par \\b\\fs24 ${encodeRTF(t.previewAlternateExecutor)}\\b0\\par \n`;
                 rtf += `${encodeRTF(t.previewAlternateClause)}\\par \n`;
                 let altText = `\\b ${encodeRTF(alternateExecutor.name.toUpperCase())} \\b0 (${encodeRTF(t.pdfRelLabel)}: ${encodeRTF(alternateExecutor.relationship)})`;
-                if (alternateExecutor.parentName) altText += `, ${encodeRTF(alternateExecutor.parentName)}`;
+                if (alternateExecutor.parentName) altText += `, ${encodeRTF(translateParentName(alternateExecutor.parentName))}`;
                 if (alternateExecutor.address) altText += `, ${encodeRTF(t.pdfResidingAt)} ${encodeRTF(alternateExecutor.address)}`;
                 rtf += `${altText}\\par\\par \n`;
             }
