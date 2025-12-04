@@ -635,7 +635,7 @@
                 <div class="p-4 md:p-6 bg-slate-50">
                     <div id="residual-shares-list" class="space-y-2"></div>
 
-                    <button onclick="addResidualShare()"
+                    <button onclick="addResidualShare('', '', '', true)"
                         class="w-full py-3 border-2 border-dashed border-indigo-300 text-indigo-600 font-semibold rounded hover:bg-indigo-50 hover:shadow-md transition flex items-center justify-center gap-2 mt-4"
                         data-i18n="btnAddResidual">
                         <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -1391,8 +1391,12 @@
             currentExecutorSheetId = executorId;
             currentExecutorSheetIsPrimary = isPrimary;
 
+            // Push state for back button handling
+            history.pushState({ step: lastActiveStep, sheet: 'executor' }, '', '#executor-sheet');
+
             const sheet = document.getElementById('executor-sheet');
             const container = document.getElementById('executor-sheet'); // It's the same element for the sheet and container
+            const overlay = document.getElementById('executor-sheet-overlay');
             const titleEl = document.getElementById('sheet-executor-title');
             const t = TRANSLATIONS[currentLang];
 
@@ -1434,6 +1438,7 @@
             document.getElementById('sheet-ex-parent').value = parentNameOnly;
             document.getElementById('sheet-ex-prefix').value = prefix;
 
+            overlay.classList.remove('hidden');
             sheet.classList.remove('hidden');
             setTimeout(() => {
                 container.classList.remove('translate-y-full');
@@ -1441,16 +1446,22 @@
             document.body.style.overflow = 'hidden';
         }
 
-        function closeExecutorSheet() {
+        function _closeExecutorSheetUI() {
             const sheet = document.getElementById('executor-sheet');
             const container = document.getElementById('executor-sheet');
+            const overlay = document.getElementById('executor-sheet-overlay');
 
             container.classList.add('translate-y-full');
             setTimeout(() => {
                 sheet.classList.add('hidden');
+                overlay.classList.add('hidden');
                 document.body.style.overflow = 'auto';
                 currentExecutorSheetId = null;
             }, 300);
+        }
+
+        function closeExecutorSheet() {
+            history.back();
         }
 
         function saveExecutorSheet() {
@@ -1659,6 +1670,12 @@
         // Handle browser back/forward buttons
         window.addEventListener('popstate', (event) => {
             // Check for open sheets and close them (UI only)
+            const executorSheet = document.getElementById('executor-sheet');
+            if (executorSheet && !executorSheet.classList.contains('hidden')) {
+                _closeExecutorSheetUI();
+                return;
+            }
+
             const benSheet = document.getElementById('ben-bottom-sheet');
             if (benSheet && !benSheet.classList.contains('hidden')) {
                 _closeBenSheetUI();
@@ -3699,7 +3716,7 @@
             updateAllDropdowns();
         }
 
-        function addResidualShare(benId = '', share = '', altId = '') {
+        function addResidualShare(benId = '', share = '', altId = '', userClick = false) {
             // Auto-calculate share if not provided
             if (!share) {
                 const existingShares = collectResidualShares();
@@ -3717,9 +3734,10 @@
                     const uniqueId = generateUniqueId();
                     const data = { id: uniqueId, benId, share, altId };
                     renderResidualSummaryCard(data.id, data);
+                } else if (userClick) {
+                    // User clicked "Add" button - open the sheet
+                    openResidualSheet();
                 }
-                // Don't auto-open sheet when called without benId (e.g., during page navigation)
-                // User should explicitly click "Add" button to open the sheet
                 return;
             }
 
