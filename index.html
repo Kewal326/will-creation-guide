@@ -4063,6 +4063,7 @@
         }
 
         function finishJourney() {
+            const t = TRANSLATIONS[currentLang];
             const assets = document.querySelectorAll('.asset-item'); let isValid = true;
             assets.forEach(row => {
                 const uniqueId = row.id.replace('asset-row-', '');
