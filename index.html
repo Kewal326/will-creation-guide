@@ -1179,11 +1179,19 @@
         }
 
         function collectExecutors() {
+            console.log('[CollectExecutors] START');
+
             // Collect from desktop rows
-            // Note: Mobile collection logic will be added in Phase 2
-            document.querySelectorAll('.executor-item').forEach(row => {
+            const desktopRows = document.querySelectorAll('.executor-item');
+            console.log('[CollectExecutors] Found', desktopRows.length, 'desktop rows');
+
+            desktopRows.forEach(row => {
                 const id = parseInt(row.id.replace('executor-row-', ''));
+                console.log('[CollectExecutors] Processing row with ID:', id);
+
                 const executor = executors.find(e => e.id === id);
+                console.log('[CollectExecutors] Found executor in array?', !!executor, executor);
+
                 if (executor) {
                     const nameInput = document.getElementById(`ex-name-${id}`);
                     const relInput = document.getElementById(`ex-rel-${id}`);
@@ -1191,9 +1199,25 @@
                     const prefixInput = document.getElementById(`ex-prefix-${id}`);
                     const parentInput = document.getElementById(`ex-parent-${id}`);
 
+                    console.log('[CollectExecutors] Input elements found:', {
+                        nameInput: !!nameInput,
+                        relInput: !!relInput,
+                        addrInput: !!addrInput
+                    });
+
+                    console.log('[CollectExecutors] Input VALUES:', {
+                        nameValue: nameInput ? nameInput.value : 'N/A',
+                        relValue: relInput ? relInput.value : 'N/A',
+                        addrValue: addrInput ? addrInput.value : 'N/A'
+                    });
+
+                    console.log('[CollectExecutors] Executor BEFORE update:', JSON.stringify(executor));
+
                     if (nameInput) executor.name = nameInput.value.trim();
                     if (relInput) executor.relationship = relInput.value.trim();
                     if (addrInput) executor.address = addrInput.value.trim();
+
+                    console.log('[CollectExecutors] Executor AFTER update:', JSON.stringify(executor));
 
                     // Combine prefix and parent name
                     if (prefixInput && parentInput) {
@@ -1208,20 +1232,23 @@
                 }
             });
 
-            // Collect from mobile summary cards
-            document.querySelectorAll('.executor-summary-card').forEach(card => {
-                const id = parseInt(card.getAttribute('data-id'));
-                const dataDiv = card.querySelector('.executor-data');
-                if (dataDiv) {
-                    const data = JSON.parse(dataDiv.getAttribute('data-json') || '{}');
-                    const existingExecutor = executors.find(e => e.id === id);
-                    if (existingExecutor) {
-                        Object.assign(existingExecutor, data);
-                    } else {
-                        executors.push(data);
+            // Collect from mobile summary cards (ONLY on mobile view)
+            // On desktop, mobile cards may contain stale data that would overwrite desktop input values
+            if (isMobile()) {
+                document.querySelectorAll('.executor-summary-card').forEach(card => {
+                    const id = parseInt(card.getAttribute('data-id'));
+                    const dataDiv = card.querySelector('.executor-data');
+                    if (dataDiv) {
+                        const data = JSON.parse(dataDiv.getAttribute('data-json') || '{}');
+                        const existingExecutor = executors.find(e => e.id === id);
+                        if (existingExecutor) {
+                            Object.assign(existingExecutor, data);
+                        } else {
+                            executors.push(data);
+                        }
                     }
-                }
-            });
+                });
+            }
 
             return executors;
         }
@@ -1500,9 +1527,16 @@
         }
 
         function validateAndMoveToBeneficiaries() {
+            console.log('[ValidateAndMove] Starting validation');
+            console.log('[ValidateAndMove] Executors before collectExecutors:', executors);
+
             collectExecutors();
 
+            console.log('[ValidateAndMove] Executors after collectExecutors:', executors);
+
             const primaryExecutors = executors.filter(e => e.isPrimary);
+            console.log('[ValidateAndMove] Primary executors:', primaryExecutors);
+
             if (primaryExecutors.length === 0) {
                 alert("Please add at least one Primary Executor.");
                 return;
@@ -1510,7 +1544,20 @@
 
             let isValid = true;
             executors.forEach(ex => {
+                // Check if executor is completely untouched (all fields empty)
+                const isCompletelyEmpty = !ex.name && !ex.relationship && !ex.address && !ex.parentName;
+
+                console.log('[ValidateAndMove] Executor', ex.id, '- isEmpty:', isCompletelyEmpty, 'name:', ex.name, 'rel:', ex.relationship);
+
+                if (isCompletelyEmpty) {
+                    // Skip validation for completely empty executors (placeholder rows)
+                    console.log('[ValidateAndMove] Skipping empty executor', ex.id);
+                    return;
+                }
+
+                // If executor has been started (at least one field filled), validate required fields
                 if (!ex.name || !ex.relationship) {
+                    console.log('[ValidateAndMove] VALIDATION FAILED for executor', ex.id);
                     isValid = false;
                     // Expand the row with error for desktop
                     const body = document.getElementById(`executor-body-${ex.id}`);
@@ -1527,8 +1574,11 @@
                 }
             });
 
+            console.log('[ValidateAndMove] Final isValid:', isValid);
+
             if (!isValid) {
-                alert("Please fill in Name and Relationship for all executors.");
+                const t = TRANSLATIONS[currentLang];
+                alert(t.errExecutorFields || "Please fill in Name and Relationship for all executors.");
                 return;
             }
 
@@ -3164,7 +3214,7 @@
                 updateMaxReached(4);
                 goToStep(4);
             }
-            if (document.getElementById('asset-container').children.length === 0) addAssetRow();
+            if (document.getElementById('asset-container').children.length === 0) addAssetRow(true);
             if (document.getElementById('residual-shares-list').children.length === 0) addResidualShare();
         }
 
@@ -3213,13 +3263,17 @@
             }
         }
 
-        function addAssetRow() {
+        function addAssetRow(autoInit = false) {
             const t = TRANSLATIONS[currentLang]; // Get translations
 
             // Mobile: Open bottom sheet instead of accordion
             if (isMobile()) {
                 assetCount++;
-                openAssetSheet(assetCount);
+                // Don't auto-open sheet during page navigation (autoInit = true)
+                // Only open when user explicitly clicks "Add Asset" button
+                if (!autoInit) {
+                    openAssetSheet(assetCount);
+                }
                 return;
             }
 
@@ -3516,10 +3570,9 @@
                     const uniqueId = generateUniqueId();
                     const data = { id: uniqueId, benId, share, altId };
                     renderResidualSummaryCard(data.id, data);
-                } else {
-                    // User adding new - open sheet
-                    openResidualSheet();
                 }
+                // Don't auto-open sheet when called without benId (e.g., during page navigation)
+                // User should explicitly click "Add" button to open the sheet
                 return;
             }
 
@@ -3594,6 +3647,10 @@
         }
 
         function saveData() {
+            // Immediately sync executors from DOM to global array
+            // This ensures data is available for validation and language changes
+            collectExecutors();
+
             const statusEl = document.getElementById('save-status');
             statusEl.innerText = "SAVING..."; statusEl.classList.remove('bg-green-600'); statusEl.classList.add('bg-yellow-500');
             clearTimeout(saveTimeout);
