@@ -768,16 +768,19 @@
                         <input type="checkbox" id="modal-dont-show"
                             class="rounded text-indigo-600 focus:ring-indigo-500 h-4 w-4">
                         <label for="modal-dont-show"
-                            class="text-xs font-medium text-gray-500 select-none cursor-pointer">Don't show this warning
+                            class="text-xs font-medium text-gray-500 select-none cursor-pointer"
+                            data-i18n="lblDontShow">Don't show this warning
                             again for beneficiaries</label>
                     </div>
 
                     <div class="flex gap-3 justify-end mt-2">
                         <button onclick="closeWarningModal()"
-                            class="px-4 py-2 bg-white border border-gray-300 rounded-md text-gray-700 text-sm font-bold hover:bg-gray-50 transition">Go
+                            class="px-4 py-2 bg-white border border-gray-300 rounded-md text-gray-700 text-sm font-bold hover:bg-gray-50 transition"
+                            data-i18n="btnGoBack">Go
                             Back</button>
                         <button onclick="confirmWarningModal()"
-                            class="px-4 py-2 bg-indigo-600 text-white rounded-md text-sm font-bold hover:bg-indigo-700 shadow transition">Proceed
+                            class="px-4 py-2 bg-indigo-600 text-white rounded-md text-sm font-bold hover:bg-indigo-700 shadow transition"
+                            data-i18n="btnProceed">Proceed
                             Anyway</button>
                     </div>
                 </div>
@@ -999,14 +1002,14 @@
         }
 
         window.removeSpecificRow = function (uniqueId) {
-            if (confirm("Are you sure you want to remove this asset?")) {
+            if (confirm(TRANSLATIONS[currentLang].confirmDeleteAsset)) {
                 const el = document.getElementById('asset-row-' + uniqueId);
                 if (el) { el.remove(); saveData(); }
             }
         };
 
         window.removeBeneficiaryRow = function (uniqueId) {
-            if (confirm("Remove this beneficiary? This will remove them from any assigned assets.")) {
+            if (confirm(TRANSLATIONS[currentLang].confirmDeleteBen)) {
                 const el = document.getElementById('ben-row-' + uniqueId);
                 if (el) { el.remove(); saveData(); }
             }
@@ -1538,7 +1541,7 @@
             console.log('[ValidateAndMove] Primary executors:', primaryExecutors);
 
             if (primaryExecutors.length === 0) {
-                alert("Please add at least one Primary Executor.");
+                alert(t.errPrimaryExReq || "Please add at least one Primary Executor.");
                 return;
             }
 
@@ -1578,7 +1581,7 @@
 
             if (!isValid) {
                 const t = TRANSLATIONS[currentLang];
-                alert(t.errExecutorFields || "Please fill in Name and Relationship for all executors.");
+                alert(t.errExFields || "Please fill in Name and Relationship for all executors.");
                 return;
             }
 
@@ -1647,16 +1650,39 @@
         }
 
         // Handle browser back/forward buttons
+        // Handle browser back/forward buttons
         window.addEventListener('popstate', (event) => {
+            // Check for open sheets and close them (UI only)
+            const benSheet = document.getElementById('ben-bottom-sheet');
+            if (benSheet && !benSheet.classList.contains('hidden')) {
+                _closeBenSheetUI();
+                return;
+            }
+
+            const residualSheet = document.getElementById('residual-bottom-sheet');
+            if (residualSheet && !residualSheet.classList.contains('hidden')) {
+                _closeResidualSheetUI();
+                return;
+            }
+
+            const assetSheet = document.getElementById('asset-bottom-sheet');
+            if (assetSheet && !assetSheet.classList.contains('hidden')) {
+                _closeAssetSheetUI();
+                return;
+            }
+
             if (event.state && event.state.step !== undefined) {
-                goToStep(event.state.step, true); // Skip history to avoid duplicate entry
+                if (event.state.step !== lastActiveStep) {
+                    goToStep(event.state.step, true); // Skip history to avoid duplicate entry
+                }
             }
         });
 
         function startFresh() {
+            const t = TRANSLATIONS[currentLang];
             showCustomWarning(
-                "⚠️ Delete Draft & Start Over?",
-                "You are about to delete your saved draft. All previous progress will be permanently lost.\n\nAre you sure?",
+                t.warnDeleteDraftTitle,
+                t.warnDeleteDraftMsg,
                 false,
                 () => {
                     // Save current language before clearing data
@@ -1701,9 +1727,41 @@
             }
         }
 
+        function checkDraftStatus() {
+            const raw = localStorage.getItem(STORAGE_KEY);
+            if (!raw) {
+                document.getElementById('resume-banner').classList.add('hidden');
+                document.getElementById('start-btn-container').style.display = '';
+                return;
+            }
+
+            try {
+                const data = JSON.parse(raw);
+                const hasData = data.myName ||
+                    (data.beneficiaries && data.beneficiaries.length > 0) ||
+                    (data.assets && data.assets.length > 0);
+
+                if (hasData) {
+                    document.getElementById('resume-banner').classList.remove('hidden');
+                    document.getElementById('start-btn-container').style.display = 'none';
+                } else {
+                    document.getElementById('resume-banner').classList.add('hidden');
+                    document.getElementById('start-btn-container').style.display = '';
+                }
+            } catch (e) {
+                console.error('Error checking draft status:', e);
+                document.getElementById('resume-banner').classList.add('hidden');
+                document.getElementById('start-btn-container').style.display = '';
+            }
+        }
+
         function goToStep(step, skipHistory = false) {
             lastActiveStep = step;
             document.querySelectorAll('.step-section').forEach(el => el.classList.remove('active'));
+
+            if (step === 0) {
+                checkDraftStatus();
+            }
 
             if (step === 5) {
                 document.getElementById('success-overlay').classList.remove('hidden');
@@ -1784,7 +1842,7 @@
             }
 
             if (!isValid) {
-                alert("Please fill in all mandatory fields highlighted in red.");
+                alert(t.errMandatory || "Please fill in all mandatory fields highlighted in red.");
                 return;
             }
             updateMaxReached(nextStep);
@@ -1944,6 +2002,10 @@
 
         function openBenSheet(benId = null) {
             currentBenSheetId = benId || generateUniqueId();
+
+            // Push state for back button handling
+            history.pushState({ step: lastActiveStep, sheet: 'ben' }, '', '#ben-sheet');
+
             const sheet = document.getElementById('ben-bottom-sheet');
             const container = document.getElementById('ben-sheet-container');
 
@@ -1957,7 +2019,7 @@
             document.body.style.overflow = 'hidden';
         }
 
-        function closeBenSheet() {
+        function _closeBenSheetUI() {
             const sheet = document.getElementById('ben-bottom-sheet');
             const container = document.getElementById('ben-sheet-container');
 
@@ -1966,6 +2028,10 @@
                 sheet.classList.add('hidden');
                 document.body.style.overflow = 'auto';
             }, 300);
+        }
+
+        function closeBenSheet() {
+            history.back();
         }
 
         function renderBenSheet(benId) {
@@ -2099,7 +2165,7 @@
             };
 
             if (!data.name) {
-                alert('Please enter beneficiary name');
+                alert(t.errBenName || 'Please enter beneficiary name');
                 return;
             }
 
@@ -2118,6 +2184,10 @@
 
         function openResidualSheet(residualId = null) {
             currentResidualSheetId = residualId || generateUniqueId();
+
+            // Push state for back button handling
+            history.pushState({ step: lastActiveStep, sheet: 'residual' }, '', '#residual-sheet');
+
             const sheet = document.getElementById('residual-bottom-sheet');
             const container = document.getElementById('residual-sheet-container');
 
@@ -2130,7 +2200,7 @@
             document.body.style.overflow = 'hidden';
         }
 
-        function closeResidualSheet() {
+        function _closeResidualSheetUI() {
             const sheet = document.getElementById('residual-bottom-sheet');
             const container = document.getElementById('residual-sheet-container');
 
@@ -2139,6 +2209,10 @@
                 sheet.classList.add('hidden');
                 document.body.style.overflow = 'auto';
             }, 300);
+        }
+
+        function closeResidualSheet() {
+            history.back();
         }
 
         function renderResidualSheet(residualId) {
@@ -2231,7 +2305,7 @@
             };
 
             if (!data.benId) {
-                alert('Please select a beneficiary');
+                alert(t.errSelectBen || 'Please select a beneficiary');
                 return;
             }
 
@@ -2324,6 +2398,10 @@
             if (!isMobile() || isLoadingData) return; // Only for mobile and not during data load
 
             currentAssetSheetId = assetId;
+
+            // Push state for back button handling
+            history.pushState({ step: lastActiveStep, sheet: 'asset' }, '', '#asset-sheet');
+
             const t = TRANSLATIONS[currentLang];
             const sheet = document.getElementById('asset-bottom-sheet');
             const container = document.getElementById('asset-sheet-container');
@@ -2345,7 +2423,7 @@
             }, 10);
         }
 
-        function closeAssetSheet() {
+        function _closeAssetSheetUI() {
             const sheet = document.getElementById('asset-bottom-sheet');
             const container = document.getElementById('asset-sheet-container');
 
@@ -2357,6 +2435,10 @@
                 document.body.style.overflow = 'auto';
                 currentAssetSheetId = null;
             }, 300);
+        }
+
+        function closeAssetSheet() {
+            history.back();
         }
 
         function renderAssetSheet(assetId) {
@@ -2594,7 +2676,7 @@
         function saveAssetSheet() {
             const type = document.getElementById('sheet-asset-type').value;
             if (!type) {
-                alert('Please select an asset type');
+                alert(t.errSelectAssetType || 'Please select an asset type');
                 return;
             }
 
@@ -2736,7 +2818,7 @@
         }
 
         function removeMobileAsset(assetId) {
-            if (confirm('Remove this asset?')) {
+            if (confirm(TRANSLATIONS[currentLang].confirmDeleteAsset)) {
                 document.getElementById(`asset-row-${assetId}`)?.remove();
                 saveData();
             }
@@ -3245,7 +3327,7 @@
             const totalBens = desktopBens.length + mobileBens.length;
 
             if (totalBens === 0) {
-                alert("Please add at least one beneficiary.");
+                alert(t.errAddBen || "Please add at least one beneficiary.");
                 return;
             }
 
@@ -3504,7 +3586,7 @@
                 updateAssetHeader(assetId); // Update header count
                 saveData();
             }
-            else alert("Asset must have at least one beneficiary.");
+            else alert(t.errAssetBenReq || "Asset must have at least one beneficiary.");
         }
 
         // Updated for Consistency
@@ -3966,7 +4048,7 @@
                     if (!bId) { document.getElementById(`asset-body-${uniqueId}`).classList.remove('hidden'); sr.querySelector('.ben-select-share').classList.add('error-border'); isValid = false; }
                     totalShare += share;
                 });
-                if (totalShare !== 100) { document.getElementById(`asset-body-${uniqueId}`).classList.remove('hidden'); alert(`Error: Total share must be 100%.`); isValid = false; return; }
+                if (totalShare !== 100) { document.getElementById(`asset-body-${uniqueId}`).classList.remove('hidden'); alert(t.errTotalShare || `Error: Total share must be 100%.`); isValid = false; return; }
             });
 
             let residualTotal = 0; let hasResBen = false;
@@ -3987,8 +4069,8 @@
                 }
             });
 
-            if (!hasResBen) { alert("Please select at least one Residual Beneficiary."); closePreview(); goToStep(4); return; }
-            if (residualTotal !== 100) { alert(`Residual shares must total 100%.`); closePreview(); goToStep(4); return; }
+            if (!hasResBen) { alert(t.errResidualReq || "Please select at least one Residual Beneficiary."); closePreview(); goToStep(4); return; }
+            if (residualTotal !== 100) { alert(t.errResidualTotal || `Residual shares must total 100%.`); closePreview(); goToStep(4); return; }
             if (!isValid) { closePreview(); goToStep(4); return; }
 
             performSave(); // Force save before generation
@@ -4015,7 +4097,7 @@
 
         async function generatePDF() {
             if (currentLang === 'hi') {
-                alert("PDF generation is currently not supported for Hindi. Please download the Editable (.rtf) version.");
+                alert(t.errPdfHindi || "PDF generation is currently not supported for Hindi. Please download the Editable (.rtf) version.");
                 return;
             }
             const t = TRANSLATIONS[currentLang]; // Define translation helper
