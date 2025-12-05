@@ -1,0 +1,4 @@
+User-agent: *
+Allow: /
+
+Sitemap: https://will-away.pages.dev/llms.txt

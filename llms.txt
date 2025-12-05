@@ -1,0 +1,26 @@
+# Sahay - Free Online Will Maker
+
+## Summary
+Sahay is a secure, client-side only web application that allows users in India to create a legal Will in minutes for free. It requires no login, stores no data on servers, and generates a downloadable PDF instantly.
+
+## Key Features
+- **Privacy First**: All data remains on the user's device (local storage). No data is sent to any server.
+- **Free & Open**: Completely free to use with no hidden costs.
+- **Instant PDF**: Generates a legally valid Will PDF using client-side libraries.
+- **Comprehensive**: Supports Executors (Primary & Alternate), Beneficiaries (including Minors with Guardians), and various Asset types (Bank Accounts, Real Estate, Stocks, etc.).
+- **Localization**: Supports English and Hindi languages.
+
+## How It Works
+1.  **Personal Details**: User enters their basic information.
+2.  **Executors**: User appoints trusted individuals to carry out the Will.
+3.  **Beneficiaries**: User lists who will inherit their assets. Supports minor beneficiaries by asking for guardian details.
+4.  **Assets**: User lists their assets and allocates them to beneficiaries (percentage or specific items).
+5.  **Review & Download**: User reviews the draft and downloads the final PDF.
+
+## Technical Details
+- **Stack**: HTML5, Tailwind CSS, Vanilla JavaScript.
+- **PDF Generation**: Uses `jspdf` library for client-side PDF creation.
+- **Storage**: Uses browser `localStorage` to save drafts.
+
+## Usage
+Visit [https://will-away.pages.dev/](https://will-away.pages.dev/) to start creating a Will. The interface guides you through each step with validation to ensure completeness.
