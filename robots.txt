@@ -2,3 +2,4 @@ User-agent: *
 Allow: /
 
 Sitemap: https://will-away.pages.dev/llms.txt
+Sitemap: https://will-away.pages.dev/sitemap.xml
