@@ -1150,8 +1150,113 @@
         // Toggle executor row expansion
         function toggleExecutorRow(id) {
             const body = document.getElementById(`executor-body-${id}`);
-            if (body) {
-                body.classList.toggle('hidden');
+            if (!body) return; // Safety check if body element doesn't exist
+            const isHidden = body.classList.contains('hidden');
+
+            if (!isHidden) {
+                // Validate before collapsing
+                const nameInput = document.getElementById(`ex-name-${id}`);
+                const relInput = document.getElementById(`ex-rel-${id}`);
+                const name = nameInput.value.trim();
+                const rel = relInput.value.trim();
+                let isValid = true;
+
+                if (!name) {
+                    nameInput.classList.add('error-border');
+                    isValid = false;
+                } else {
+                    nameInput.classList.remove('error-border');
+                }
+
+                if (!rel) {
+                    relInput.classList.add('error-border');
+                    isValid = false;
+                } else {
+                    relInput.classList.remove('error-border');
+                }
+
+                if (!isValid) return; // Stop collapse if invalid
+            }
+
+            if (isHidden) {
+                body.classList.remove('hidden');
+            } else {
+                body.classList.add('hidden');
+                updateExecutorHeader(id);
+            }
+        }
+
+        function toggleBeneficiary(uniqueId) {
+            console.log(`[toggleBeneficiary] Called for ${uniqueId}`);
+            const body = document.getElementById(`ben-body-${uniqueId}`);
+            const isHidden = body.classList.contains('hidden');
+
+            if (!isHidden) {
+                // Validate before collapsing
+                const nameInput = document.getElementById(`ben-name-${uniqueId}`);
+                const relInput = document.getElementById(`ben-rel-${uniqueId}`);
+                const name = nameInput.value.trim();
+                const rel = relInput.value.trim();
+
+                // Check visibility for guardian validation
+                const guardianDiv = document.getElementById(`guardian-div-${uniqueId}`);
+                const isGuardianVisible = guardianDiv && !guardianDiv.classList.contains('hidden');
+                const gNameInput = document.getElementById(`guardian-name-${uniqueId}`);
+                const gRelInput = document.getElementById(`guardian-rel-${uniqueId}`);
+
+                console.log(`[toggleBeneficiary] Validating: Name=${name}, Rel=${rel}, GuardianVisible=${isGuardianVisible}`);
+
+                let isValid = true;
+
+                if (!name) {
+                    nameInput.classList.add('error-border');
+                    isValid = false;
+                } else {
+                    nameInput.classList.remove('error-border');
+                }
+
+                if (!rel) {
+                    relInput.classList.add('error-border');
+                    isValid = false;
+                } else {
+                    relInput.classList.remove('error-border');
+                }
+
+                if (isGuardianVisible) {
+                    if (!gNameInput.value.trim()) {
+                        gNameInput.classList.add('error-border');
+                        isValid = false;
+                    } else {
+                        gNameInput.classList.remove('error-border');
+                    }
+                    if (!gRelInput.value.trim()) {
+                        gRelInput.classList.add('error-border');
+                        isValid = false;
+                    } else {
+                        gRelInput.classList.remove('error-border');
+                    }
+                }
+
+                if (!isValid) {
+                    console.log(`[toggleBeneficiary] Validation failed`);
+                    return; // Stop collapse if invalid
+                }
+            }
+
+            if (isHidden) {
+                // Close others and highlight current
+                document.querySelectorAll('[id^="ben-body-"]').forEach(el => el.classList.add('hidden'));
+                document.querySelectorAll('.beneficiary-item').forEach(el => el.classList.remove('ring-2', 'ring-blue-100'));
+
+                body.classList.remove('hidden');
+                const row = document.getElementById(`ben-row-${uniqueId}`);
+                if (row) row.classList.add('ring-2', 'ring-blue-100');
+            } else {
+                body.classList.add('hidden');
+                const row = document.getElementById(`ben-row-${uniqueId}`);
+                if (row) row.classList.remove('ring-2', 'ring-blue-100');
+                updateBeneficiaryHeader(uniqueId);
+                saveData();
             }
         }
 
@@ -1547,6 +1652,7 @@
         }
 
         function validateAndMoveToBeneficiaries() {
+            const t = TRANSLATIONS[currentLang];
             console.log('[ValidateAndMove] Starting validation');
             console.log('[ValidateAndMove] Executors before collectExecutors:', executors);
 
@@ -1564,18 +1670,7 @@
 
             let isValid = true;
             executors.forEach(ex => {
-                // Check if executor is completely untouched (all fields empty)
-                const isCompletelyEmpty = !ex.name && !ex.relationship && !ex.address && !ex.parentName;
-
-                console.log('[ValidateAndMove] Executor', ex.id, '- isEmpty:', isCompletelyEmpty, 'name:', ex.name, 'rel:', ex.relationship);
-
-                if (isCompletelyEmpty) {
-                    // Skip validation for completely empty executors (placeholder rows)
-                    console.log('[ValidateAndMove] Skipping empty executor', ex.id);
-                    return;
-                }
-
-                // If executor has been started (at least one field filled), validate required fields
+                // If executor exists in the list, it must be valid (name and relationship required)
                 if (!ex.name || !ex.relationship) {
                     console.log('[ValidateAndMove] VALIDATION FAILED for executor', ex.id);
                     isValid = false;
@@ -2119,10 +2214,17 @@
                         </select>
                     </div>
 
-                    <!-- Minor Checkbox -->
-                    <div class="flex items-center bg-gray-50 p-3 rounded-lg">
-                        <input type="checkbox" id="sheet-ben-minor" class="w-5 h-5 text-indigo-600 rounded" onchange="document.getElementById('sheet-guardian-section').classList.toggle('hidden', !this.checked)" ${data && data.isMinor ? 'checked' : ''}>
-                        <label for="sheet-ben-minor" class="ml-3 text-sm font-bold text-gray-700">${t.dynIsMinor}</label>
+                    <!-- Minor Toggle (Yes/No) -->
+                    <div class="bg-gray-50 p-3 rounded-lg">
+                        <label class="block text-sm font-bold text-gray-700 mb-2">${t.dynIsMinor}</label>
+                        <div class="flex bg-gray-200 p-1 rounded-lg">
+                            <button type="button" onclick="document.getElementById('sheet-ben-minor').checked = false; document.getElementById('sheet-guardian-section').classList.add('hidden'); this.classList.add('bg-white', 'shadow', 'text-indigo-600'); this.nextElementSibling.classList.remove('bg-white', 'shadow', 'text-indigo-600'); this.nextElementSibling.classList.add('text-gray-500');" 
+                                class="flex-1 py-2 rounded-md text-sm font-bold transition-all ${data && data.isMinor ? 'text-gray-500' : 'bg-white shadow text-indigo-600'}">No</button>
+                            <button type="button" onclick="document.getElementById('sheet-ben-minor').checked = true; document.getElementById('sheet-guardian-section').classList.remove('hidden'); this.classList.add('bg-white', 'shadow', 'text-indigo-600'); this.previousElementSibling.classList.remove('bg-white', 'shadow', 'text-indigo-600'); this.previousElementSibling.classList.add('text-gray-500');" 
+                                class="flex-1 py-2 rounded-md text-sm font-bold transition-all ${data && data.isMinor ? 'bg-white shadow text-indigo-600' : 'text-gray-500'}">Yes</button>
+                        </div>
+                        <!-- Hidden Checkbox for Logic Compatibility -->
+                        <input type="checkbox" id="sheet-ben-minor" class="hidden" ${data && data.isMinor ? 'checked' : ''}>
                     </div>
 
                     <!-- Guardian Section -->
@@ -2168,6 +2270,7 @@
         }
 
         function saveBenSheet() {
+            const t = TRANSLATIONS[currentLang];
             const benId = currentBenSheetId;
 
             // Collect Data
@@ -2187,8 +2290,18 @@
                 defaultAltId: document.getElementById('sheet-ben-defaultAlt').value
             };
 
-            if (!data.name) {
-                alert(t.errBenName || 'Please enter beneficiary name');
+            const missingFields = [];
+            if (!data.name) missingFields.push(t.dynFullName || "Full Name");
+            if (!data.rel) missingFields.push(t.dynRelationship || "Relationship");
+
+            if (data.isMinor) {
+                if (!data.gName) missingFields.push(t.dynGuardianName || "Guardian Name");
+                if (!data.gRel) missingFields.push(t.dynGuardianRel || "Guardian Relationship");
+            }
+
+            if (missingFields.length > 0) {
+                const fieldsStr = missingFields.join(' and ');
+                alert(`${t.errEnter || "Please enter"} ${fieldsStr}`);
                 return;
             }
 
@@ -3143,21 +3256,7 @@
         }
 
         // Beneficiaries
-        function toggleBeneficiary(uniqueId) {
-            const body = document.getElementById(`ben-body-${uniqueId}`);
-            const row = document.getElementById(`ben-row-${uniqueId}`);
 
-            if (body.classList.contains('hidden')) {
-                document.querySelectorAll('[id^="ben-body-"]').forEach(el => el.classList.add('hidden'));
-                document.querySelectorAll('.beneficiary-item').forEach(el => el.classList.remove('ring-2', 'ring-blue-100'));
-                body.classList.remove('hidden');
-                row.classList.add('ring-2', 'ring-blue-100');
-            } else {
-                body.classList.add('hidden');
-                row.classList.remove('ring-2', 'ring-blue-100');
-                saveData();
-            }
-        }
 
         function updateBeneficiaryHeader(uniqueId) {
             const t = TRANSLATIONS[currentLang];
@@ -3284,48 +3383,58 @@
                         </div>
 
                         <!-- Options -->
-                         <div class="grid grid-cols-1 md:grid-cols-2 gap-4 mb-4">
-                            <div>
-                                <label class="text-[10px] font-bold text-gray-400 uppercase tracking-wide block mb-1">${t.dynDefaultAlternate}</label>
-                                <select id="ben-defaultAlt-${uniqueId}" class="w-full border p-2 rounded text-sm bg-white text-gray-600 outline-none" onchange="saveData()">
-                                    <option value="">-- ${t.dynDefaultAlternate} --</option>
-                                </select>
-                            </div>
-                            <div class="flex items-center mt-6">
-                                <input type="checkbox" id="ben-minor-${uniqueId}" class="w-4 h-4 text-blue-600 rounded" onchange="toggleGuardianSection('${uniqueId}')" ${data && data.isMinor ? 'checked' : ''}>
-                                <label for="ben-minor-${uniqueId}" class="ml-2 text-sm text-gray-700 font-bold select-none cursor-pointer">${t.dynIsMinor}</label>
-                            </div>
+                         <div class="mb-4">
+                            <label class="text-[10px] font-bold text-gray-400 uppercase tracking-wide block mb-1">${t.dynDefaultAlternate}</label>
+                            <select id="ben-defaultAlt-${uniqueId}" class="w-full border p-2 rounded text-sm bg-white text-gray-600 outline-none" onchange="saveData()">
+                                <option value="">-- ${t.dynDefaultAlternate} --</option>
+                            </select>
                          </div>
 
-                         <!-- Guardian Section (Clean) -->
-                         <div id="guardian-div-${uniqueId}" class="mt-3 pt-3 border-t border-gray-200 ${data && data.isMinor ? '' : 'hidden'}">
-                             <div class="grid grid-cols-1 md:grid-cols-2 gap-3 mb-2">
-                                <div>
-                                    <label class="text-[10px] font-bold uppercase text-gray-500 block mb-1">${t.dynGuardianName}</label>
-                                    <input type="text" id="guardian-name-${uniqueId}" class="w-full border p-2 rounded text-sm outline-none" placeholder="${t.dynPhGuardianName}" value="${data ? data.gName : ''}" oninput="saveData()">
+                         <!-- Guardian Section (Grouped) -->
+                         <div class="bg-indigo-50 border border-indigo-100 rounded-lg p-3 mt-4">
+                            <div class="flex items-center justify-between mb-2">
+                                <h4 class="text-xs font-bold text-indigo-800 uppercase tracking-wide">Guardian Details</h4>
+                                <div class="flex items-center gap-2">
+                                    <label class="text-[10px] font-bold text-indigo-600 uppercase">${t.dynIsMinor}</label>
+                                    <div class="flex bg-white p-1 rounded border border-indigo-200">
+                                        <button type="button" onclick="document.getElementById('ben-minor-${uniqueId}').checked = false; toggleGuardianSection('${uniqueId}'); this.classList.add('bg-indigo-600', 'text-white', 'shadow-sm'); this.nextElementSibling.classList.remove('bg-indigo-600', 'text-white', 'shadow-sm'); this.nextElementSibling.classList.add('text-indigo-400');" 
+                                            class="px-3 py-0.5 rounded text-xs font-bold transition-all ${data && data.isMinor ? 'text-indigo-400' : 'bg-indigo-600 text-white shadow-sm'}">No</button>
+                                        <button type="button" onclick="document.getElementById('ben-minor-${uniqueId}').checked = true; toggleGuardianSection('${uniqueId}'); this.classList.add('bg-indigo-600', 'text-white', 'shadow-sm'); this.previousElementSibling.classList.remove('bg-indigo-600', 'text-white', 'shadow-sm'); this.previousElementSibling.classList.add('text-indigo-400');" 
+                                            class="px-3 py-0.5 rounded text-xs font-bold transition-all ${data && data.isMinor ? 'bg-indigo-600 text-white shadow-sm' : 'text-indigo-400'}">Yes</button>
+                                    </div>
                                 </div>
-                                <div>
-                                    <label class="text-[10px] font-bold uppercase text-gray-500 block mb-1">${t.dynGuardianRel}</label>
-                                    <input type="text" id="guardian-rel-${uniqueId}" class="w-full border p-2 rounded text-sm outline-none" placeholder="${t.dynPhGuardianRel}" value="${data ? data.gRel : ''}" oninput="saveData()">
-                                </div>
-                             </div>
-                             <div class="grid grid-cols-1 md:grid-cols-2 gap-3">
-                                <div>
-                                    <label class="text-[10px] font-bold uppercase text-gray-500 block mb-1">${t.dynGuardianParent}</label>
-                                     <div class="flex gap-2">
-                                         <select id="ben-gRelPrefix-${uniqueId}" onchange="saveData()" class="w-28 border p-2 rounded text-sm bg-white text-gray-600 outline-none">
-                                             <option value="S/o" ${data && data.gRelPrefix === 'S/o' ? 'selected' : ''}>${t.optSonOf}</option>
-                                             <option value="D/o" ${data && data.gRelPrefix === 'D/o' ? 'selected' : ''}>${t.optDaughterOf}</option>
-                                             <option value="W/o" ${data && data.gRelPrefix === 'W/o' ? 'selected' : ''}>${t.optWifeOf}</option>
-                                         </select>
-                                         <input type="text" id="guardian-father-${uniqueId}" class="w-full border p-2 rounded text-sm outline-none" placeholder="${t.dynPhName}" value="${data ? data.gFather : ''}" oninput="saveData()">
-                                     </div>
-                                </div>
-                                <div>
-                                    <label class="text-[10px] font-bold uppercase text-gray-500 block mb-1">${t.dynGuardianAddress}</label>
-                                    <input type="text" id="guardian-addr-${uniqueId}" class="w-full border p-2 rounded text-sm outline-none" placeholder="${t.dynPhGuardianAddress}" value="${data ? data.gAddr : ''}" oninput="saveData()">
-                                </div>
-                             </div>
+                            </div>
+                            <input type="checkbox" id="ben-minor-${uniqueId}" class="hidden" ${data && data.isMinor ? 'checked' : ''}>
+
+                            <div id="guardian-div-${uniqueId}" class="${data && data.isMinor ? '' : 'hidden'}">
+                                 <div class="grid grid-cols-1 md:grid-cols-2 gap-2 mb-2">
+                                    <div>
+                                        <label class="text-[10px] font-bold uppercase text-indigo-600 block mb-1">${t.dynGuardianName}</label>
+                                        <input type="text" id="guardian-name-${uniqueId}" class="w-full border border-indigo-200 p-1.5 rounded text-sm outline-none focus:border-indigo-500" placeholder="${t.dynPhGuardianName}" value="${data ? data.gName : ''}" oninput="saveData()">
+                                    </div>
+                                    <div>
+                                        <label class="text-[10px] font-bold uppercase text-indigo-600 block mb-1">${t.dynGuardianRel}</label>
+                                        <input type="text" id="guardian-rel-${uniqueId}" class="w-full border border-indigo-200 p-1.5 rounded text-sm outline-none focus:border-indigo-500" placeholder="${t.dynPhGuardianRel}" value="${data ? data.gRel : ''}" oninput="saveData()">
+                                    </div>
+                                 </div>
+                                 <div class="grid grid-cols-1 md:grid-cols-2 gap-2">
+                                    <div>
+                                        <label class="text-[10px] font-bold uppercase text-indigo-600 block mb-1">${t.dynGuardianParent}</label>
+                                         <div class="flex gap-2">
+                                             <select id="ben-gRelPrefix-${uniqueId}" onchange="saveData()" class="w-28 border border-indigo-200 p-1.5 rounded text-sm bg-white text-indigo-800 outline-none focus:border-indigo-500">
+                                                 <option value="S/o" ${data && data.gRelPrefix === 'S/o' ? 'selected' : ''}>${t.optSonOf}</option>
+                                                 <option value="D/o" ${data && data.gRelPrefix === 'D/o' ? 'selected' : ''}>${t.optDaughterOf}</option>
+                                                 <option value="W/o" ${data && data.gRelPrefix === 'W/o' ? 'selected' : ''}>${t.optWifeOf}</option>
+                                             </select>
+                                             <input type="text" id="guardian-father-${uniqueId}" class="w-full border border-indigo-200 p-1.5 rounded text-sm outline-none focus:border-indigo-500" placeholder="${t.dynPhName}" value="${data ? data.gFather : ''}" oninput="saveData()">
+                                         </div>
+                                    </div>
+                                    <div>
+                                        <label class="text-[10px] font-bold uppercase text-indigo-600 block mb-1">${t.dynPermAddress}</label>
+                                        <textarea id="guardian-addr-${uniqueId}" class="w-full border border-indigo-200 p-1.5 rounded text-sm outline-none focus:border-indigo-500" rows="1" placeholder="${t.dynPhAddress}" oninput="saveData()">${data ? data.gAddr : ''}</textarea>
+                                    </div>
+                                 </div>
+                            </div>
                          </div>
 
                         <div class="text-center mt-6">
@@ -3344,6 +3453,7 @@
         }
 
         function validateAndMoveToAssets() {
+            const t = TRANSLATIONS[currentLang];
             // Check for both desktop and mobile beneficiaries
             const desktopBens = document.querySelectorAll('.beneficiary-item:not(.ben-summary-card)');
             const mobileBens = document.querySelectorAll('.ben-summary-card');
@@ -3361,14 +3471,46 @@
                 const uid = row.getAttribute('data-id');
                 const name = document.getElementById(`ben-name-${uid}`).value.trim();
                 const rel = document.getElementById(`ben-rel-${uid}`).value.trim();
-                if (!name || !rel) {
+
+                // Check visibility instead of checkbox state for robustness
+                const guardianDiv = document.getElementById(`guardian-div-${uid}`);
+                const isGuardianVisible = guardianDiv && !guardianDiv.classList.contains('hidden');
+
+                const gName = document.getElementById(`guardian-name-${uid}`).value.trim();
+                const gRel = document.getElementById(`guardian-rel-${uid}`).value.trim();
+
+                console.log(`[Validation] Row ${uid}: Name=${name}, GuardianVisible=${isGuardianVisible}, GName=${gName}, GRel=${gRel}`);
+
+                let rowValid = true;
+                if (!name) { document.getElementById(`ben-name-${uid}`).classList.add('error-border'); rowValid = false; }
+                else document.getElementById(`ben-name-${uid}`).classList.remove('error-border');
+
+                if (!rel) { document.getElementById(`ben-rel-${uid}`).classList.add('error-border'); rowValid = false; }
+                else document.getElementById(`ben-rel-${uid}`).classList.remove('error-border');
+
+                if (isGuardianVisible) {
+                    if (!gName) {
+                        console.log(`[Validation] Row ${uid}: Missing Guardian Name`);
+                        document.getElementById(`guardian-name-${uid}`).classList.add('error-border');
+                        rowValid = false;
+                    }
+                    else document.getElementById(`guardian-name-${uid}`).classList.remove('error-border');
+
+                    if (!gRel) {
+                        console.log(`[Validation] Row ${uid}: Missing Guardian Rel`);
+                        document.getElementById(`guardian-rel-${uid}`).classList.add('error-border');
+                        rowValid = false;
+                    }
+                    else document.getElementById(`guardian-rel-${uid}`).classList.remove('error-border');
+                }
+
+                if (!rowValid) {
                     document.getElementById(`ben-body-${uid}`).classList.remove('hidden');
-                    if (!name) document.getElementById(`ben-name-${uid}`).classList.add('error-border');
-                    if (!rel) document.getElementById(`ben-rel-${uid}`).classList.add('error-border');
+                    // Ensure guardian section is visible if minor validation failed
+                    if (isMinor && (!gName || !gRel)) {
+                        document.getElementById(`guardian-div-${uid}`).classList.remove('hidden');
+                    }
                     isValid = false;
-                } else {
-                    document.getElementById(`ben-name-${uid}`).classList.remove('error-border');
-                    document.getElementById(`ben-rel-${uid}`).classList.remove('error-border');
                 }
             });
 
@@ -3377,6 +3519,8 @@
             if (isValid) {
                 updateMaxReached(4);
                 goToStep(4);
+            } else {
+                alert(t.errMandatory || "Please fill in all mandatory fields.");
             }
             if (document.getElementById('asset-container').children.length === 0) addAssetRow(true);
             if (document.getElementById('residual-shares-list').children.length === 0) addResidualShare();
