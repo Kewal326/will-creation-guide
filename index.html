@@ -657,7 +657,7 @@
             </div>
 
             <!-- RESIDUAL CLAUSE CARD (UNIFIED UI) -->
-            <div
+            <div id="residual-section"
                 class="bg-white rounded-lg shadow-sm border border-gray-200 overflow-hidden ring-2 ring-transparent hover:ring-indigo-50 transition-all">
                 <!-- Header -->
                 <div class="bg-white p-4 border-b border-gray-100 flex justify-between items-center select-none">
@@ -1060,9 +1060,37 @@
         window.removeBeneficiaryRow = function (uniqueId) {
             if (confirm(TRANSLATIONS[currentLang].confirmDeleteBen)) {
                 const el = document.getElementById('ben-row-' + uniqueId);
-                if (el) { el.remove(); saveData(); }
+                if (el) {
+                    el.remove();
+                    cleanupBeneficiaryFromAssets(uniqueId);
+                    saveData();
+                }
             }
         };
+
+        function cleanupBeneficiaryFromAssets(benId) {
+            // Update Mobile Summary Cards
+            document.querySelectorAll('.asset-summary-card').forEach(card => {
+                const dataDiv = card.querySelector('.asset-data');
+                if (dataDiv) {
+                    let beneficiaries = JSON.parse(dataDiv.getAttribute('data-beneficiaries') || '[]');
+                    const originalLength = beneficiaries.length;
+                    beneficiaries = beneficiaries.filter(b => String(b.benId) !== String(benId));
+
+                    if (beneficiaries.length !== originalLength) {
+                        // Update data attribute
+                        dataDiv.setAttribute('data-beneficiaries', JSON.stringify(beneficiaries));
+
+                        // Update UI Text (Count)
+                        const t = TRANSLATIONS[currentLang];
+                        const countEl = card.querySelector('p.text-xs.text-gray-500');
+                        if (countEl) {
+                            countEl.innerText = `→ ${beneficiaries.length} ${t.dynBeneficiaries}`;
+                        }
+                    }
+                }
+            });
+        }
 
         // --- Multiple Executors Functions ---
 
@@ -1586,6 +1614,14 @@
             document.getElementById('sheet-ex-parent').value = parentNameOnly;
             document.getElementById('sheet-ex-prefix').value = prefix;
 
+            // Update prefix options text
+            const prefixSelect = document.getElementById('sheet-ex-prefix');
+            if (prefixSelect) {
+                prefixSelect.options[0].textContent = t.optSonOf;
+                prefixSelect.options[1].textContent = t.optDaughterOf;
+                prefixSelect.options[2].textContent = t.optWifeOf;
+            }
+
             overlay.classList.remove('hidden');
             sheet.classList.remove('hidden');
             setTimeout(() => {
@@ -1832,6 +1868,12 @@
                 return;
             }
 
+            const previewOverlay = document.getElementById('preview-overlay');
+            if (previewOverlay && !previewOverlay.classList.contains('hidden')) {
+                _closePreviewUI();
+                return;
+            }
+
             if (event.state && event.state.step !== undefined) {
                 if (event.state.step !== lastActiveStep) {
                     goToStep(event.state.step, true); // Skip history to avoid duplicate entry
@@ -1943,7 +1985,236 @@
             }
         }
 
+
+        // --- STEP VALIDATION FUNCTIONS ---
+        function validateStep1() {
+            const t = TRANSLATIONS[currentLang];
+            const requiredFields = ['myName', 'fatherName', 'myDob', 'myAddress', 'myPlace'];
+
+            for (const fieldId of requiredFields) {
+                const field = document.getElementById(fieldId);
+                if (!field || !field.value.trim()) {
+                    return { valid: false, message: t.errMandatory || 'Please fill in all mandatory fields.', step: 1 };
+                }
+            }
+
+            // Check custom religion if "Other" is selected
+            if (document.getElementById('religionSelector').value === 'Other') {
+                const customReligion = document.getElementById('customReligion');
+                if (!customReligion || !customReligion.value.trim()) {
+                    return { valid: false, message: t.errMandatory || 'Please specify your religion.', step: 1 };
+                }
+            }
+
+            return { valid: true };
+        }
+
+        function validateStep2() {
+            const t = TRANSLATIONS[currentLang];
+
+            // Check if at least one executor exists
+            if (!executors || executors.length === 0) {
+                return { valid: false, message: t.errAddExecutor || 'Please add at least one executor.', step: 2 };
+            }
+
+            // Check if at least one primary executor exists
+            const hasPrimary = executors.some(ex => ex.isPrimary);
+            if (!hasPrimary) {
+                return { valid: false, message: 'Please add at least one primary executor.', step: 2 };
+            }
+
+            return { valid: true };
+        }
+
+        function validateStep3() {
+            const t = TRANSLATIONS[currentLang];
+            performSave(); // Ensure beneficiaries array is up to date
+
+            if (!beneficiaries || beneficiaries.length === 0) {
+                return { valid: false, message: t.errAddBen || 'Please add at least one beneficiary.', step: 3 };
+            }
+
+            return { valid: true };
+        }
+
+        function validateStep4() {
+            const t = TRANSLATIONS[currentLang];
+            performSave(); // Ensure data is up to date
+
+            // First check if beneficiaries exist (prerequisite)
+            if (!beneficiaries || beneficiaries.length === 0) {
+                return { valid: false, message: t.errAddBen || 'Please add at least one beneficiary before adding assets.', step: 3 };
+            }
+
+            // Validate desktop assets
+            const assets = document.querySelectorAll('.asset-item');
+            for (const row of assets) {
+                const uniqueId = row.id.replace('asset-row-', '');
+                let totalShare = 0;
+                let beneficiaryCount = 0;
+                row.querySelectorAll('.share-row').forEach(sr => {
+                    const benId = sr.querySelector('.ben-select-share')?.value;
+                    const share = parseFloat(sr.querySelector('.share-input').value) || 0;
+                    if (benId) {
+                        beneficiaryCount++;
+                        totalShare += share;
+                    }
+                });
+                if (beneficiaryCount === 0 || totalShare !== 100) {
+                    return { valid: false, message: t.errTotalShare || 'All assets must have 100% distribution.', step: 4, assetId: uniqueId };
+                }
+            }
+
+            // Validate mobile assets
+            const mobileAssets = document.querySelectorAll('.asset-summary-card');
+            for (const card of mobileAssets) {
+                const dataDiv = card.querySelector('.asset-data');
+                if (dataDiv) {
+                    const beneficiaries = JSON.parse(dataDiv.getAttribute('data-beneficiaries') || '[]');
+                    let totalShare = 0;
+                    let validBeneficiaryCount = 0;
+                    beneficiaries.forEach(b => {
+                        if (b.benId) {
+                            validBeneficiaryCount++;
+                            totalShare += parseFloat(b.share) || 0;
+                        }
+                    });
+                    if (validBeneficiaryCount === 0 || totalShare !== 100) {
+                        const assetId = card.id.replace('asset-row-', '');
+                        return { valid: false, message: t.errTotalShare || 'All assets must have 100% distribution.', step: 4, assetId };
+                    }
+                }
+            }
+
+            // Validate residual beneficiaries
+            let residualTotal = 0;
+            let hasResBen = false;
+            document.querySelectorAll('.residual-row').forEach(row => {
+                if (row.querySelector('.residual-ben-select').value) hasResBen = true;
+                residualTotal += parseFloat(row.querySelector('.residual-share-input').value) || 0;
+            });
+            document.querySelectorAll('.residual-summary-card').forEach(card => {
+                const dataDiv = card.querySelector('.residual-data');
+                if (dataDiv) {
+                    const data = JSON.parse(dataDiv.getAttribute('data-json') || '{}');
+                    if (data.benId) hasResBen = true;
+                    residualTotal += parseFloat(data.share) || 0;
+                }
+            });
+
+            if (!hasResBen) {
+                return { valid: false, message: t.errResidualReq || 'Please select at least one Residual Beneficiary.', step: 4, residual: true };
+            }
+            if (residualTotal !== 100) {
+                return { valid: false, message: t.errResidualTotal || 'Residual shares must total 100%.', step: 4, residual: true };
+            }
+
+            return { valid: true };
+        }
+
         function navigateToStep(step) {
+            // Allow free backward navigation
+            if (step < lastActiveStep) {
+                if (step <= maxReachedStep) {
+                    goToStep(step);
+                }
+                return;
+            }
+
+            // Validate all steps from 1 to target step when moving forward
+            for (let i = 1; i <= Math.min(step, 4); i++) {
+                let validation;
+                switch (i) {
+                    case 1: validation = validateStep1(); break;
+                    case 2: validation = validateStep2(); break;
+                    case 3: validation = validateStep3(); break;
+                    case 4: validation = validateStep4(); break;
+                    default: validation = { valid: true };
+                }
+
+                if (!validation.valid) {
+                    alert(validation.message);
+                    goToStep(validation.step);
+
+                    // Highlight the issue
+                    setTimeout(() => {
+                        if (validation.assetId) {
+                            // Highlight invalid asset
+                            const invalidRow = document.getElementById(`asset-row-${validation.assetId}`);
+                            if (invalidRow) {
+                                if (invalidRow.classList.contains('asset-item')) {
+                                    // Desktop
+                                    document.getElementById(`asset-body-${validation.assetId}`).classList.remove('hidden');
+                                    invalidRow.classList.add('ring-2', 'ring-red-500');
+                                    setTimeout(() => invalidRow.classList.remove('ring-2', 'ring-red-500'), 8000);
+                                    invalidRow.scrollIntoView({ behavior: 'smooth', block: 'center' });
+                                } else if (isMobile()) {
+                                    // Mobile
+                                    setTimeout(() => openAssetSheet(validation.assetId), 200);
+                                }
+                            }
+                        } else if (validation.residual) {
+                            // Highlight residual section
+                            const residualSection = document.getElementById('residual-section');
+                            if (residualSection) {
+                                residualSection.scrollIntoView({ behavior: 'smooth', block: 'center' });
+                                residualSection.classList.add('ring-2', 'ring-red-500');
+                            }
+                            if (isMobile()) {
+                                setTimeout(() => addResidualShare('', '', '', true), 200);
+                            }
+                        }
+                    }, 100);
+                    return;
+                }
+            }
+
+            // Additional validation for Step 5 (Generate) - final safety check
+            if (step === 5) {
+                // Validate all previous steps as a final check
+                for (let i = 1; i <= 4; i++) {
+                    let validation;
+                    switch (i) {
+                        case 1: validation = validateStep1(); break;
+                        case 2: validation = validateStep2(); break;
+                        case 3: validation = validateStep3(); break;
+                        case 4: validation = validateStep4(); break;
+                    }
+
+                    if (!validation.valid) {
+                        alert(validation.message);
+                        goToStep(validation.step);
+
+                        // Highlight the issue (same as above)
+                        setTimeout(() => {
+                            if (validation.assetId) {
+                                const invalidRow = document.getElementById(`asset-row-${validation.assetId}`);
+                                if (invalidRow) {
+                                    if (invalidRow.classList.contains('asset-item')) {
+                                        document.getElementById(`asset-body-${validation.assetId}`).classList.remove('hidden');
+                                        invalidRow.classList.add('ring-2', 'ring-red-500');
+                                        setTimeout(() => invalidRow.classList.remove('ring-2', 'ring-red-500'), 8000);
+                                        invalidRow.scrollIntoView({ behavior: 'smooth', block: 'center' });
+                                    } else if (isMobile()) {
+                                        setTimeout(() => openAssetSheet(validation.assetId), 200);
+                                    }
+                                }
+                            } else if (validation.residual) {
+                                const residualSection = document.getElementById('residual-section');
+                                if (residualSection) {
+                                    residualSection.scrollIntoView({ behavior: 'smooth', block: 'center' });
+                                    residualSection.classList.add('ring-2', 'ring-red-500');
+                                }
+                                if (isMobile()) {
+                                    setTimeout(() => addResidualShare('', '', '', true), 200);
+                                }
+                            }
+                        }, 100);
+                        return;
+                    }
+                }
+            }
+
             if (step <= maxReachedStep) {
                 goToStep(step);
             }
@@ -2011,14 +2282,23 @@
         }
 
         // --- PREVIEW LOGIC ---
+        // --- PREVIEW LOGIC ---
         function openPreview() {
             performSave(); // Force save to update beneficiaries array
             renderPreview();
+
+            // Push history state so back button works
+            history.pushState({ step: lastActiveStep, preview: true }, '', '#preview');
+
             document.getElementById('preview-overlay').classList.remove('hidden');
             document.body.style.overflow = 'hidden'; // Prevent background scrolling
         }
 
         function closePreview() {
+            history.back();
+        }
+
+        function _closePreviewUI() {
             document.getElementById('preview-overlay').classList.add('hidden');
             document.body.style.overflow = 'auto';
         }
@@ -2392,6 +2672,20 @@
 
         function closeResidualSheet() {
             history.back();
+
+            // Check if residual beneficiaries exist after closing
+            setTimeout(() => {
+                const residualShares = collectResidualShares();
+                const hasResBen = residualShares.some(s => s.benId);
+
+                // If no beneficiaries exist, re-apply red ring
+                if (!hasResBen) {
+                    const residualSection = document.getElementById('residual-section');
+                    if (residualSection) {
+                        residualSection.classList.add('ring-2', 'ring-red-500');
+                    }
+                }
+            }, 300);
         }
 
         function renderResidualSheet(residualId) {
@@ -2474,6 +2768,7 @@
         }
 
         function saveResidualSheet() {
+            const t = TRANSLATIONS[currentLang]; // Add translations
             const residualId = currentResidualSheetId;
 
             const data = {
@@ -2490,6 +2785,12 @@
 
             // Render Summary Card
             renderResidualSummaryCard(residualId, data);
+
+            // Remove red ring from residual section if it exists
+            const residualSection = document.getElementById('residual-section');
+            if (residualSection) {
+                residualSection.classList.remove('ring-2', 'ring-red-500');
+            }
 
             closeResidualSheet();
             saveData();
@@ -4086,6 +4387,15 @@
             });
 
             localStorage.setItem(STORAGE_KEY, JSON.stringify(data));
+
+            // Remove red ring from residual section if at least one beneficiary exists
+            const hasResidualBen = residualShares.some(s => s.benId);
+            if (hasResidualBen) {
+                const residualSection = document.getElementById('residual-section');
+                if (residualSection) {
+                    residualSection.classList.remove('ring-2', 'ring-red-500');
+                }
+            }
         }
 
         function loadData() {
@@ -4261,6 +4571,24 @@
                     totalShare += share;
                 });
                 if (totalShare !== 100) { document.getElementById(`asset-body-${uniqueId}`).classList.remove('hidden'); alert(t.errTotalShare || `Error: Total share must be 100%.`); isValid = false; return; }
+            });
+
+            // 1.5 Mobile Asset Cards Validation
+            document.querySelectorAll('.asset-summary-card').forEach(card => {
+                const dataDiv = card.querySelector('.asset-data');
+                if (dataDiv) {
+                    const beneficiaries = JSON.parse(dataDiv.getAttribute('data-beneficiaries') || '[]');
+                    let totalShare = 0;
+                    beneficiaries.forEach(b => totalShare += parseFloat(b.share) || 0);
+
+                    if (totalShare !== 100) {
+                        alert(t.errTotalShare || `Error: Total share must be 100%.`);
+                        isValid = false;
+                        // Highlight the card
+                        card.classList.add('ring-2', 'ring-red-500');
+                        setTimeout(() => card.classList.remove('ring-2', 'ring-red-500'), 3000);
+                    }
+                }
             });
 
             let residualTotal = 0; let hasResBen = false;
@@ -4825,9 +5153,9 @@
                 <div class="flex gap-2">
                     <select id="sheet-ex-prefix"
                         class="p-3 border rounded-lg focus:ring-2 focus:ring-indigo-500 outline-none bg-white">
-                        <option value="S/o">S/o</option>
-                        <option value="D/o">D/o</option>
-                        <option value="W/o">W/o</option>
+                        <option value="S/o" data-i18n="optSonOf">S/o</option>
+                        <option value="D/o" data-i18n="optDaughterOf">D/o</option>
+                        <option value="W/o" data-i18n="optWifeOf">W/o</option>
                     </select>
                     <input type="text" id="sheet-ex-parent"
                         class="w-full p-3 border rounded-lg focus:ring-2 focus:ring-indigo-500 outline-none"
