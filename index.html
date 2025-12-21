@@ -1337,11 +1337,16 @@
             const rel = document.getElementById(`ex-rel-${id}`).value;
             const row = document.getElementById(`executor-row-${id}`);
             const t = TRANSLATIONS[currentLang];
+            const executor = executors.find(e => e.id === id);
 
-            if (row) {
+            if (row && executor) {
                 const title = row.querySelector('h4');
                 const subtitle = row.querySelector('p');
-                if (title) title.textContent = name || (row.id.includes('primary') ? t.s2ExecutorNum : t.s2AlternateExecutor);
+
+                // Determine label based on primary status
+                const label = executor.isPrimary ? t.s2ExecutorNum : t.s2AlternateExecutor;
+
+                if (title) title.textContent = name || label;
                 if (subtitle) subtitle.textContent = rel || t.lblExRel;
             }
         }
@@ -1881,6 +1886,23 @@
             }
         });
 
+        // Handle Escape key to close preview and sheets
+        window.addEventListener('keydown', (e) => {
+            if (e.key === 'Escape') {
+                const preview = document.getElementById('preview-overlay');
+                if (preview && !preview.classList.contains('hidden')) {
+                    closePreview();
+                    return;
+                }
+
+                // Also handle other sheets via history back if necessary
+                const openSheet = document.querySelector('.fixed.inset-0:not(.hidden):not(#preview-overlay), #ben-bottom-sheet:not(.hidden), #asset-bottom-sheet:not(.hidden), #residual-bottom-sheet:not(.hidden)');
+                if (openSheet) {
+                    history.back();
+                }
+            }
+        });
+
         function startFresh() {
             const t = TRANSLATIONS[currentLang];
             showCustomWarning(
@@ -1994,7 +2016,7 @@
             for (const fieldId of requiredFields) {
                 const field = document.getElementById(fieldId);
                 if (!field || !field.value.trim()) {
-                    return { valid: false, message: t.errMandatory || 'Please fill in all mandatory fields.', step: 1 };
+                    return { valid: false, message: t.errMandatory || 'Please fill in all mandatory fields.', step: 1, fieldId: fieldId };
                 }
             }
 
@@ -2002,7 +2024,7 @@
             if (document.getElementById('religionSelector').value === 'Other') {
                 const customReligion = document.getElementById('customReligion');
                 if (!customReligion || !customReligion.value.trim()) {
-                    return { valid: false, message: t.errMandatory || 'Please specify your religion.', step: 1 };
+                    return { valid: false, message: t.errMandatory || 'Please specify your religion.', step: 1, fieldId: 'customReligion' };
                 }
             }
 
@@ -2015,6 +2037,17 @@
             // Check if at least one executor exists
             if (!executors || executors.length === 0) {
                 return { valid: false, message: t.errAddExecutor || 'Please add at least one executor.', step: 2 };
+            }
+
+            // Check individual executor fields
+            performSave(); // Ensure executors array is up to date with scraping
+            for (const ex of executors) {
+                if (!ex.name) {
+                    return { valid: false, message: t.errMandatory || 'Please fill in Executor Name.', step: 2, executorId: ex.id, field: 'name' };
+                }
+                if (!ex.relationship) {
+                    return { valid: false, message: t.errMandatory || 'Please fill in Executor Relationship.', step: 2, executorId: ex.id, field: 'rel' };
+                }
             }
 
             // Check if at least one primary executor exists
@@ -2138,7 +2171,31 @@
 
                     // Highlight the issue
                     setTimeout(() => {
-                        if (validation.assetId) {
+                        if (validation.fieldId) {
+                            // Step 1: Highlight specific field
+                            const field = document.getElementById(validation.fieldId);
+                            if (field) {
+                                field.classList.add('error-border');
+                                field.scrollIntoView({ behavior: 'smooth', block: 'center' });
+                                setTimeout(() => field.classList.remove('error-border'), 3000);
+                            }
+                        } else if (validation.executorId) {
+                            // Step 2: Highlight executor field
+                            const row = document.getElementById(`executor-row-${validation.executorId}`);
+                            if (row) {
+                                // Ensure body is visible
+                                document.getElementById(`executor-body-${validation.executorId}`).classList.remove('hidden');
+                                row.scrollIntoView({ behavior: 'smooth', block: 'center' });
+
+                                const inputId = validation.field === 'name' ? `ex-name-${validation.executorId}` : `ex-rel-${validation.executorId}`;
+                                const input = document.getElementById(inputId);
+                                if (input) {
+                                    input.classList.add('error-border');
+                                    setTimeout(() => input.classList.remove('error-border'), 3000);
+                                    input.focus();
+                                }
+                            }
+                        } else if (validation.assetId) {
                             // Highlight invalid asset
                             const invalidRow = document.getElementById(`asset-row-${validation.assetId}`);
                             if (invalidRow) {
@@ -2295,6 +2352,7 @@
         }
 
         function closePreview() {
+            _closePreviewUI(); // Force close UI immediately
             history.back();
         }
 
